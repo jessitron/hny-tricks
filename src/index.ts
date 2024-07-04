@@ -1,6 +1,9 @@
 import './tracing';
 import express, { Request, Response } from 'express';
+import htm from 'htm';
+import vhtml from 'vhtml';
 
+const html = htm.bind(vhtml);
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -10,5 +13,9 @@ app.listen(port, () => {
 
 app.get("/", (req, res) => {
   console.log("here we are at /")
-  res.send("Welcome to Jessitron's Honeycomb Tricks");
+  const element = html`<html>
+  <body>
+  <h1>Welcome to Jessitron's Honeycomb Tricks</body></html>`
+  console.log(element);
+  res.send(`<!DOCTYPE html>${element}`);
 })
