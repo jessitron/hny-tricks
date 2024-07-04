@@ -11,7 +11,3 @@ app.get("/", (req, res) => {
   console.log("here we are at /")
   res.send("Welcome to Jessitron's Honeycomb Tricks");
 })
-
-const greet: string = "Hello wrold"
-
-console.log(greet);
