@@ -14,10 +14,6 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@babel/core": "^7.24.7",
-    "@babel/preset-env": "^7.24.7",
-    "@babel/preset-typescript": "^7.24.7",
-    "@babel/register": "^7.24.6",
     "@opentelemetry/auto-instrumentations-node": "^0.48.0",
     "express": "^4.19.2"
   }
