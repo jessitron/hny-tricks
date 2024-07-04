@@ -2,8 +2,9 @@
   "name": "hny-tricks",
   "version": "1.0.0",
   "description": "Automate some maintenance operations for my honeycomb teams",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
+    "start": "tsc && node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
