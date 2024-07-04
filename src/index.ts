@@ -1,5 +1,6 @@
 import './tracing';
 import express, { Request, Response } from 'express';
+import { renderToStaticMarkup } from 'jsx-to-string';
 
 const app = express();
 const port = process.env.PORT || 3000;
