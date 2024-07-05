@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
   console.log("here we are at /");
   const element = html`<html>
     <body>
-      <h1>Welcome to Jessitron's Honeycomb Tricks
+      <h1>Welcome to Jessitron's Honeycomb Tricks</h1>
     </body>
   </html>`;
   console.log(element);
