@@ -1,9 +1,7 @@
-import './tracing';
-import express, { Request, Response } from 'express';
-import htm from 'htm';
-import vhtml from 'vhtml';
+import "./tracing";
+import express, { Request, Response } from "express";
+import { html } from "./htm-but-right";
 
-const html = htm.bind(vhtml);
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -12,10 +10,12 @@ app.listen(port, () => {
 });
 
 app.get("/", (req, res) => {
-  console.log("here we are at /")
+  console.log("here we are at /");
   const element = html`<html>
-  <body>
-  <h1>Welcome to Jessitron's Honeycomb Tricks</body></html>`
+    <body>
+      <h1>Welcome to Jessitron's Honeycomb Tricks</h1>
+    </body>
+  </html>`;
   console.log(element);
   res.send(`<!DOCTYPE html>${element}`);
-})
+});
