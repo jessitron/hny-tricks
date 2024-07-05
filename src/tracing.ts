@@ -12,7 +12,7 @@ const sdk: NodeSDK = new NodeSDK({
       '@opentelemetry/instrumentation-fs': {
         enabled: false,
       },
-    }),
+    }), 
   ],
 });
 

@@ -11,10 +11,10 @@ app.listen(port, () => {
 
 app.get("/", (req, res) => {
   console.log("here we are at /");
-  const element = html`<html>
+  const element = `<html>
     <head>
       <script src="https://unpkg.com/@jessitronica/hny-otel-web@0.2.0/dist/hny.js"></script>
-      ${javascriptToStartTracing}
+      <script>${javascriptToStartTracing}</script>
     </head>
     <body>
       <h1>Welcome to Jessitron's Honeycomb Tricks</h1>
@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
   res.send(`<!DOCTYPE html>${element}`);
 });
 
-const javascriptToStartTracing = `<script>
+const javascriptToStartTracing = `
   console.log("I am the script yo");
   Hny({
     apiKey:
@@ -32,4 +32,4 @@ const javascriptToStartTracing = `<script>
     serviceName: "hny-tricks-web",
     debug: true,
   });
-</script>`;
+`;
