@@ -4,7 +4,8 @@ export function Team(apiKey: string | undefined): string {
   return html`<div class="team">
     <form hx-post="/team" hx-target="#stuff">
         <label for="apikey">Honeycomb API Key:</label>
-        <input id="apikey" hx-get="/validate" hx-swap="afterend"></input>
+        <input id="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-swap="beforeend"></input>
+        <span id="apikey-opinion"></span>
         <button>Check Permissions</button>
     </form>
     <p class="fine-print">This API key will be sent to the Honeycomb Tricks backend, but we don't save it. We call the Honeycomb auth endpoint,

@@ -10,3 +10,7 @@ body {
 .fine-print {
   font-size: smaller;
 }
+
+label {
+  margin-right: 5px;
+}
