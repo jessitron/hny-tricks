@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
   // well, I found the trick to get it to set the script body in the script :-/
   const element = html`<html>
     <head>
-      <script src="https://unpkg.com/@jessitronica/hny-otel-web@0.2.0/dist/hny.js"></script>
+      <script src="https://unpkg.com/@jessitronica/hny-otel-web@0.5.0/dist/hny.js"></script>
       <script
         dangerouslySetInnerHTML=${{ __html: javascriptToStartTracing }}
       ></script>
@@ -58,7 +58,7 @@ app.post("/validate", (req: Request, res: Response) => {
 
 const javascriptToStartTracing = `
   console.log("I am the script yo");
-   Hny({  apiKey: "hcaik_01j229z3ezkranjdcgj7e5dvx4vz4prbbkkbgx4rnv4strm0kb485sae9f",
+   Hny.initializeTracing({  apiKey: "hcaik_01j229z3ezkranjdcgj7e5dvx4vz4prbbkkbgx4rnv4strm0kb485sae9f",
           serviceName: "hny-tricks-web",
           debug: true,
         });
