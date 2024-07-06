@@ -2,7 +2,7 @@ import { html } from "./htm-but-right";
 
 export function Team(apiKey: string | undefined): string {
   return html`<div class="team">
-    <form>
+    <form hx-post="/team" hx-target="#stuff">
         <label for="apikey">Honeycomb API Key:</label>
         <input id="apikey"></input>
         <button>Check Permissions</button>

@@ -2,7 +2,7 @@ import "./tracing";
 import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
-import { Team } from "./Team";
+import { Team as HoneycombApiKey } from "./Team";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,12 +29,18 @@ app.get("/", (req, res) => {
     </head>
     <body>
       <h1>Jessitron's Honeycomb Tricks</h1>
-      <${Team} />
+      <${HoneycombApiKey} />
+      <div id="stuff"></div>
     </body>
   </html>`;
   const fullResponse = `<!DOCTYPE html>${element}`;
   trace.getActiveSpan()?.setAttribute("response.body", fullResponse);
   res.send(fullResponse);
+});
+
+app.post("/team", (req: Request, res: Response) => {
+  console.log("here we are at /team");
+  res.send("ok");
 });
 
 const javascriptToStartTracing = `
