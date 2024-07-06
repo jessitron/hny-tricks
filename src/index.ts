@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
   // well, I found the trick to get it to set the script body in the script :-/
   const element = html`<html>
     <head>
-      <script src="https://unpkg.com/@jessitronica/hny-otel-web@0.5.0/dist/hny.js"></script>
+      <script src="/hny.js"></script>
       <script
         dangerouslySetInnerHTML=${{ __html: javascriptToStartTracing }}
       ></script>
