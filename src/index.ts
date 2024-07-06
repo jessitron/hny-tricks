@@ -11,10 +11,13 @@ app.listen(port, () => {
 
 app.get("/", (req, res) => {
   console.log("here we are at /");
-  const element = `<html>
+  // well, I found the trick to get it to set the script body in the script :-/
+  const element = html`<html>
     <head>
       <script src="https://unpkg.com/@jessitronica/hny-otel-web@0.2.0/dist/hny.js"></script>
-      <script>${javascriptToStartTracing}</script>
+      <script
+        dangerouslySetInnerHTML=${{ __html: javascriptToStartTracing }}
+      ></script>
     </head>
     <body>
       <h1>Welcome to Jessitron's Honeycomb Tricks</h1>
@@ -26,10 +29,10 @@ app.get("/", (req, res) => {
 
 const javascriptToStartTracing = `
   console.log("I am the script yo");
-  Hny({
-    apiKey:
-      "hcaik_01j229z3ezkranjdcgj7e5dvx4vz4prbbkkbgx4rnv4strm0kb485sae9f",
-    serviceName: "hny-tricks-web",
-    debug: true,
-  });
+   Hny({
+          apiKey:
+            "hcaik_01j229z3ezkranjdcgj7e5dvx4vz4prbbkkbgx4rnv4strm0kb485sae9f",
+          serviceName: "hny-tricks-web",
+          debug: true,
+        });
 `;
