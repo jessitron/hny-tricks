@@ -2,6 +2,7 @@ import "./tracing";
 import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
+import { Team } from "./Team";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
     </head>
     <body>
       <h1>Jessitron's Honeycomb Tricks</h1>
+      <${Team} />
     </body>
   </html>`;
   const fullResponse = `<!DOCTYPE html>${element}`;

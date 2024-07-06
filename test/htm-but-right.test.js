@@ -5,7 +5,7 @@ describe("making htm work better in error cases", () => {
     const result = html`<div><span>hello</div>`;
     //  expect(result).toBe("<div><span>hello</span></div>"); // this is what htm gives back
     expect(result).toBe(
-      "<div style='color:red'>Invalid HTML detected. Did you forget to close a tag?<hr/>div,<span>hello</span><hr/></div>"
+      "<div style='color:red'>Invalid HTML detected. Did you forget to close a tag? put characters after the element end? <hr/>div,<span>hello</span><hr/></div>"
     );
   });
 
