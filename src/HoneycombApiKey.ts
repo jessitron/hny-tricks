@@ -4,7 +4,7 @@ export function Team(apiKey: string | undefined): string {
   return html`<div class="team">
     <form hx-post="/team" hx-target="#stuff">
         <label for="apikey">Honeycomb API Key:</label>
-        <input id="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-swap="beforeend"></input>
+        <input id="apikey" hx-post="/validate" hx-target="#apikey-opinion" hx-swap="beforeend"></input>
         <span id="apikey-opinion"></span>
         <button>Check Permissions</button>
     </form>

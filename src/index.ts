@@ -43,11 +43,14 @@ app.post("/team", (req: Request, res: Response) => {
   res.send("ok");
 });
 
-app.get("/validate", (req: Request, res: Response) => {
-  console.log("here we are at /validate");
-  trace
-    .getActiveSpan()
-    ?.setAttributes({ "request.body": req.body, "request.query": req.query });
+app.post("/validate", (req: Request, res: Response) => {
+  console.log("here we are at /validate yo");
+  trace.getActiveSpan()?.setAttributes({
+    dammit: "work",
+    "noreally.request.body": "<" + JSON.stringify(req.body) + ">",
+    "noreally.request.query": "<" + JSON.stringify(req.query) + ">",
+    "noreally.request.params": "<" + JSON.stringify(req.params) + ">",
+  });
   res.send("😵");
 });
 
