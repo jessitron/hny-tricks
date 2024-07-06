@@ -44,7 +44,7 @@ app.post("/team", (req: Request, res: Response) => {
 });
 
 app.post("/validate", (req: Request, res: Response) => {
-  console.log("here we are at /validate yo");
+  console.log("here we are at /validate oy");
   trace.getActiveSpan()?.setAttributes({
     dammit: "work",
     "noreally.request.body": "<" + JSON.stringify(req.body) + ">",
