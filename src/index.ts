@@ -3,12 +3,14 @@ import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
 import { Team as HoneycombApiKey } from "./HoneycombApiKey";
+import bodyParser from "body-parser";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // serve files from the public directory
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
