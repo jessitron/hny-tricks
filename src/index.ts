@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
       <script
         dangerouslySetInnerHTML=${{ __html: javascriptToStartTracing }}
       ></script>
-      <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+      <script src="/htmx.js"></script>
       <title>Hny Tricks</title>
       <link rel="stylesheet" href="styles.css" />
     </head>
