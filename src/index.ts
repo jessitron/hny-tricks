@@ -45,7 +45,7 @@ app.post("/team", (req: Request, res: Response) => {
   res.send("ok");
 });
 
-app.post("/validate", (req: Request, res: Response) => {
+app.get("/validate", (req: Request, res: Response) => {
   console.log("here we are at /validate oy");
   trace.getActiveSpan()?.setAttributes({
     dammit: "work",
@@ -53,7 +53,7 @@ app.post("/validate", (req: Request, res: Response) => {
     "noreally.request.query": "<" + JSON.stringify(req.query) + ">",
     "noreally.request.params": "<" + JSON.stringify(req.params) + ">",
   });
-  res.send(commentOnApiKey(req.body.apikey));
+  res.send(commentOnApiKey(req.query.apikey));
 });
 
 const javascriptToStartTracing = `

@@ -5,7 +5,7 @@ export function Team(apiKey: string | undefined): string {
     <form hx-post="/team" hx-target="#stuff" id="apikey-form">
       <div>
         <label for="apikey">Honeycomb API Key:</label>
-        <input id="apikey" name="apikey" hx-post="/validate" hx-target="#apikey-opinion" ></input>
+        <input id="apikey" name="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
         <button>Check Permissions</button>
       </div> 
       <div>
@@ -19,6 +19,9 @@ export function Team(apiKey: string | undefined): string {
 }
 
 export function commentOnApiKey(apiKey: string): string {
+  if (!apiKey) {
+    return "";
+  }
   const keyInfo = interpretApiKey(apiKey);
   if (keyInfo.type === "ingest") {
     if (keyInfo.region !== "unknown") {
