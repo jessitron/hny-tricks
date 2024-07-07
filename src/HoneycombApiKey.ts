@@ -9,6 +9,7 @@ import {
   HoneycombAuthResponse,
   HoneycombEndpointByRegion,
 } from "./common";
+import { error } from "console";
 
 export function ApiKeyPrompt(apiKey: string | undefined): string {
   return html`<div class="apiKey">
@@ -108,9 +109,15 @@ export async function authorize(apiKey: string): Promise<string> {
     </div>`;
   }
   if (keyInfo.region === "unknowable") {
-    return html`<div>
-      <span class="unhappy">unimplemented</span>
-    </div>`;
+    const workingRegion = await tryAllRegions(apiKey);
+    if (workingRegion === "unknown") {
+      return html`<div>
+        <span class="unhappy">
+          That API key did not work in any Honeycomb region. 😭
+        </span>
+      </div>`;
+    }
+    keyInfo.region = workingRegion; // now we know.
   }
   const endpoint = HoneycombEndpointByRegion[keyInfo.region];
   trace.getActiveSpan()?.setAttribute("honeycomb.endpoint", endpoint);
@@ -118,17 +125,51 @@ export async function authorize(apiKey: string): Promise<string> {
   trace
     .getActiveSpan()
     ?.setAttributes({ "honeycomb.auth.response": JSON.stringify(response) });
+  if (isErrorResponse(response)) {
+    return html`<div>
+      <span class="unhappy">Auth check failed: ${response.message}</span>
+    </div>`;
+  }
   return teamDescription({ keyInfo, permissions: response });
+}
+
+type FetchError = {
+  fetchError: true;
+  message: string;
+};
+function isErrorResponse(
+  response: HoneycombAuthResponse | FetchError
+): response is FetchError {
+  return (response as FetchError).fetchError;
 }
 
 async function fetchPermissions(params: {
   apiKey: string;
   endpoint: string;
-}): Promise<HoneycombAuthResponse> {
+}): Promise<HoneycombAuthResponse | FetchError> {
   const { apiKey, endpoint } = params;
-  const result = await fetch(endpoint + "auth/", {
+  return fetch(endpoint + "auth/", {
     method: "GET",
     headers: { "X-Honeycomb-Team": `${apiKey}` },
-  });
-  return result.json();
+  }).then(
+    (result) => {
+      if (!result.ok) {
+        return { fetchError: true, message: result.statusText };
+      }
+      return result.json();
+    },
+    (error) => ({ fetchError: true, message: error.message })
+  );
+}
+
+async function tryAllRegions(apiKey: string): Promise<Region> {
+  const regions = Object.keys(HoneycombEndpointByRegion) as Region[]; // is there a more clever way to do that?
+  for (const region of regions) {
+    const endpoint = HoneycombEndpointByRegion[region];
+    const response = await fetchPermissions({ apiKey, endpoint });
+    if (!isErrorResponse(response)) {
+      return region;
+    }
+  }
+  return "unknown";
 }
