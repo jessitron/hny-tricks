@@ -31,21 +31,23 @@ export function commentOnApiKey(apiKey: string): string {
 }
 
 type KeyType = "none" | "ingest";
-type Region = "US" | "EU" | "dogfood" | "unknown";
+type Region = "US" | "EU" | "dogfood EU" | "dogfood US" | "unknown";
 export function interpretApiKey(apiKey: string): {
   type: KeyType;
   region: Region;
 } {
   let keyType: KeyType = "none";
   let region: Region = "unknown";
-  if (apiKey.length === 64 && apiKey.match(/^hc[abd]ik_[a-z0-9]{58}$/)) {
+  if (apiKey.length === 64 && apiKey.match(/^hc[abcd]ik_[a-z0-9]{58}$/)) {
     keyType = "ingest";
     if (apiKey.startsWith("hcaik_")) {
       region = "US";
     } else if (apiKey.startsWith("hcbik_")) {
       region = "EU";
     } else if (apiKey.startsWith("hcdik_")) {
-      region = "dogfood";
+      region = "dogfood EU";
+    } else if (apiKey.startsWith("hccik_")) {
+      region = "dogfood US";
     }
   }
   return { type: keyType, region };
