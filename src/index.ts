@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
 import {
+  authorize,
   commentOnApiKey,
   ApiKeyPrompt as HoneycombApiKey,
 } from "./HoneycombApiKey";
@@ -43,9 +44,9 @@ app.get("/", (req, res) => {
   res.send(fullResponse);
 });
 
-app.post("/team", (req: Request, res: Response) => {
+app.post("/team", async (req: Request, res: Response) => {
   console.log("here we are at /team");
-  res.send("ok");
+  res.send(await authorize(req.body.apikey));
 });
 
 app.get("/validate", (req: Request, res: Response) => {

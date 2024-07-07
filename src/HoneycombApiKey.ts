@@ -1,7 +1,17 @@
 import { html } from "./htm-but-right";
+import { trace } from "@opentelemetry/api";
+import { teamDescription } from "./Team";
+import {
+  Region,
+  KeyType,
+  KeyInfo,
+  EnvironmentType,
+  HoneycombAuthResponse,
+  HoneycombEndpointByRegion,
+} from "./common";
 
 export function ApiKeyPrompt(apiKey: string | undefined): string {
-  return html`<div class="team">
+  return html`<div class="apiKey">
     <form hx-post="/team" hx-target="#stuff" id="apikey-form">
       <div>
         <label for="apikey">Honeycomb API Key:</label>
@@ -41,20 +51,7 @@ export function commentOnApiKey(apiKey: string): string {
   return html`<span class="unhappy">That doesn't look like an API key</span>`;
 }
 
-type KeyType = "none" | "ingest" | "configuration";
-type Region =
-  | "US"
-  | "EU"
-  | "dogfood EU"
-  | "dogfood US"
-  | "unknown"
-  | "unknowable"; // configuration keys don't include region info in the key
-type EnvironmentType = "classic" | "e&s" | "none";
-export function interpretApiKey(apiKey: string): {
-  type: KeyType;
-  environmentType: EnvironmentType;
-  region: Region;
-} {
+export function interpretApiKey(apiKey: string): KeyInfo {
   let keyType: KeyType = "none";
   let region: Region = "unknown";
   let environmentType: EnvironmentType = "none";
@@ -91,5 +88,47 @@ export function interpretApiKey(apiKey: string): {
     environmentType = "classic";
     region = "unknowable";
   }
+  trace.getActiveSpan()?.setAttributes({
+    "honeycomb.key.type": keyType,
+    "honeycomb.key.region": region,
+    "honeycomb.key.environmentType": environmentType,
+  });
   return { type: keyType, environmentType, region };
+}
+
+export async function authorize(apiKey: string): Promise<string> {
+  if (!apiKey) {
+    return html`<div><span class="unhappy">No API key provided"</span></div>`;
+  }
+
+  const keyInfo = interpretApiKey(apiKey);
+  if (keyInfo.region === "unknown") {
+    return html`<div>
+      <span class="unhappy">This doesn't look like an API key</span>
+    </div>`;
+  }
+  if (keyInfo.region === "unknowable") {
+    return html`<div>
+      <span class="unhappy">unimplemented</span>
+    </div>`;
+  }
+  const endpoint = HoneycombEndpointByRegion[keyInfo.region];
+  trace.getActiveSpan()?.setAttribute("honeycomb.endpoint", endpoint);
+  const response = await fetchPermissions({ apiKey, endpoint });
+  trace
+    .getActiveSpan()
+    ?.setAttributes({ "honeycomb.auth.response": JSON.stringify(response) });
+  return teamDescription({ keyInfo, permissions: response });
+}
+
+async function fetchPermissions(params: {
+  apiKey: string;
+  endpoint: string;
+}): Promise<HoneycombAuthResponse> {
+  const { apiKey, endpoint } = params;
+  const result = await fetch(endpoint + "auth/", {
+    method: "GET",
+    headers: { "X-Honeycomb-Team": `${apiKey}` },
+  });
+  return result.json();
 }
