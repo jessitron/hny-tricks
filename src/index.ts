@@ -2,7 +2,7 @@ import "./tracing";
 import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
-import { Team as HoneycombApiKey } from "./HoneycombApiKey";
+import { commentOnApiKey, Team as HoneycombApiKey } from "./HoneycombApiKey";
 import bodyParser from "body-parser";
 
 const app = express();
@@ -53,7 +53,7 @@ app.post("/validate", (req: Request, res: Response) => {
     "noreally.request.query": "<" + JSON.stringify(req.query) + ">",
     "noreally.request.params": "<" + JSON.stringify(req.params) + ">",
   });
-  res.send("😵");
+  res.send(commentOnApiKey(req.body.apikey));
 });
 
 const javascriptToStartTracing = `

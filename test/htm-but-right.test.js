@@ -13,4 +13,7 @@ describe("making htm work better in error cases", () => {
     const result = html`<div><span>hello</span></div>`;
     expect(result).toBe("<div><span>hello</span></div>");
   });
+
+  // WISH: it("accepts the empty tag")
 });
+

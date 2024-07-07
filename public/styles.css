@@ -14,3 +14,12 @@ body {
 label {
   margin-right: 5px;
 }
+
+button {
+  margin: 5px;
+}
+
+.unhappy {
+  color: maroon;
+  border: 1px dashed maroon;
+}
