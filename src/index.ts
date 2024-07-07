@@ -2,7 +2,10 @@ import "./tracing";
 import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
-import { commentOnApiKey, Team as HoneycombApiKey } from "./HoneycombApiKey";
+import {
+  commentOnApiKey,
+  ApiKeyPrompt as HoneycombApiKey,
+} from "./HoneycombApiKey";
 import bodyParser from "body-parser";
 
 const app = express();

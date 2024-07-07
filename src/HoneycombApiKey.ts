@@ -1,6 +1,6 @@
 import { html } from "./htm-but-right";
 
-export function Team(apiKey: string | undefined): string {
+export function ApiKeyPrompt(apiKey: string | undefined): string {
   return html`<div class="team">
     <form hx-post="/team" hx-target="#stuff" id="apikey-form">
       <div>
