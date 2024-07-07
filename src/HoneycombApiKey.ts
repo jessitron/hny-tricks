@@ -26,12 +26,22 @@ export function commentOnApiKey(apiKey: string): string {
         >This looks like an ingest key, but I can't tell which region</span
       >`;
     }
+  } else if (keyInfo.type === "configuration") {
+    return html`<span class="happy"
+      >That looks like a Honeycomb configuration key. Great.</span
+    >`;
   }
   return html`<span class="unhappy">That doesn't look like an API key</span>`;
 }
 
-type KeyType = "none" | "ingest";
-type Region = "US" | "EU" | "dogfood EU" | "dogfood US" | "unknown";
+type KeyType = "none" | "ingest" | "configuration";
+type Region =
+  | "US"
+  | "EU"
+  | "dogfood EU"
+  | "dogfood US"
+  | "unknown"
+  | "unknowable"; // configuration keys don't include region info in the key
 export function interpretApiKey(apiKey: string): {
   type: KeyType;
   region: Region;
@@ -49,6 +59,10 @@ export function interpretApiKey(apiKey: string): {
     } else if (apiKey.startsWith("hccik_")) {
       region = "dogfood US";
     }
+  }
+  if (apiKey.match(/^[a-zA-Z0-9]{22}$/)) {
+    keyType = "configuration";
+    region = "unknowable";
   }
   return { type: keyType, region };
 }

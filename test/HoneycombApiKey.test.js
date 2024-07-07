@@ -15,4 +15,11 @@ describe("checking the API key", () => {
     expect(result.type).toBe("ingest");
     expect(result.region).toBe("dogfood US");
   });
+  it("recognizes a configuration key", () => {
+    const inactiveKey =
+      "uOexnOwfIU3LecPs1cYpLC";
+    const result = interpretApiKey(inactiveKey);
+    expect(result.type).toBe("configuration");
+    expect(result.region).toBe("unknowable");
+  });
 });
