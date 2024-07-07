@@ -15,7 +15,7 @@ export const html = (strings: TemplateStringsArray, ...values: any[]) => {
     return result;
   }
   const span = trace.getActiveSpan();
-  span.addEvent("Interfering with HTML", {
+  span?.addEvent("Interfering with HTML", {
     "app.inputStrings": strings.join(", "),
     "app.inputValues": values.join(", "),
     "app.htm_result_type": typeof result,

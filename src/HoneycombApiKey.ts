@@ -15,5 +15,38 @@ export function Team(apiKey: string | undefined): string {
 }
 
 export function commentOnApiKey(apiKey: string): string {
+  const keyInfo = interpretApiKey(apiKey);
+  if (keyInfo.type === "ingest") {
+    if (keyInfo.region !== "unknown") {
+      return html`<span class="happy"
+        >This looks like a ${keyInfo.region} ingest key</span
+      >`;
+    } else {
+      return html`<span class="unhappy"
+        >This looks like an ingest key, but I can't tell which region</span
+      >`;
+    }
+  }
   return html`<span class="unhappy">That doesn't look like an API key</span>`;
+}
+
+type KeyType = "none" | "ingest";
+type Region = "US" | "EU" | "dogfood" | "unknown";
+export function interpretApiKey(apiKey: string): {
+  type: KeyType;
+  region: Region;
+} {
+  let keyType: KeyType = "none";
+  let region: Region = "unknown";
+  if (apiKey.length === 64 && apiKey.match(/^hc[abd]ik_[a-z0-9]{58}$/)) {
+    keyType = "ingest";
+    if (apiKey.startsWith("hcaik_")) {
+      region = "US";
+    } else if (apiKey.startsWith("hcbik_")) {
+      region = "EU";
+    } else if (apiKey.startsWith("hcdik_")) {
+      region = "dogfood";
+    }
+  }
+  return { type: keyType, region };
 }
