@@ -20,6 +20,11 @@ button {
 }
 
 .unhappy {
+  padding: 2px;
   color: maroon;
   border: 1px dashed maroon;
+}
+
+.happy {
+  color: green;
 }
