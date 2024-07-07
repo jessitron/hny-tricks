@@ -42,27 +42,47 @@ type Region =
   | "dogfood US"
   | "unknown"
   | "unknowable"; // configuration keys don't include region info in the key
+type EnvironmentType = "classic" | "e&s" | "none";
 export function interpretApiKey(apiKey: string): {
   type: KeyType;
+  environmentType: EnvironmentType;
   region: Region;
 } {
   let keyType: KeyType = "none";
   let region: Region = "unknown";
-  if (apiKey.length === 64 && apiKey.match(/^hc[abcd]ik_[a-z0-9]{58}$/)) {
+  let environmentType: EnvironmentType = "none";
+  if (apiKey.length === 64 && apiKey.match(/^hc[abcd]i[kc]_[a-z0-9]{58}$/)) {
     keyType = "ingest";
-    if (apiKey.startsWith("hcaik_")) {
-      region = "US";
-    } else if (apiKey.startsWith("hcbik_")) {
-      region = "EU";
-    } else if (apiKey.startsWith("hcdik_")) {
-      region = "dogfood EU";
-    } else if (apiKey.startsWith("hccik_")) {
-      region = "dogfood US";
+    switch (apiKey[2]) {
+      case "a":
+        region = "US";
+        break;
+      case "b":
+        region = "EU";
+        break;
+      case "c":
+        region = "dogfood US";
+        break;
+      case "d":
+        region = "dogfood EU";
+        break;
     }
-  }
-  if (apiKey.match(/^[a-zA-Z0-9]{22}$/)) {
+    switch (apiKey[4]) {
+      case "c":
+        environmentType = "classic";
+        break;
+      case "k":
+        environmentType = "e&s";
+        break;
+    }
+  } else if (apiKey.match(/^[a-zA-Z0-9]{22}$/)) {
     keyType = "configuration";
+    environmentType = "e&s";
+    region = "unknowable";
+  } else if (apiKey.match(/^[a-f0-9]{32}$/)) {
+    keyType = "configuration";
+    environmentType = "classic";
     region = "unknowable";
   }
-  return { type: keyType, region };
+  return { type: keyType, environmentType, region };
 }
