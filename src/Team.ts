@@ -8,12 +8,12 @@ import { html } from "./htm-but-right";
 
 export function teamDescription({ keyInfo, permissions }) {
   const envLink = constructEnvironmentLink(keyInfo, permissions);
-  return html`<div class="team">
+  return html`<section class="team">
     <h4>Region: ${keyInfo.region}</h4>
     <h3>Team: ${permissions.team.name}</h3>
     <h4>Environment: ${permissions.environment.name || "Classic"}</h4>
     <a href=${envLink}> ${envLink} </a>
-  </div>`;
+</section>`;
 }
 
 function constructEnvironmentLink(

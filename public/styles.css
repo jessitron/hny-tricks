@@ -61,11 +61,17 @@ section {
   margin: auto;
   border: 6px solid var(--color-hny-slate);
   padding: 10px;
+  margin: 5px;
 }
 
 .apiKey {
   background-color: var(--color-hny-lime);
   color: black;
+}
+
+section.team {
+  background-color: var(--color-hny-pacific);
+  color: white;
 }
 
 .apiKey input {
