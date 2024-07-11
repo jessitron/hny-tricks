@@ -11,7 +11,7 @@ import {
 } from "./common";
 
 export function ApiKeyPrompt(apiKey: string | undefined): string {
-  return html`<div class="apiKey">
+  return html`<section class="apiKey">
     <form hx-post="/team" hx-target="#stuff" id="apikey-form" hx-indicator="#checking-permissions">
       <div>
         <label for="apikey">Honeycomb API Key:</label>
@@ -26,7 +26,7 @@ export function ApiKeyPrompt(apiKey: string | undefined): string {
     and then tell you which team and environment it belongs to, and which permissions it has.
     </p> 
     <div id="checking-permissions" class="htmx-indicator">...</div>
-  </div>`;
+ </section>`;
 }
 
 export function commentOnApiKey(apiKey: string): string {

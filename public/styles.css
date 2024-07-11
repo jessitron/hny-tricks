@@ -1,14 +1,47 @@
+:root {
+  --color-primary: #0296ec;
+  --color-error: #ec5802;
+  --color-success: #21ec02;
+  --color-hny-lime: #64ba00;
+  --color-hny-pacific: #0298ec;
+  --color-hny-denim: #01487b;
+  --color-hny-honey: #ffb000;
+  --color-hny-tango: #f96e10;
+  --color-hny-indigo: #51368d;
+  --color-hny-slate: #25303e;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  background: linear-gradient(
+    85.65deg,
+    rgba(255, 209, 1, 1) 0%,
+    rgba(255, 176, 0, 1) 100%
+  );
+  }
+
+h1 {
+  color: white;
+  text-shadow: 3px 3px 3px var(--color-hny-slate);
+}
+
+section {
+  max-width: 90vw;
+  min-width: 300px;
+  margin: auto;
+  border: 6px solid var(--color-hny-slate);
+  padding: 10px;
 }
 
 .apiKey {
-  background-color: aliceblue;
-  padding: 10px;
+  background-color: var(--color-hny-lime);
+  color: black;
 }
 
 .fine-print {
   font-size: smaller;
+  text-align: left;
 }
 
 label {
@@ -31,16 +64,16 @@ button {
 
 div.team {
   background-color: burlywood;
-  padding: 10px;  
+  padding: 10px;
 }
 
-.htmx-indicator{
-  opacity:0;
+.htmx-indicator {
+  opacity: 0;
   transition: opacity 500ms ease-in;
 }
-.htmx-request .htmx-indicator{
-  opacity:1
+.htmx-request .htmx-indicator {
+  opacity: 1;
 }
-.htmx-request.htmx-indicator{
-  opacity:1
+.htmx-request.htmx-indicator {
+  opacity: 1;
 }
