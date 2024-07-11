@@ -37,6 +37,8 @@ app.get("/", (req, res) => {
       <h1>Jessitron's Honeycomb Tricks</h1>
       <${HoneycombApiKey} />
       <div id="stuff"></div>
+      <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
+      <${SneakyFooter} />
     </body>
   </html>`;
   const fullResponse = `<!DOCTYPE html>${element}`;
@@ -67,3 +69,8 @@ const javascriptToStartTracing = `
           debug: true,
         });
 `;
+
+const SneakyFooter = () =>
+  html`<footer>
+    <img id="bug" src="./bug-thinks-nuggs.jpg" />
+  </footer>`;
