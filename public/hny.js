@@ -1,0 +1,1 @@
+../../hny-otel-web/dist/hny.js

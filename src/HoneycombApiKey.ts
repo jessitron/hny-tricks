@@ -14,7 +14,7 @@ export function ApiKeyPrompt(apiKey: string | undefined): string {
   return html`<section class="apiKey">
     <form hx-post="/team" hx-target="#stuff" id="apikey-form" hx-indicator="#big-think">
       <div>
-        <label for="apikey">Honeycomb API Key: <span id="reveal-password">👁</span></label>
+        <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
         <input id="apikey" type="password" name="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
         <button>Check Permissions</button>
       </div>
@@ -25,6 +25,7 @@ export function ApiKeyPrompt(apiKey: string | undefined): string {
     <p class="fine-print">This API key will be sent to the Honeycomb Tricks backend, but we don't save it. We call the Honeycomb auth endpoint,
     and then tell you which team and environment it belongs to, and which permissions it has.
     </p> 
+    <script src="/jess.js"></script>
  </section>`;
 }
 
