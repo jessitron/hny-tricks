@@ -72,6 +72,37 @@ section {
 section.team {
   background-color: var(--color-hny-pacific);
   color: white;
+
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "region name env"
+    "link link link";
+  justify-items: center;
+  justify-content: stretch;
+  align-items: end;
+  row-gap: 10px;
+}
+
+.team-description {
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+.team-region {
+  grid-area: region;
+}
+.team-name {
+  grid-area: name;
+  font-size: larger;
+}
+.team-env {
+  grid-area: env;
+}
+.team-link {
+  grid-area: link;
+  margin: 5px;
 }
 
 .apiKey input {
