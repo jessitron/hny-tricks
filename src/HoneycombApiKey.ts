@@ -9,7 +9,6 @@ import {
   HoneycombAuthResponse,
   HoneycombEndpointByRegion,
 } from "./common";
-import { error } from "console";
 
 export function ApiKeyPrompt(apiKey: string | undefined): string {
   return html`<div class="apiKey">
@@ -18,7 +17,7 @@ export function ApiKeyPrompt(apiKey: string | undefined): string {
         <label for="apikey">Honeycomb API Key:</label>
         <input id="apikey" name="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
         <button>Check Permissions</button>
-      </div> 
+      </div>
       <div>
         <span id="apikey-opinion"></span>
       </div>
