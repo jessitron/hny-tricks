@@ -14,8 +14,8 @@ export function ApiKeyPrompt(apiKey: string | undefined): string {
   return html`<section class="apiKey">
     <form hx-post="/team" hx-target="#stuff" id="apikey-form" hx-indicator="#big-think">
       <div>
-        <label for="apikey">Honeycomb API Key:</label>
-        <input id="apikey" name="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
+        <label for="apikey">Honeycomb API Key: <span id="reveal-password">👁</span></label>
+        <input id="apikey" type="password" name="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
         <button>Check Permissions</button>
       </div>
       <div>
