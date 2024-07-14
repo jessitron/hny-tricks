@@ -1,0 +1,246 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-for-frontend
+  namespace: o11yday
+spec:
+  selector:
+    app: backend-for-frontend
+  ports:
+    - protocol: TCP
+      port: 10114
+      targetPort: 10114
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-for-frontend
+  namespace: o11yday
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-for-frontend
+  template:
+    metadata:
+      labels:
+        app: backend-for-frontend
+    spec:
+      containers:
+        - name: backend-for-frontend
+          image: o11yday/backend-for-frontend-nodejs:IMAGE_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10114
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://daemonset-otelcol.default.svc.cluster.local:4318"
+            - name: OTEL_SERVICE_NAME
+              value: "backend-for-frontend-nodejs"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: meminator
+  namespace: o11yday
+spec:
+  selector:
+    app: meminator
+  ports:
+    - protocol: TCP
+      port: 10114
+      targetPort: 10114
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meminator
+  namespace: o11yday
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meminator
+  template:
+    metadata:
+      labels:
+        app: meminator
+    spec:
+      containers:
+        - name: meminator
+          image: o11yday/meminator-nodejs:IMAGE_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10114
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://daemonset-otelcol.default.svc.cluster.local:4318"
+            - name: OTEL_SERVICE_NAME
+              value: "meminator-nodejs"
+            - name: OTEL_EXPORTER_OTLP_LOG_PROTOCOL
+              value: http
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: phrase-picker
+  namespace: o11yday
+spec:
+  selector:
+    app: phrase-picker
+  ports:
+    - protocol: TCP
+      port: 10114
+      targetPort: 10114
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phrase-picker
+  namespace: o11yday
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phrase-picker
+  template:
+    metadata:
+      labels:
+        app: phrase-picker
+    spec:
+      containers:
+        - name: phrase-picker
+          image: o11yday/phrase-picker-nodejs:IMAGE_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10114
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://daemonset-otelcol.default.svc.cluster.local:4318"
+            - name: OTEL_SERVICE_NAME
+              value: "phrase-picker-nodejs"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: image-picker
+  namespace: o11yday
+spec:
+  selector:
+    app: image-picker
+  ports:
+    - protocol: TCP
+      port: 10114
+      targetPort: 10114
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-picker
+  namespace: o11yday
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-picker
+  template:
+    metadata:
+      labels:
+        app: image-picker
+    spec:
+      containers:
+        - name: image-picker
+          image: o11yday/image-picker-nodejs:IMAGE_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10114
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://daemonset-otelcol.default.svc.cluster.local:4318"
+            - name: OTEL_SERVICE_NAME
+              value: "image-picker-nodejs"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: o11yday
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 80
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: o11yday
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: o11yday/web:IMAGE_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen
+  namespace: o11yday
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgen
+  template:
+    metadata:
+      labels:
+        app: loadgen
+    spec:
+      containers:
+        - name: loadgen
+          image: o11yday/loadgen:IMAGE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: LOAD_URL
+              value: "http://nginx:8080/backend/createPicture"
+            - name: HONEYCOMB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: o11yday-hny-api-key
+                  key: api-key

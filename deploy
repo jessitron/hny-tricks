@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# this will only work if you are me, and have your aws login set up etc.
+
+set -e
+set -x
+
+me=$0
+
+source .env
+VERSION_NUMBER=1
+export IMAGE_NAME=hny-tricks
+export IMAGE_TAG=hny-tricks-$VERSION_NUMBER
+
+# because separately pushing ignores the other platform GOD I HATE HASHICORP SOMETIMES
+docker build -t $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG .
+
+cat k8s/k8s.yaml \
+| sed 's/IMAGE_TAG/'$IMAGE_TAG'/g' \
+| kubectl apply -f -
+
+
+HONEYCOMB_API_KEY=$HONEYCOMB_API_KEY_PROD_MARKERS VERSION_NUMBER=$VERSION_NUMBER ./scripts/create-marker.sh $deploy_ONLY
+
+## Now change this script to increment the version number, so next time it will be different.
+function sed_in_place {
+  expr=$1
+  file=$2
+  backup=$file.bak
+  sed "$expr" $file > $file.bak
+  if [ $? -eq 0 ]; then
+    chmod `stat -f %A $file` $file.bak # this works on mac
+    mv $file.bak $file
+  else
+    echo "replacement didn't work on $file"
+    break
+  fi
+}
+
+echo "Deployed from $me with VERSION_NUMBER $VERSION_NUMBER"
+
+sed_in_place "s/VERSION_NUMBER=$VERSION_NUMBER/VERSION_NUMBER=$(( VERSION_NUMBER + 1 ))/" $me
