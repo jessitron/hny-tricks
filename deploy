@@ -9,11 +9,17 @@ me=$0
 
 source .env
 VERSION_NUMBER=1
-export IMAGE_NAME=hny-tricks
+export IMAGE_NAME=jessitron/hny-tricks
 export IMAGE_TAG=hny-tricks-$VERSION_NUMBER
+export IMAGE_REPO=414852377253.dkr.ecr.us-east-1.amazonaws.com
 
 # because separately pushing ignores the other platform GOD I HATE HASHICORP SOMETIMES
 docker build -t $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG .
+
+docker build --platform linux/amd64 -t jessitron/hny-tricks-nginx:latest .
+
+docker tag jessitron/hny-tricks-nginx:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest
 
 cat k8s/k8s.yaml \
 | sed 's/IMAGE_TAG/'$IMAGE_TAG'/g' \

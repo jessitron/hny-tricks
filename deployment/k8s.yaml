@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hny-tricks
+  namespace: hny-tricks
+spec:
+  selector:
+    app: HNY-TRICKS
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hny-tricks
+  namespace: hny-tricks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hny-tricks
+  template:
+    metadata:
+      labels:
+        app: hny-tricks
+    spec:
+      containers:
+        - name: hny-tricks
+          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://daemonset-otelcol.default.svc.cluster.local:4318"
+            - name: OTEL_SERVICE_NAME
+              value: "hny-tricks"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-for-hny-tricks
+  namespace: hny-tricks
+spec:
+  selector:
+    app: nginx-for-hny-tricks
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-for-hny-tricks
+  namespace: hny-tricks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-for-hny-tricks
+  template:
+    metadata:
+      labels:
+        app: nginx-for-hny-tricks
+    spec:
+      containers:
+        - name: nginx
+          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
