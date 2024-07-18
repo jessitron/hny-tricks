@@ -5,7 +5,7 @@ metadata:
   namespace: hny-tricks
 spec:
   selector:
-    app: HNY-TRICKS
+    app: hny-tricks
   ports:
     - protocol: TCP
       port: 3000
