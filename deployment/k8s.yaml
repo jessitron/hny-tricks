@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: hny-tricks
-          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks:latest
+          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks:IMAGE_TAG
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
