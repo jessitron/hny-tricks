@@ -2,11 +2,7 @@ import "./tracing";
 import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
-import {
-  authorize,
-  commentOnApiKey,
-  ApiKeyPrompt as HoneycombApiKey,
-} from "./HoneycombApiKey";
+import { authorize, commentOnApiKey, ApiKeyPrompt } from "./HoneycombApiKey";
 import bodyParser from "body-parser";
 
 const app = express();
@@ -35,7 +31,7 @@ app.get("/", (req, res) => {
     </head>
     <body>
       <h1>Jessitron's Honeycomb Tricks</h1>
-      <${HoneycombApiKey} />
+      <${ApiKeyPrompt} />
       <div id="stuff"></div>
       <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
       <${SneakyFooter} />
