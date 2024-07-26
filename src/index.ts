@@ -10,6 +10,8 @@ import {
 } from "./HoneycombApiKey";
 import bodyParser from "body-parser";
 import { teamDescription } from "./Team";
+import { describeDatasets } from "./Datasets";
+import { spanAttributesAboutAuth } from "./common";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -53,12 +55,18 @@ app.get("/", (req, res) => {
 
 app.post("/team", async (req: Request, res: Response) => {
   console.log("here we are at /team");
+  const span = trace.getActiveSpan();
   const authResult = await authorize(req.body.apikey);
   if (isAuthError(authResult)) {
+    span?.setAttributes({ "hny.authError": authResult.html });
+    span?.setStatus({ code: 2, message: "auth failed" });
     res.send(authResult.html);
     return;
   }
-  res.send(teamDescription(authResult));
+  span?.setAttributes(spanAttributesAboutAuth(authResult));
+
+  var result = teamDescription(authResult) + describeDatasets(authResult);
+  res.send(result);
 });
 
 // used in the ApiKeyPrompt

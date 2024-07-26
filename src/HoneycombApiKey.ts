@@ -152,7 +152,7 @@ export async function authorize(
       <span class="unhappy">Auth check failed: ${response.message}</span>
     </div>`);
   }
-  return describeAuthorization(keyInfo, response);
+  return describeAuthorization(apiKey, keyInfo, response);
 }
 
 type FetchError = {

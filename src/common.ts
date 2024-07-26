@@ -56,6 +56,7 @@ export const HoneycombUIEndpointByRegion: Record<Region, string> = {
 
 export type HnyTricksAuthorization = {
   apiKey: string;
+  apiKeyId: string;
   keyInfo: KeyInfo;
   permissions: { canManageDatasets: boolean };
   environment: { slug: string; name: string };
@@ -63,16 +64,28 @@ export type HnyTricksAuthorization = {
 };
 
 export function describeAuthorization(
+  apiKey: string,
   keyInfo: KeyInfo,
   hnyAuthResponse: HoneycombAuthResponse
 ): HnyTricksAuthorization {
   return {
-    apiKey: hnyAuthResponse.id,
+    apiKey, // don't log this
+    apiKeyId: hnyAuthResponse.id, // this is safe to print
     keyInfo,
     permissions: {
       canManageDatasets: hnyAuthResponse.api_key_access.createDatasets,
     },
     environment: hnyAuthResponse.environment,
     team: hnyAuthResponse.team,
+  };
+}
+export function spanAttributesAboutAuth(auth: HnyTricksAuthorization) {
+  return {
+    "honeycomb.key.type": auth.keyInfo.type,
+    "honeycomb.key.region": auth.keyInfo.region,
+    "honeycomb.key.environmentType": auth.keyInfo.environmentType,
+    "honeycomb.key.id": auth.apiKeyId,
+    "honeycomb.environment": auth.environment.slug,
+    "honeycomb.team": auth.team.slug,
   };
 }
