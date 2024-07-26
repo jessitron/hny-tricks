@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
     </head>
     <body>
       <h1>Jessitron's Honeycomb Tricks</h1>
-      <${ApiKeyPrompt} />
+      <${ApiKeyPrompt} destinationElement="#stuff" />
       <div id="stuff"></div>
       <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
       <${SneakyFooter} />
