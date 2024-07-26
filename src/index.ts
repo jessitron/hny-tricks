@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
     </head>
     <body>
       <h1>Jessitron's Honeycomb Tricks</h1>
-      <${ApiKeyPrompt} destinationElement="#stuff" />
+      <${ApiKeyPrompt} destinationElement="#stuff" endpointToPopulateItWith="/team" />
       <div id="stuff"></div>
       <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
       <${SneakyFooter} />
@@ -47,6 +47,7 @@ app.post("/team", async (req: Request, res: Response) => {
   res.send(await authorize(req.body.apikey));
 });
 
+// used in the ApiKeyPrompt
 app.get("/validate", (req: Request, res: Response) => {
   console.log("here we are at /validate oy");
   trace.getActiveSpan()?.setAttributes({
