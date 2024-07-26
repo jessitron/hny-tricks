@@ -8,9 +8,14 @@ import {
   EnvironmentType,
   HoneycombAuthResponse,
   HoneycombEndpointByRegion,
+  describeAuthorization,
+  HnyTricksAuthorization,
 } from "./common";
 
-export function ApiKeyPrompt(params: { destinationElement: string, endpointToPopulateItWith: string }): string {
+export function ApiKeyPrompt(params: {
+  destinationElement: string;
+  endpointToPopulateItWith: string;
+}): string {
   return html`<section class="apiKey">
     <form hx-post="${params.endpointToPopulateItWith}" hx-target="${params.destinationElement}" id="apikey-form" hx-indicator="#big-think">
       <div>
@@ -97,25 +102,42 @@ export function interpretApiKey(apiKey: string): KeyInfo {
   return { type: keyType, environmentType, region };
 }
 
-export async function authorize(apiKey: string): Promise<string> {
+type AuthError = {
+  authError: true;
+  html: string;
+};
+function authError(html: string): AuthError {
+  return { authError: true, html };
+}
+export function isAuthError(
+  response: HnyTricksAuthorization | AuthError
+): response is AuthError {
+  return (response as AuthError).authError;
+}
+
+export async function authorize(
+  apiKey: string
+): Promise<HnyTricksAuthorization | AuthError> {
   if (!apiKey) {
-    return html`<div><span class="unhappy">No API key provided</span></div>`;
+    return authError(
+      html`<div><span class="unhappy">No API key provided</span></div>`
+    );
   }
 
   const keyInfo = interpretApiKey(apiKey);
   if (keyInfo.region === "unknown") {
-    return html`<div>
+    return authError(html`<div>
       <span class="unhappy">This doesn't look like an API key</span>
-    </div>`;
+    </div>`);
   }
   if (keyInfo.region === "unknowable") {
     const workingRegion = await tryAllRegions(apiKey);
     if (workingRegion === "unknown") {
-      return html`<div>
+      return authError(html`<div>
         <span class="unhappy">
           That API key did not work in any Honeycomb region. 😭
         </span>
-      </div>`;
+      </div>`);
     }
     keyInfo.region = workingRegion; // now we know.
   }
@@ -126,11 +148,11 @@ export async function authorize(apiKey: string): Promise<string> {
     .getActiveSpan()
     ?.setAttributes({ "honeycomb.auth.response": JSON.stringify(response) });
   if (isErrorResponse(response)) {
-    return html`<div>
+    return authError(html`<div>
       <span class="unhappy">Auth check failed: ${response.message}</span>
-    </div>`;
+    </div>`);
   }
-  return teamDescription({ keyInfo, permissions: response });
+  return describeAuthorization(keyInfo, response);
 }
 
 type FetchError = {

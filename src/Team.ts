@@ -1,4 +1,5 @@
 import {
+  HnyTricksAuthorization,
   HoneycombAuthResponse,
   HoneycombEndpointByRegion,
   HoneycombUIEndpointByRegion,
@@ -6,27 +7,24 @@ import {
 } from "./common";
 import { html } from "./htm-but-right";
 
-export function teamDescription({ keyInfo, permissions }) {
-  const envLink = constructEnvironmentLink(keyInfo, permissions);
+export function teamDescription(auth: HnyTricksAuthorization) {
+  const envLink = constructEnvironmentLink(auth);
   return html`<section class="team">
-    <div class="team-description team-region">Region: ${keyInfo.region}</div>
-    <div class="team-description team-name">Team: ${permissions.team.name}</div>
+    <div class="team-description team-region">Region: ${auth.keyInfo.region}</div>
+    <div class="team-description team-name">Team: ${auth.team.name}</div>
     <div class="team-description team-env">
-      Environment: ${permissions.environment.name || "Classic"}
+      Environment: ${auth.environment.name || "Classic"}
     </div>
     <div class="team-link"><a href=${envLink}> ${envLink} </a></div>
   </section>`;
 }
 
-function constructEnvironmentLink(
-  keyInfo: KeyInfo,
-  permissions: HoneycombAuthResponse
-): any {
+function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
   // TODO: handle classic and get the endpoint right
-  const envSlug = permissions.environment.slug || "$legacy$"; // Classic environment doesn't have a slug
+  const envSlug = auth.environment.slug || "$legacy$"; // Classic environment doesn't have a slug
   return (
-    HoneycombUIEndpointByRegion[keyInfo.region] +
-    permissions.team.slug +
+    HoneycombUIEndpointByRegion[auth.keyInfo.region] +
+    auth.team.slug +
     "/environments/" +
     envSlug +
     "/"

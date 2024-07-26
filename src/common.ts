@@ -53,3 +53,26 @@ export const HoneycombUIEndpointByRegion: Record<Region, string> = {
   "dogfood EU": "https://ui.dogfood.eu1.honeycomb.io/",
   "dogfood US": "https://ui-dogfood.honeycomb.io/",
 };
+
+export type HnyTricksAuthorization = {
+  apiKey: string;
+  keyInfo: KeyInfo;
+  permissions: { canManageDatasets: boolean };
+  environment: { slug: string; name: string };
+  team: { slug: string; name: string };
+};
+
+export function describeAuthorization(
+  keyInfo: KeyInfo,
+  hnyAuthResponse: HoneycombAuthResponse
+): HnyTricksAuthorization {
+  return {
+    apiKey: hnyAuthResponse.id,
+    keyInfo,
+    permissions: {
+      canManageDatasets: hnyAuthResponse.api_key_access.createDatasets,
+    },
+    environment: hnyAuthResponse.environment,
+    team: hnyAuthResponse.team,
+  };
+}

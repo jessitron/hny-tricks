@@ -2,8 +2,14 @@ import "./tracing";
 import express, { Request, Response } from "express";
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
-import { authorize, commentOnApiKey, ApiKeyPrompt } from "./HoneycombApiKey";
+import {
+  authorize,
+  commentOnApiKey,
+  ApiKeyPrompt,
+  isAuthError,
+} from "./HoneycombApiKey";
 import bodyParser from "body-parser";
+import { teamDescription } from "./Team";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -31,7 +37,10 @@ app.get("/", (req, res) => {
     </head>
     <body>
       <h1>Jessitron's Honeycomb Tricks</h1>
-      <${ApiKeyPrompt} destinationElement="#stuff" endpointToPopulateItWith="/team" />
+      <${ApiKeyPrompt}
+        destinationElement="#stuff"
+        endpointToPopulateItWith="/team"
+      />
       <div id="stuff"></div>
       <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
       <${SneakyFooter} />
@@ -44,7 +53,12 @@ app.get("/", (req, res) => {
 
 app.post("/team", async (req: Request, res: Response) => {
   console.log("here we are at /team");
-  res.send(await authorize(req.body.apikey));
+  const authResult = await authorize(req.body.apikey);
+  if (isAuthError(authResult)) {
+    res.send(authResult.html);
+    return;
+  }
+  res.send(teamDescription(authResult));
 });
 
 // used in the ApiKeyPrompt
