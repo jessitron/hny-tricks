@@ -10,7 +10,7 @@ import {
   HoneycombEndpointByRegion,
 } from "./common";
 
-export function ApiKeyPrompt(apiKey: string | undefined): string {
+export function ApiKeyPrompt(): string {
   return html`<section class="apiKey">
     <form hx-post="/team" hx-target="#stuff" id="apikey-form" hx-indicator="#big-think">
       <div>
