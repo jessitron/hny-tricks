@@ -29,6 +29,8 @@ export type Region =
   | "EU"
   | "dogfood EU"
   | "dogfood US"
+  | "kibble EU"
+  | "kibble US"
   | "unknown"
   | "unknowable"; // configuration keys don't include region info in the key
 export type EnvironmentType = "classic" | "e&s" | "none";
@@ -44,6 +46,8 @@ export const HoneycombEndpointByRegion: Record<Region, string> = {
   US: "https://api.honeycomb.io/1/",
   "dogfood EU": "https://api.dogfood.eu1.honeycomb.io/1/",
   "dogfood US": "https://api-dogfood.honeycomb.io/1/",
+  "kibble EU": "https://api.kibble.eu1.honeycomb.io/1/",
+  "kibble US": "https://api-kibble.honeycomb.io/1/",
 };
 
 // @ts-ignore I don't want this to be complete, TypeScript. I do want all the keys to be regions.
@@ -52,6 +56,8 @@ export const HoneycombUIEndpointByRegion: Record<Region, string> = {
   US: "https://ui.honeycomb.io/",
   "dogfood EU": "https://ui.dogfood.eu1.honeycomb.io/",
   "dogfood US": "https://ui-dogfood.honeycomb.io/",
+  "kibble EU": "https://ui.kibble.eu1.honeycomb.io/",
+  "kibble US": "https://ui-kibble.honeycomb.io/",
 };
 
 export type HnyTricksAuthorization = {

@@ -82,8 +82,7 @@ app.get("/validate", (req: Request, res: Response) => {
 });
 
 const javascriptToStartTracing = `
-  console.log("I am the script yo");
-   Hny.initializeTracing({  apiKey: "hcaik_01j229z3ezkranjdcgj7e5dvx4vz4prbbkkbgx4rnv4strm0kb485sae9f",
+   Hny.initializeTracing({  apiKey: "${process.env.HONEYCOMB_INGEST_API_KEY}",
           serviceName: "hny-tricks-web",
           debug: true,
         });

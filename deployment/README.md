@@ -100,6 +100,10 @@ docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tric
 
 see jessitron/infra/otel-demo-help/o11yday-ingress.yaml for the ingress.
 
+### get the honeycomb ingress key
+
+`k create secret generic honeycomb-ingest-for-hny-tricks --from-literal=apikey=...`
+
 ### set up the collector to send to a different environment for this app.
 
 this is not a rigorous deployment (it's super flaky really) but I wanted it to be out there so I can show people.

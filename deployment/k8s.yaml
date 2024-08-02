@@ -37,6 +37,11 @@ spec:
               value: "http://daemonset-otelcol.default.svc.cluster.local:4318"
             - name: OTEL_SERVICE_NAME
               value: "hny-tricks"
+            - name: HONEYCOMB_INGEST_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: honeycomb-ingest-for-hny-tricks
+                  key: apikey
 
 ---
 apiVersion: v1
