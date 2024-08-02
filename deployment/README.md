@@ -102,7 +102,10 @@ see jessitron/infra/otel-demo-help/o11yday-ingress.yaml for the ingress.
 
 ### get the honeycomb ingress key
 
-`k create secret generic honeycomb-ingest-for-hny-tricks --from-literal=apikey=...`
+The key points to modernity/otel-demo, because that's where the collector sends data.
+It is realistic for apps that don't connect to one another (like hny-tricks and otel-demo) to be running in the same environment.
+
+`k --namespace hny-tricks create secret generic honeycomb-ingest-for-hny-tricks --from-literal=apikey=...`
 
 ### set up the collector to send to a different environment for this app.
 
