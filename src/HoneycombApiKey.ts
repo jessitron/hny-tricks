@@ -7,10 +7,11 @@ import {
   KeyInfo,
   EnvironmentType,
   HoneycombAuthResponse,
-  HoneycombEndpointByRegion,
+  HoneycombApiEndpointByRegion,
   describeAuthorization,
   HnyTricksAuthorization,
 } from "./common";
+import { fetchFromHoneycombApi, isErrorResponse } from "./HoneycombApi";
 
 export function ApiKeyPrompt(params: {
   destinationElement: string;
@@ -141,9 +142,10 @@ export async function authorize(
     }
     keyInfo.region = workingRegion; // now we know.
   }
-  const endpoint = HoneycombEndpointByRegion[keyInfo.region];
-  trace.getActiveSpan()?.setAttribute("honeycomb.endpoint", endpoint);
-  const response = await fetchPermissions({ apiKey, endpoint });
+  const response = await fetchFromHoneycombApi<HoneycombAuthResponse>(
+    { apiKey, keyInfo },
+    "/auth"
+  );
   trace
     .getActiveSpan()
     ?.setAttributes({ "honeycomb.auth.response": JSON.stringify(response) });
@@ -155,40 +157,13 @@ export async function authorize(
   return describeAuthorization(apiKey, keyInfo, response);
 }
 
-type FetchError = {
-  fetchError: true;
-  message: string;
-};
-function isErrorResponse(
-  response: HoneycombAuthResponse | FetchError
-): response is FetchError {
-  return (response as FetchError).fetchError;
-}
-
-async function fetchPermissions(params: {
-  apiKey: string;
-  endpoint: string;
-}): Promise<HoneycombAuthResponse | FetchError> {
-  const { apiKey, endpoint } = params;
-  return fetch(endpoint + "auth/", {
-    method: "GET",
-    headers: { "X-Honeycomb-Team": `${apiKey}` },
-  }).then(
-    (result) => {
-      if (!result.ok) {
-        return { fetchError: true, message: result.statusText };
-      }
-      return result.json();
-    },
-    (error) => ({ fetchError: true, message: error.message })
-  );
-}
-
 async function tryAllRegions(apiKey: string): Promise<Region> {
-  const regions = Object.keys(HoneycombEndpointByRegion) as Region[]; // is there a more clever way to do that?
+  const regions = Object.keys(HoneycombApiEndpointByRegion) as Region[]; // is there a more clever way to do that?
   for (const region of regions) {
-    const endpoint = HoneycombEndpointByRegion[region];
-    const response = await fetchPermissions({ apiKey, endpoint });
+    const response = await fetchFromHoneycombApi<HoneycombAuthResponse>(
+      { apiKey, keyInfo: { region } },
+      "/auth"
+    );
     if (!isErrorResponse(response)) {
       return region;
     }

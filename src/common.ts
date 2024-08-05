@@ -41,7 +41,7 @@ export type KeyInfo = {
 };
 
 // @ts-ignore I don't want this to be complete, TypeScript. I do want all the keys to be regions.
-export const HoneycombEndpointByRegion: Record<Region, string> = {
+export const HoneycombApiEndpointByRegion: Record<Region, string> = {
   EU: "https://api.eu1.honeycomb.io/1/",
   US: "https://api.honeycomb.io/1/",
   "dogfood EU": "https://api.dogfood.eu1.honeycomb.io/1/",

@@ -101,8 +101,8 @@ app.post("/datasets", async (req: Request, res: Response) => {
   }
   span?.setAttributes(spanAttributesAboutAuth(authResult));
 
-  const output = describeDatasets(authResult);
-  res.send("Datasets go here");
+  const output = await describeDatasets(authResult);
+  res.send(output);
 });
 
 const javascriptToStartTracing = `
