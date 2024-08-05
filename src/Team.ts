@@ -1,9 +1,6 @@
 import {
   HnyTricksAuthorization,
-  HoneycombAuthResponse,
-  HoneycombEndpointByRegion,
   HoneycombUIEndpointByRegion,
-  KeyInfo,
 } from "./common";
 import { html } from "./htm-but-right";
 
