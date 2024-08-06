@@ -21,7 +21,7 @@ export function ApiKeyPrompt(params: {
     <form hx-post="${params.endpointToPopulateItWith}" hx-target="${params.destinationElement}" id="apikey-form" hx-indicator="#big-think">
       <div>
         <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
-        <input id="apikey" type="password" name="apikey" hx-get="/validate" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
+        <input id="apikey" type="password" name="apikey" hx-post="/validate" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
         <button>Check Permissions</button>
       </div>
       <div>

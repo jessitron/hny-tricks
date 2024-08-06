@@ -106,7 +106,9 @@ app.post("/datasets", async (req: Request, res: Response) => {
 });
 
 const javascriptToStartTracing = `
-   Hny.initializeTracing({  apiKey: "${process.env.HONEYCOMB_INGEST_API_KEY}",
+   Hny.initializeTracing({  apiKey: "${
+     process.env.HONEYCOMB_INGEST_API_KEY || process.env.HONEYCOMB_API_KEY
+   }",
           serviceName: "hny-tricks-web",
           debug: true,
         });
