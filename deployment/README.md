@@ -20,6 +20,10 @@ and then there's "aws for pwd" which confirms the region
 
 `aws configure get region`
 
+be in the right k8s context
+
+`k config use-context pixie-lou`
+
 ### Build an image
 
 A directory up from here:

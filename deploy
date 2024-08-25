@@ -7,7 +7,7 @@ set -x
 
 me=$0
 
-VERSION_NUMBER=3
+VERSION_NUMBER=4
 export IMAGE_NAME=jessitron/hny-tricks
 export IMAGE_TAG=hny-tricks-$VERSION_NUMBER
 export IMAGE_REPO=414852377253.dkr.ecr.us-east-1.amazonaws.com
@@ -15,6 +15,10 @@ export IMAGE_REPO=414852377253.dkr.ecr.us-east-1.amazonaws.com
 # because separately pushing ignores the other platform GOD I HATE HASHICORP SOMETIMES
 docker build --platform linux/amd64 -t $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG .
 docker push $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG
+
+if [ "$?" -ne 0 ]; then
+  echo "Push failed. You probably need to 'awslogin' and then 'dockerlogin'"
+fi
 
 cat deployment/k8s.yaml \
 | sed 's/IMAGE_TAG/'$IMAGE_TAG'/g' \
