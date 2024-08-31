@@ -1,5 +1,6 @@
 import { trace } from "@opentelemetry/api";
 import { HoneycombApiEndpointByRegion, Region } from "./common";
+import { report, reportError } from "./tracing-util";
 
 type SomeResponse = object;
 
@@ -21,7 +22,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
   path: string
 ): Promise<T | FetchError> {
   const endpoint = HoneycombApiEndpointByRegion[params.keyInfo.region];
-  trace.getActiveSpan()?.setAttribute("honeycomb.endpoint", endpoint);
+  report({ "honeycomb.endpoint": endpoint });
   const { apiKey } = params;
   return fetch(endpoint + path, {
     method: "GET",
@@ -29,10 +30,21 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
   }).then(
     (result) => {
       if (!result.ok) {
+        reportError(
+          {
+            statusText: result.statusText,
+            status: result.status,
+            body: result.body,
+          },
+          { "http.url": endpoint + path }
+        );
         return { fetchError: true, message: result.statusText };
       }
       return result.json();
     },
-    (error) => ({ fetchError: true, message: error.message })
+    (error) => {
+      reportError(error, { "http.url": endpoint + path });
+      return { fetchError: true, message: error.message };
+    }
   );
 }

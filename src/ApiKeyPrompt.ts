@@ -12,7 +12,7 @@ import {
   HnyTricksAuthorization,
 } from "./common";
 import { fetchFromHoneycombApi, isErrorResponse } from "./HoneycombApi";
-import { inSpan, inSpanAsync } from "./tracing-util";
+import { inSpan, inSpanAsync, report } from "./tracing-util";
 
 export function ApiKeyPrompt(params: {
   destinationElement: string;
@@ -179,7 +179,7 @@ async function tryAllRegions(apiKey: string): Promise<Region> {
         }
       }
 
-      span?.setAttributes({
+      report({
         "honeycomb.region": regionIdentified,
         "app.regionsTried": regionsTried,
       });

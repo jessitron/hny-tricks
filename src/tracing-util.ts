@@ -9,6 +9,18 @@ export function report(attributes: Attributes) {
   }
 }
 
+export function reportError(error: any, attributes: Attributes) {
+  // todo: put it on a span
+  if (REPORT_ATTRIBUTES_TO_CONSOLE) {
+    if (error.printStackTrace) {
+      error.printStackTrace();
+    } else {
+      console.log(error);
+    }
+    console.log(JSON.stringify(attributes, null, 2));
+  }
+}
+
 export function inSpan(tracerName, spanName, fn) {
   if (fn === undefined) {
     console.log("USAGE: inSpan(tracerName, spanName, () => { ... })");
