@@ -44,6 +44,7 @@ app.get("/", (req, res) => {
       <${ApiKeyPrompt}
         destinationElement="#stuff"
         endpointToPopulateItWith="/team"
+        endpointForApiKeyValidation="/validate"
       />
       <div id="stuff"></div>
       <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
