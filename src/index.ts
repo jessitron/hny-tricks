@@ -36,6 +36,7 @@ app.get("/", (req, res) => {
         dangerouslySetInnerHTML=${{ __html: javascriptToStartTracing }}
       ></script>
       <script src="/htmx.js"></script>
+      <script src="/jess.js"></script>
       <title>Hny Tricks</title>
       <link rel="stylesheet" href="styles.css" />
     </head>
