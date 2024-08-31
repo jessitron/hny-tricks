@@ -36,7 +36,6 @@ app.get("/", (req, res) => {
         dangerouslySetInnerHTML=${{ __html: javascriptToStartTracing }}
       ></script>
       <script src="/htmx.js"></script>
-      <script src="/jess.js"></script>
       <title>Hny Tricks</title>
       <link rel="stylesheet" href="styles.css" />
     </head>
@@ -51,6 +50,7 @@ app.get("/", (req, res) => {
       <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
       <${SneakyFooter} />
     </body>
+    <script src="/jess.js"></script>
   </html>`;
   const fullResponse = `<!DOCTYPE html>${element}`;
   trace.getActiveSpan()?.setAttribute("response.body", fullResponse);
