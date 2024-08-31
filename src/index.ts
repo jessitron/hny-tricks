@@ -7,7 +7,7 @@ import {
   commentOnApiKey,
   ApiKeyPrompt,
   isAuthError,
-} from "./HoneycombApiKey";
+} from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
 import { teamDescription } from "./Team";
 import { describeDatasets } from "./Datasets";
