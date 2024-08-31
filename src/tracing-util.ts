@@ -1,4 +1,13 @@
-import { trace } from "@opentelemetry/api";
+import { Attributes, trace } from "@opentelemetry/api";
+
+const REPORT_ATTRIBUTES_TO_CONSOLE = true;
+
+export function report(attributes: Attributes) {
+  trace.getActiveSpan()?.setAttributes(attributes);
+  if (REPORT_ATTRIBUTES_TO_CONSOLE) {
+    console.log(JSON.stringify(attributes, null, 2));
+  }
+}
 
 export function inSpan(tracerName, spanName, fn) {
   if (fn === undefined) {

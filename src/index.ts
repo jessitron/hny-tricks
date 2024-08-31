@@ -12,6 +12,8 @@ import bodyParser from "body-parser";
 import { teamDescription } from "./Team";
 import { describeDatasets } from "./Datasets";
 import { spanAttributesAboutAuth } from "./common";
+import { getAuthResult } from "./FakeRegion";
+import { report } from "./tracing-util";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -79,13 +81,15 @@ app.post("/team", async (req: Request, res: Response) => {
 // used in the ApiKeyPrompt
 app.post("/validate", (req: Request, res: Response) => {
   console.log("here we are at /validate oy");
-  trace.getActiveSpan()?.setAttributes({
+  report({
     dammit: "work",
-    "noreally.request.body": "<" + JSON.stringify(req.body) + ">",
-    "noreally.request.query": "<" + JSON.stringify(req.query) + ">",
-    "noreally.request.params": "<" + JSON.stringify(req.params) + ">",
+    "noreally.request.body": "< " + JSON.stringify(req.body) + " >",
+    "noreally.request.query": "< " + JSON.stringify(req.query) + " >",
+    "noreally.request.params": "< " + JSON.stringify(req.params) + " >",
   });
-  res.send(commentOnApiKey(req.query.apikey));
+  const apiKeyInterpretation = commentOnApiKey(req.body.apikey);
+  report({ "app.response": apiKeyInterpretation });
+  res.send(apiKeyInterpretation);
 });
 
 app.post("/datasets", async (req: Request, res: Response) => {
@@ -103,6 +107,16 @@ app.post("/datasets", async (req: Request, res: Response) => {
 
   const output = await describeDatasets(authResult);
   res.send(output);
+});
+
+app.get("/test-region/api/auth", async (req: Request, res: Response) => {
+  const fakeAuthResult = getAuthResult(req.body.apikey);
+  if (!!fakeAuthResult) {
+    res.send(fakeAuthResult);
+  } else {
+    res.setStatus(401);
+    res.send("That is not one of our fake test teams, gj");
+  }
 });
 
 const javascriptToStartTracing = `

@@ -25,6 +25,7 @@ export type HoneycombAuthResponse = {
 
 export type KeyType = "none" | "ingest" | "configuration";
 export type Region =
+  | "local test"
   | "US"
   | "EU"
   | "dogfood EU"
@@ -42,6 +43,7 @@ export type KeyInfo = {
 
 // @ts-ignore I don't want this to be complete, TypeScript. I do want all the keys to be regions.
 export const HoneycombApiEndpointByRegion: Record<Region, string> = {
+  "local test": "/test-region/ui",
   EU: "https://api.eu1.honeycomb.io/1/",
   US: "https://api.honeycomb.io/1/",
   "dogfood EU": "https://api.dogfood.eu1.honeycomb.io/1/",
@@ -52,6 +54,7 @@ export const HoneycombApiEndpointByRegion: Record<Region, string> = {
 
 // @ts-ignore I don't want this to be complete, TypeScript. I do want all the keys to be regions.
 export const HoneycombUIEndpointByRegion: Record<Region, string> = {
+  "local test": "/test-region/api",
   EU: "https://ui.eu1.honeycomb.io/",
   US: "https://ui.honeycomb.io/",
   "dogfood EU": "https://ui.dogfood.eu1.honeycomb.io/",
