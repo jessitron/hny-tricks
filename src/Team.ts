@@ -19,6 +19,7 @@ export function teamDescription(auth: HnyTricksAuthorization) {
       Environment: ${auth.environment.name || "Classic"}
     </div>
     <div class="team-link"><a href=${envLink}> ${envLink} </a></div>
+    <script src="/jess.js"></script>
   </section>`;
 }
 
