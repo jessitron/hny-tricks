@@ -9,7 +9,7 @@ export function teamDescription(auth: HnyTricksAuthorization) {
             <input id="apikey" type="password" name="apikey" disabled="true" value="${
               auth.apiKey
             }" ></input>
-            <button>Reset</button>
+            <button onclick="window.location = window.location" >Reset</button>
     </div>
     <div class="team-description team-region">Region: ${
       auth.keyInfo.region
