@@ -6,9 +6,9 @@ export function teamDescription(auth: HnyTricksAuthorization) {
   return html`<section class="team">
     <div class="team-description team-apikey">
         <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
-            <input id="apikey" type="password" name="apikey" hx-post="${
+            <input id="apikey" type="password" name="apikey" disabled="true" value="${
               auth.apiKey
-            }" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
+            }" ></input>
             <button>Reset</button>
     </div>
     <div class="team-description team-region">Region: ${

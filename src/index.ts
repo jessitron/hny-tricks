@@ -50,7 +50,7 @@ app.get("/", (req, res) => {
       <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
       <${SneakyFooter} />
     </body>
-    <script src="/jess.js"></script>
+    <script src="/jess.js"></script>x 
   </html>`;
   const fullResponse = `<!DOCTYPE html>${element}`;
   trace.getActiveSpan()?.setAttribute("response.body", fullResponse);
