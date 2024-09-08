@@ -77,6 +77,7 @@ section.team {
   grid-template-columns: auto;
   grid-template-rows: auto;
   grid-template-areas:
+    "key key key"
     "region name env"
     "link link link";
   justify-items: center;
@@ -88,6 +89,10 @@ section.team {
 .team-description {
   margin-right: 5px;
   margin-left: 5px;
+}
+
+.team-apikey {
+  grid-area: key;
 }
 
 .team-region {
