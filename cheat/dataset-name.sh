@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# create a derived column called 'dc.dataset' in each dataset, containing the name of the dataset.
+# Then, query in Honeycomb: all datasets, count, group by dc.dataset
+# and find out where they are!
+
 # set -x
 
 # Check if HONEYCOMB_API_KEY is set
