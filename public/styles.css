@@ -15,6 +15,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
+  margin: auto;
   background: linear-gradient(
     85.65deg,
     rgba(255, 209, 1, 1) 0%,
@@ -22,9 +23,21 @@ body {
   );
 }
 
+main {
+  max-width: 95%;
+  min-width: 500px;
+  text-align: center;
+  margin: auto;
+}
+
 h1 {
   color: white;
   text-shadow: 3px 3px 3px var(--color-hny-slate);
+}
+
+section {
+  border: 6px solid var(--color-hny-slate);
+  padding: 10px;
 }
 
 button {
@@ -53,15 +66,6 @@ button:hover {
 button:active {
   background-color: var(--color-hny-spice);
   text-shadow: none;
-}
-
-section {
-  max-width: 90vw;
-  min-width: 300px;
-  margin: auto;
-  border: 6px solid var(--color-hny-slate);
-  padding: 10px;
-  margin: 5px;
 }
 
 .apiKey {

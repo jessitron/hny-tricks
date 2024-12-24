@@ -20,14 +20,18 @@ export function index() {
       <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-      <h1>Jessitron's Honeycomb Tricks</h1>
-      <${ApiKeyPrompt}
-        destinationElement="#stuff"
-        endpointToPopulateItWith="/team"
-        endpointForApiKeyValidation="/validate"
-      />
-      <div id="stuff"></div>
-      <div id="big-think" class="htmx-indicator"><img src="./spin.gif" /></div>
+      <main>
+        <h1>Jessitron's Honeycomb Tricks</h1>
+        <${ApiKeyPrompt}
+          destinationElement="#stuff"
+          endpointToPopulateItWith="/team"
+          endpointForApiKeyValidation="/validate"
+        />
+        <div id="stuff"></div>
+        <div id="big-think" class="htmx-indicator">
+          <img src="./spin.gif" />
+        </div>
+      </main>
       <${SneakyFooter} />
     </body>
   </html>`;
