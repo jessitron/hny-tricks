@@ -1,3 +1,4 @@
+import { context, trace } from "@opentelemetry/api";
 import { ApiKeyPrompt } from "./ApiKeyPrompt";
 import { html } from "./htm-but-right";
 
@@ -9,6 +10,7 @@ import { html } from "./htm-but-right";
  */
 
 export function index() {
+  const traceId = trace.getSpanContext(context.active()).traceId;
   return html`<html>
     <head>
       <script src="/hny.js"></script>
@@ -19,7 +21,7 @@ export function index() {
       <title>Hny Tricks</title>
       <link rel="stylesheet" href="styles.css" />
     </head>
-    <body>
+    <body data-traceid="${traceId}">
       <header>
         <a href="/">
           <img class="icon" id="hny-heart" src="./honeycomb-heart.png" />

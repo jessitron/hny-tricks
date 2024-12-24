@@ -1,4 +1,4 @@
-import { Attributes, trace } from "@opentelemetry/api";
+import { Attributes, context, trace } from "@opentelemetry/api";
 
 const REPORT_ATTRIBUTES_TO_CONSOLE = true;
 
@@ -61,4 +61,8 @@ export async function inSpanAsync(tracerName, spanName, fn) {
       span.end();
     }
   });
+}
+
+export function currentTraceId() {
+  return trace.getSpanContext(context.active()).traceId;
 }

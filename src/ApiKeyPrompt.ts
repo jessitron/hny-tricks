@@ -12,7 +12,7 @@ import {
   HnyTricksAuthorization,
 } from "./common";
 import { fetchFromHoneycombApi, isErrorResponse } from "./HoneycombApi";
-import { inSpan, inSpanAsync, report } from "./tracing-util";
+import { currentTraceId, inSpan, inSpanAsync, report } from "./tracing-util";
 
 export function ApiKeyPrompt(params: {
   destinationElement: string;
@@ -108,8 +108,12 @@ type AuthError = {
   authError: true;
   html: string;
 };
-function authError(html: string): AuthError {
-  return { authError: true, html };
+function authError(htmlInput: string): AuthError {
+  const wrappedHtml = html`<div data-traceid="${currentTraceId()}">
+    ${htmlInput}
+  </div>`;
+
+  return { authError: true, html: wrappedHtml };
 }
 export function isAuthError(
   response: HnyTricksAuthorization | AuthError
