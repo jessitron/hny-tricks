@@ -1,5 +1,35 @@
-import { HnyTricksAuthorization, HoneycombUIEndpointByRegion } from "./common";
+import { trace } from "@opentelemetry/api";
+import { authorize, isAuthError, startingApiKeyPrompt } from "./ApiKeyPrompt";
+import {
+  HnyTricksAuthorization,
+  HoneycombUIEndpointByRegion,
+  spanAttributesAboutAuth,
+} from "./common";
 import { html } from "./htm-but-right";
+
+export async function team(apikey) {
+  const span = trace.getActiveSpan();
+  if (!apikey) {
+    span.setAttribute("warning", "no api key received");
+    return startingApiKeyPrompt;
+  }
+  const authResult = await authorize(apikey);
+  if (isAuthError(authResult)) {
+    span?.setAttributes({ "hny.authError": authResult.html });
+    span?.setStatus({ code: 2, message: "auth failed" });
+    return authResult.html;
+  }
+  span?.setAttributes(spanAttributesAboutAuth(authResult));
+
+  const datasetSection = html`<section
+    hx-trigger="load"
+    hx-post="/datasets"
+    hx-include="#apikey"
+  >
+    Loading datasets...
+  </section>`;
+  return teamDescription(authResult) + datasetSection;
+}
 
 export function teamDescription(auth: HnyTricksAuthorization) {
   const envLink = constructEnvironmentLink(auth);

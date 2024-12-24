@@ -6,9 +6,10 @@ import {
   authorize,
   commentOnApiKey,
   isAuthError,
+  startingApiKeyPrompt,
 } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
-import { teamDescription } from "./Team";
+import { team, teamDescription } from "./Team";
 import { describeDatasets } from "./Datasets";
 import { spanAttributesAboutAuth } from "./common";
 import { fakeAuthEndpoint, getAuthResult } from "./FakeRegion";
@@ -35,25 +36,7 @@ app.get("/", (req, res) => {
 
 app.post("/team", async (req: Request, res: Response) => {
   console.log("here we are at /team");
-  const span = trace.getActiveSpan();
-  const authResult = await authorize(req.body.apikey);
-  if (isAuthError(authResult)) {
-    span?.setAttributes({ "hny.authError": authResult.html });
-    span?.setStatus({ code: 2, message: "auth failed" });
-    res.send(authResult.html);
-    return;
-  }
-  span?.setAttributes(spanAttributesAboutAuth(authResult));
-
-  const datasetSection = html`<section
-    hx-trigger="load"
-    hx-post="/datasets"
-    hx-include="#apikey"
-  >
-    Loading datasets...
-  </section>`;
-  var result = teamDescription(authResult) + datasetSection;
-  res.send(result);
+  res.send(await team(req.body.apikey));
 });
 
 // used in the ApiKeyPrompt
@@ -88,5 +71,3 @@ app.post("/datasets", async (req: Request, res: Response) => {
 });
 
 app.get("/test-region/api/auth", fakeAuthEndpoint);
-
-
