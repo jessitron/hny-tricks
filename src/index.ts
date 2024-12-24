@@ -1,6 +1,6 @@
-import { context, trace } from "@opentelemetry/api";
 import { ApiKeyPrompt } from "./ApiKeyPrompt";
 import { html } from "./htm-but-right";
+import { currentTraceId } from "./tracing-util";
 
 /**
  * I wanted to pull out the html for the main page, and make it more isolated and clear,
@@ -10,7 +10,6 @@ import { html } from "./htm-but-right";
  */
 
 export function index() {
-  const traceId = trace.getSpanContext(context.active()).traceId;
   return html`<html>
     <head>
       <script src="/hny.js"></script>
@@ -21,7 +20,7 @@ export function index() {
       <title>Hny Tricks</title>
       <link rel="stylesheet" href="styles.css" />
     </head>
-    <body data-traceid="${traceId}">
+    <body data-traceid="${currentTraceId()}">
       <header>
         <a href="/">
           <img class="icon" id="hny-heart" src="./honeycomb-heart.png" />
