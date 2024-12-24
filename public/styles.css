@@ -148,8 +148,9 @@ section.team {
 
 .fine-print {
   font-size: smaller;
-  text-align: left;
+  text-align: center;
   margin-bottom: 0px;
+  margin-top: 0px;
 }
 
 label {
