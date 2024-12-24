@@ -2,9 +2,8 @@
   "name": "hny-tricks",
   "version": "1.0.0",
   "description": "Automate some maintenance operations for my honeycomb teams",
-  "main": "index.ts",
   "scripts": {
-    "start": "tsc && node src/index.js",
+    "start": "tsc && node src/main.js",
     "test": "tsc && jest"
   },
   "author": "",

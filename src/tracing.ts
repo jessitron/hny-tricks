@@ -4,6 +4,10 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { ExpressLayerType } from "@opentelemetry/instrumentation-express";
 
+/**
+ * This is BACKEND TRACING
+ */
+
 const sdk: NodeSDK = new NodeSDK({
   traceExporter: new OTLPTraceExporter(),
   instrumentations: [
