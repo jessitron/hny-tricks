@@ -10,6 +10,7 @@
   --color-hny-spice: #e25404;
   --color-hny-indigo: #51368d;
   --color-hny-slate: #25303e;
+  --lat-ref-color-gold-100: #ffeab2;
 }
 
 body {
@@ -18,10 +19,21 @@ body {
   margin: auto;
   margin-top: 0px;
   background: linear-gradient(
-    85.65deg,
-    rgba(255, 209, 1, 1) 0%,
-    rgba(255, 176, 0, 1) 100%
+    90deg,
+    var(--color-hny-honey),
+    var(--lat-ref-color-gold-100) 5%,
+    var(--lat-ref-color-gold-100) 95%,
+    var(--color-hny-honey)
   );
+}
+
+header {
+  background-color: var(--color-hny-honey);
+  text-align: left;
+  padding-left: 40px;
+  margin-top: 0px;
+  padding-top: 10px;
+  padding-bottom: 5px;
 }
 
 main {
@@ -39,13 +51,6 @@ h1 {
 section {
   border: 6px solid var(--color-hny-slate);
   padding: 10px;
-}
-
-header {
-  background-color: #51368d;
-  margin-top: 0px;
-  padding-top: 10px;
-  padding-bottom: 5px;
 }
 
 header .span {
