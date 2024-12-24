@@ -10,7 +10,7 @@ export function report(attributes: Attributes) {
 }
 
 export function reportError(error: any, attributes: Attributes) {
-  // todo: put it on a span
+  trace.getActiveSpan().recordException(error)
   if (REPORT_ATTRIBUTES_TO_CONSOLE) {
     if (error.printStackTrace) {
       error.printStackTrace();
