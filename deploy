@@ -13,7 +13,7 @@ export IMAGE_TAG=hny-tricks-$VERSION_NUMBER
 export IMAGE_REPO=414852377253.dkr.ecr.us-east-1.amazonaws.com
 
 # just log in to ECR every time
-aws ecr get-login-password --region $(aws configure get region) | docker login --username AWS --password-stdin 414852377253.dkr.ecr.$(aws configure get region).amazonaws.com
+aws ecr get-login-password --region $(aws configure get region) | docker login --username AWS --password-stdin $IMAGE_REPO
 
 # because separately pushing ignores the other platform GOD I HATE HASHICORP SOMETIMES
 docker build --platform linux/amd64 -t $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG .
