@@ -9,8 +9,8 @@ export function report(attributes: Attributes) {
   }
 }
 
-export function reportError(error: any, attributes: Attributes) {
-  trace.getActiveSpan().recordException(error)
+export function recordError(error: any, attributes?: Attributes) {
+  trace.getActiveSpan().recordException(error);
   if (REPORT_ATTRIBUTES_TO_CONSOLE) {
     if (error.printStackTrace) {
       error.printStackTrace();

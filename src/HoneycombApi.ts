@@ -1,6 +1,6 @@
 import { trace } from "@opentelemetry/api";
 import { HoneycombApiEndpointByRegion, Region } from "./common";
-import { report, reportError } from "./tracing-util";
+import { report, recordError } from "./tracing-util";
 
 type SomeResponse = object;
 
@@ -30,7 +30,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
   }).then(
     (result) => {
       if (!result.ok) {
-        reportError(
+        recordError(
           {
             statusText: result.statusText,
             status: result.status,
@@ -43,7 +43,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
       return result.json();
     },
     (error) => {
-      reportError(error, { "http.url": endpoint + path });
+      recordError(error, { "http.url": endpoint + path });
       return { fetchError: true, message: error.message };
     }
   );

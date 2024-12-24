@@ -12,7 +12,7 @@ import {
   HnyTricksAuthorization,
 } from "./common";
 import { fetchFromHoneycombApi, isErrorResponse } from "./HoneycombApi";
-import { currentTraceId, inSpan, inSpanAsync, report } from "./tracing-util";
+import { currentTraceId, inSpan, inSpanAsync, recordError, report } from "./tracing-util";
 
 export function ApiKeyPrompt(params: {
   destinationElement: string;
@@ -125,6 +125,7 @@ export async function authorize(
   apiKey: string
 ): Promise<HnyTricksAuthorization | AuthError> {
   if (!apiKey) {
+    recordError(new Error("no API key provided"));
     return authError(
       html`<div><span class="unhappy">No API key provided</span></div>`
     );
