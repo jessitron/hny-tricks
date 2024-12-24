@@ -20,7 +20,15 @@ export function index() {
       <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-      <header><span>Jessitron's Honeycomb Tricks</span></header>
+      <header>
+        <a href="/">
+          <img class="icon" id="hny-heart" src="./honeycomb-heart.png" />
+        </a>
+        <span class="title">Jessitron's Honeycomb Tricks</span>
+        <a href="https://github.com/jessitron/hny-tricks">
+          <img class="icon" id="github-logo" src="./github-mark.svg" />
+        </a>
+      </header>
       <main>
         <div class="hero">
           <img id="hero-image" src="./bug-thinks-nuggs.jpg" />
