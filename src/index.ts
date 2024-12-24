@@ -20,8 +20,19 @@ export function index() {
       <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
+      <header><h2>Jessitron's Honeycomb Tricks</h2></header>
       <main>
-        <h1>Jessitron's Honeycomb Tricks</h1>
+        <div class="hero">
+          <img id="hero-image" src="./bug-thinks-nuggs.jpg" />
+          <div>
+            <h1>🪩 Welcome 🪩</h1>
+            <p>
+              Have a Honeycomb.io API key, and want to know where it goes? This
+              app will call the Honeycomb Auth endpoint to find out. It does not
+              store your API key, or anything else.
+            </p>
+          </div>
+        </div>
         <${ApiKeyPrompt}
           destinationElement="#stuff"
           endpointToPopulateItWith="/team"

@@ -40,6 +40,25 @@ section {
   padding: 10px;
 }
 
+header {
+  background-color: #51368d;
+}
+
+.hero {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.hero * {
+  margin-left: 10px;
+  text-align: left;
+}
+
+#hero-image {
+  height: 150px;
+  width: 150px;
+}
+
 button {
   margin: 5px;
   color: white;
