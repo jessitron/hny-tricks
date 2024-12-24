@@ -7,6 +7,11 @@ import {
 } from "./common";
 import { html } from "./htm-but-right";
 
+/**
+ * why is this file capitalized?
+ * it represents responses to the /team html call.
+ */
+
 export async function team(apikey) {
   const span = trace.getActiveSpan();
   if (!apikey) {
