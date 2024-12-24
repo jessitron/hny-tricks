@@ -1,4 +1,4 @@
-import { ApiKeyPrompt } from "./ApiKeyPrompt";
+import { startingApiKeyPrompt } from "./ApiKeyPrompt";
 import { html } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
 
@@ -42,11 +42,7 @@ export function index() {
             </p>
           </div>
         </div>
-        <${ApiKeyPrompt}
-          destinationElement="#stuff"
-          endpointToPopulateItWith="/team"
-          endpointForApiKeyValidation="/validate"
-        />
+        ${startingApiKeyPrompt}
         <div id="stuff"></div>
         <div id="big-think" class="htmx-indicator">
           <img src="./spin.gif" />

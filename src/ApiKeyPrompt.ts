@@ -12,7 +12,19 @@ import {
   HnyTricksAuthorization,
 } from "./common";
 import { fetchFromHoneycombApi, isErrorResponse } from "./HoneycombApi";
-import { currentTraceId, inSpan, inSpanAsync, recordError, report } from "./tracing-util";
+import {
+  currentTraceId,
+  inSpan,
+  inSpanAsync,
+  recordError,
+  report,
+} from "./tracing-util";
+
+export const startingApiKeyPrompt = html`<${ApiKeyPrompt}
+  destinationElement="#stuff"
+  endpointToPopulateItWith="/team"
+  endpointForApiKeyValidation="/validate"
+/>`;
 
 export function ApiKeyPrompt(params: {
   destinationElement: string;
