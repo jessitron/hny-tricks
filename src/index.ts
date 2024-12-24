@@ -20,7 +20,7 @@ export function index() {
       <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-      <header><h2>Jessitron's Honeycomb Tricks</h2></header>
+      <header><span>Jessitron's Honeycomb Tricks</span></header>
       <main>
         <div class="hero">
           <img id="hero-image" src="./bug-thinks-nuggs.jpg" />

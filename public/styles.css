@@ -16,6 +16,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   margin: auto;
+  margin-top: 0px;
   background: linear-gradient(
     85.65deg,
     rgba(255, 209, 1, 1) 0%,
@@ -42,15 +43,23 @@ section {
 
 header {
   background-color: #51368d;
+  margin-top: 0px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+
+header .span {
+  font-weight: bold;
 }
 
 .hero {
   display: flex;
+  margin-top: 20px;
   margin-bottom: 20px;
+  gap: 20px;
 }
 
-.hero * {
-  margin-left: 10px;
+.hero div {
   text-align: left;
 }
 
