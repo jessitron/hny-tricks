@@ -30,8 +30,7 @@ export function ApiKeyPrompt(params: {
         <span id="apikey-opinion"></span>
       </div>
     </form>
-    <p class="fine-print">This API key will be sent to the Honeycomb Tricks backend, but we don't save it. We call the Honeycomb auth endpoint,
-    and then tell you which team and environment it belongs to, and which permissions it has.
+    <p class="fine-print">This API key will be sent to the Honeycomb Tricks backend, but we don't save it.
     </p> 
     <script src="/jess.js"></script>
  </section>`;
