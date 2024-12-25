@@ -139,7 +139,11 @@ export async function authorize(
   if (!apiKey) {
     recordError(new Error("no API key provided"));
     return authError(
-      html`<div><span class="unhappy">No API key provided</span></div>`
+      html`<div>
+        <span class="unhappy">
+          Trying to authorize, but API key is blank. This part doesn't work yet
+        </span>
+      </div>`
     );
   }
 
