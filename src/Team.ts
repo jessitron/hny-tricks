@@ -27,6 +27,8 @@ export async function team(apikey) {
   span?.setAttributes(spanAttributesAboutAuth(authResult));
 
   const datasetSection = html`<section
+    name="dataset-section"
+    id="dataset-section"
     hx-trigger="load"
     hx-post="/datasets"
     hx-include="#apikey"

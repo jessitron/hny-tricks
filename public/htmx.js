@@ -2,37 +2,45 @@ var htmx = (function () {
   "use strict";
 
   // JESS is here. Note: We are looking for @jessitronica/hny-otel-web:0.8.0 (or probably later versions)
-  console.log("JESS IS HERE IN HTMX");
+  console.log("JESS IS HERE IN HTMX a");
 
   if (typeof window === "undefined") {
     console.log("JESS: NO WINDOW");
     return;
   }
-  // @ts-ignore
 
+  // Requires version 0.10.2 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
+  const INSTRUMENTATION_VERSION = "0.0.6";
+
   const HnyOtelWeb = window.Hny || {
+    emptySpan: { spanContext() {}, setAttributes() {} },
     note: "Honeycomb tracing not found; this is a stub implementation.",
     inSpan(_tracer, _span, fn) {
-      console.log("JESS: Skipping traces, no Hny");
-      return fn();
+      return fn(this.emptySpan);
     },
     inSpanAsync(_tracer, _span, fn) {
-      console.log("JESS: Skipping traces, no Hny");
-      return fn();
+      return fn(this.emptySpan);
     },
     setAttributes() {},
     recordException() {},
     addSpanEvent() {},
   };
-  // @ts-ignore
+
+  //@ts-ignore
   if (typeof window.Hny == "undefined") {
     console.log("JESS: NO HNY, tracing won't work", HnyOtelWeb);
   } else {
-    console.log("JESS: HNY IS HERE", HnyOtelWeb);
+    console.log(
+      `JESS: HNY IS HERE, instrumentation version ${INSTRUMENTATION_VERSION}`
+    );
   }
-  HnyOtelWeb.INTERNAL_TRACER = "htmx-internal"; // this is for spans that are useful for understanding htmx itself
-  HnyOtelWeb.APP_TRACER = "htmx"; // this is for spans that are useful for understanding the application using htmx
+
+  HnyOtelWeb.INTERNAL_TRACER = {
+    name: "htmx-internal",
+    version: INSTRUMENTATION_VERSION,
+  }; // this is for spans that are useful for understanding htmx itself
+  HnyOtelWeb.APP_TRACER = { name: "htmx", version: INSTRUMENTATION_VERSION }; // this is for spans that are useful for understanding the application using htmx
 
   // Now let's put a span around the rest of the initialization
   return HnyOtelWeb.inSpan(HnyOtelWeb.INTERNAL_TRACER, "htmx.init", () => {
@@ -3218,6 +3226,7 @@ var htmx = (function () {
       if (window.CustomEvent && typeof window.CustomEvent === "function") {
         // TODO: `composed: true` here is a hack to make global event handlers work with events in shadow DOM
         // This breaks expected encapsulation but needs to be here until decided otherwise by core devs
+        HnyOtelWeb.setAttributes({ "htmx.custom-event-supported": true });
         evt = new CustomEvent(eventName, {
           bubbles: true,
           cancelable: true,
@@ -3225,6 +3234,7 @@ var htmx = (function () {
           detail,
         });
       } else {
+        HnyOtelWeb.setAttributes({ "htmx.custom-event-supported": false });
         evt = getDocument().createEvent("CustomEvent");
         evt.initCustomEvent(eventName, true, true, detail);
       }
@@ -3293,8 +3303,12 @@ var htmx = (function () {
       return HnyOtelWeb.inSpan(
         HnyOtelWeb.INTERNAL_TRACER,
         "trigger " + eventName,
-        () => {
-          HnyOtelWeb.setAttributes({ "htmx.detail": safeStringify(detail) });
+        (span) => {
+          HnyOtelWeb.setAttributes({
+            "htmx.detail": safeStringify(detail),
+            ...attributesAboutElement(elt),
+            "jess.has-span-context": !!span,
+          });
           elt = resolveTarget(elt);
           if (detail == null) {
             detail = {};
@@ -3302,13 +3316,14 @@ var htmx = (function () {
           detail.elt = elt;
           const event = makeEvent(eventName, detail);
           if (htmx.logger && !ignoreEventForLogging(eventName)) {
+            // JESS: we could put span creation behind this condition todo
             htmx.logger(elt, eventName, detail);
           }
           if (detail.error) {
             logError(detail.error);
             triggerEvent(elt, "htmx:error", { errorInfo: detail });
           }
-          let eventResult = elt.dispatchEvent(event);
+          let eventResult = elt.dispatchEvent(event); // JESS: can I put tracing detail on this event object?
           const kebabName = kebabEventName(eventName);
           if (eventResult && kebabName !== eventName) {
             const kebabedEvent = makeEvent(kebabName, event.detail);
@@ -4602,6 +4617,26 @@ var htmx = (function () {
       });
     }
 
+    function attributesAboutElement(elt) {
+      if (!elt) {
+        return {};
+      }
+      const attributes = {};
+      for (const attr of elt.attributes) {
+        attributes[attr.name] = attr.value;
+      }
+      return {
+        "htmx.element.id": elt.id,
+        "htmx.element.tag": elt.tagName,
+        "htmx.element.name": elt.name,
+        "htmx.element.nodeName": elt.nodeName,
+        "htmx.element.path": elt.path,
+        "htmx.element.class": elt.className,
+        "htmx.element.attributes": JSON.stringify(attributes),
+        "htmx.element.nothing-interesting": "wisconsin",
+      };
+    }
+
     /**
      * @param {HttpVerb} verb
      * @param {string} path
@@ -4612,491 +4647,505 @@ var htmx = (function () {
      * @return {Promise<void>}
      */
     function issueAjaxRequest(verb, path, elt, event, etc, confirmed) {
-      // JESS: this may be useful at an app level, to see when your thing got queued
-      return HnyOtelWeb.inSpan(HnyOtelWeb.INTERNAL_TRACER, "issueAjaxRequest", () => {
-        HnyOtelWeb.setAttributes({
-          "htmx.verb": verb,
-          "htmx.path": path,
-          "htmx.element-id": !!elt && elt.id,
-          // does the event have a name or something?
-        });
-        let resolve = null;
-        let reject = null;
-        etc = etc != null ? etc : {};
-        if (etc.returnPromise && typeof Promise !== "undefined") {
-          var promise = new Promise(function (_resolve, _reject) {
-            resolve = _resolve;
-            reject = _reject;
-          });
-        }
-        if (elt == null) {
-          elt = getDocument().body;
-        }
-        const responseHandler = etc.handler || handleAjaxResponse;
-        const select = etc.select || null;
-
-        if (!bodyContains(elt)) {
-          // do not issue requests for elements removed from the DOM
-          maybeCall(resolve);
-          return promise; /// JESS: er... what if this was 'promise' var was never defined?
-        }
-        const target = etc.targetOverride || asElement(getTarget(elt));
-        if (target == null || target == DUMMY_ELT) {
-          triggerErrorEvent(elt, "htmx:targetError", {
-            target: getAttributeValue(elt, "hx-target"),
-          });
-          maybeCall(reject);
-          return promise;
-        }
-
-        let eltData = getInternalData(elt);
-        const submitter = eltData.lastButtonClicked; // JESS: this looks useful
-        HnyOtelWeb.setAttributes({ "htmx.submitter-id": submitter?.id });
-
-        if (submitter) {
-          const buttonPath = getRawAttribute(submitter, "formaction");
-          if (buttonPath != null) {
-            path = buttonPath;
-          }
-
-          const buttonVerb = getRawAttribute(submitter, "formmethod");
-          if (buttonVerb != null) {
-            // ignore buttons with formmethod="dialog"
-            if (buttonVerb.toLowerCase() !== "dialog") {
-              verb = /** @type HttpVerb */ (buttonVerb);
-            }
-          }
-        }
-
-        const confirmQuestion = getClosestAttributeValue(elt, "hx-confirm");
-        HnyOtelWeb.setAttributes({
-          "htmx.hx-confirm": confirmQuestion,
-          "htmx.confirmed": JSON.stringify(confirmed),
-        });
-        // allow event-based confirmation w/ a callback
-        if (confirmed === undefined) {
-          // JESS: this seems like the normal case... what is happening here?
-          const issueRequest = function (skipConfirmation) {
-            return issueAjaxRequest(
-              verb,
-              path,
-              elt,
-              event,
-              etc,
-              !!skipConfirmation
-            );
-          };
-          const confirmDetails = {
-            target,
-            elt,
-            path,
-            verb,
-            triggeringEvent: event,
-            etc,
-            issueRequest,
-            question: confirmQuestion,
-          };
-          if (triggerEvent(elt, "htmx:confirm", confirmDetails) === false) {
-            maybeCall(resolve);
-            return promise;
-          }
-        }
-
-        let syncElt = elt;
-        let syncStrategy = getClosestAttributeValue(elt, "hx-sync");
-        HnyOtelWeb.setAttributes({
-          "htmx.hx-sync": syncStrategy,
-        });
-        let queueStrategy = null;
-        let abortable = false;
-        if (syncStrategy) {
-          const syncStrings = syncStrategy.split(":");
-          const selector = syncStrings[0].trim();
-          if (selector === "this") {
-            syncElt = findThisElement(elt, "hx-sync");
-          } else {
-            syncElt = asElement(querySelectorExt(elt, selector));
-          }
-          // default to the drop strategy
-          syncStrategy = (syncStrings[1] || "drop").trim();
-          eltData = getInternalData(syncElt);
-          if (
-            syncStrategy === "drop" &&
-            eltData.xhr &&
-            eltData.abortable !== true
-          ) {
-            maybeCall(resolve);
-            return promise;
-          } else if (syncStrategy === "abort") {
-            if (eltData.xhr) {
-              maybeCall(resolve);
-              return promise;
-            } else {
-              abortable = true;
-            }
-          } else if (syncStrategy === "replace") {
-            triggerEvent(syncElt, "htmx:abort"); // abort the current request and continue
-          } else if (syncStrategy.indexOf("queue") === 0) {
-            const queueStrArray = syncStrategy.split(" ");
-            queueStrategy = (queueStrArray[1] || "last").trim();
-          }
-        }
-        HnyOtelWeb.setAttributes({
-          "htmx.abortable": eltData.abortable,
-          "htmx.sync-strategy": syncStrategy,
-          "htmx.queue-strategy": JSON.stringify(queueStrategy), // tell me if it's null
-          "htmx.queued-requests-count": (eltData || []).length,
-          "htmx.elt-data-xhr-defined": !!eltData.xhr,
-        });
-
-        if (eltData.xhr) {
-          if (eltData.abortable) {
-            triggerEvent(syncElt, "htmx:abort"); // abort the current request and continue
-          } else {
-            if (queueStrategy == null) {
-              if (event) {
-                const eventData = getInternalData(event);
-                if (
-                  eventData &&
-                  eventData.triggerSpec &&
-                  eventData.triggerSpec.queue
-                ) {
-                  queueStrategy = eventData.triggerSpec.queue;
-                }
-              }
-              if (queueStrategy == null) {
-                queueStrategy = "last";
-              }
-            }
-            if (eltData.queuedRequests == null) {
-              eltData.queuedRequests = [];
-            }
-            if (
-              queueStrategy === "first" &&
-              eltData.queuedRequests.length === 0
-            ) {
-              eltData.queuedRequests.push(function () {
-                issueAjaxRequest(verb, path, elt, event, etc);
-              });
-            } else if (queueStrategy === "all") {
-              eltData.queuedRequests.push(function () {
-                issueAjaxRequest(verb, path, elt, event, etc);
-              });
-            } else if (queueStrategy === "last") {
-              eltData.queuedRequests = []; // dump existing queue
-              eltData.queuedRequests.push(function () {
-                issueAjaxRequest(verb, path, elt, event, etc);
-              });
-            }
-            maybeCall(resolve);
-            return promise;
-          }
-        }
-
-        const xhr = new XMLHttpRequest();
-        eltData.xhr = xhr; // JESS: are we mutating the internal data on this object, or is this only a local var?
-        eltData.abortable = abortable;
-        const endRequestLock = function () {
-          eltData.xhr = null;
-          eltData.abortable = false;
-          if (
-            eltData.queuedRequests != null &&
-            eltData.queuedRequests.length > 0
-          ) {
-            const queuedRequest = eltData.queuedRequests.shift();
-            queuedRequest();
-          }
-        };
-        const promptQuestion = getClosestAttributeValue(elt, "hx-prompt");
-        if (promptQuestion) {
+      return HnyOtelWeb.inSpan(
+        HnyOtelWeb.APP_TRACER,
+        "issueAjaxRequest",
+        () => {
           HnyOtelWeb.setAttributes({
-            "htmx.hx-prompt": promptQuestion,
+            "htmx.verb": verb,
+            "htmx.path": path,
+            ...attributesAboutElement(elt),
           });
-          var promptResponse = prompt(promptQuestion);
-          // prompt returns null if cancelled and empty string if accepted with no entry
-          if (
-            promptResponse === null ||
-            !triggerEvent(elt, "htmx:prompt", {
-              prompt: promptResponse,
-              target,
-            })
-          ) {
-            maybeCall(resolve);
-            endRequestLock();
-            return promise;
-          }
-        }
-
-        if (confirmQuestion && !confirmed) {
-          if (!confirm(confirmQuestion)) {
-            maybeCall(resolve);
-            endRequestLock();
-            return promise;
-          }
-        }
-
-        let headers = getHeaders(elt, target, promptResponse);
-
-        if (verb !== "get" && !usesFormData(elt)) {
-          headers["Content-Type"] = "application/x-www-form-urlencoded";
-        }
-
-        if (etc.headers) {
-          headers = mergeObjects(headers, etc.headers);
-        }
-        const results = getInputValues(elt, verb); // JESS: this looks useful (although not PII-safe) to report
-        let errors = results.errors;
-        const rawFormData = results.formData;
-        if (etc.values) {
-          overrideFormData(rawFormData, formDataFromObject(etc.values));
-        }
-        const expressionVars = formDataFromObject(getExpressionVars(elt));
-        const allFormData = overrideFormData(rawFormData, expressionVars);
-        let filteredFormData = filterValues(allFormData, elt);
-
-        if (htmx.config.getCacheBusterParam && verb === "get") {
-          // JESS: wtf is this?
-          filteredFormData.set(
-            "org.htmx.cache-buster",
-            getRawAttribute(target, "id") || "true"
-          );
-        }
-
-        // behavior of anchors w/ empty href is to use the current URL
-        if (path == null || path === "") {
-          path = getDocument().location.href;
-        }
-
-        /**
-         * JESS: wow this is some useful type declaration
-         * @type {Object}
-         * @property {boolean} [credentials]
-         * @property {number} [timeout]
-         * @property {boolean} [noHeaders]
-         */
-        const requestAttrValues = getValuesForElement(elt, "hx-request");
-
-        const eltIsBoosted = getInternalData(elt).boosted;
-
-        let useUrlParams =
-          htmx.config.methodsThatUseUrlParams.indexOf(verb) >= 0; // JESS: ah, so I could tell it to send a body for GET
-
-        /** @type HtmxRequestConfig */
-        const requestConfig = {
-          boosted: eltIsBoosted,
-          useUrlParams,
-          formData: filteredFormData,
-          parameters: formDataProxy(filteredFormData),
-          unfilteredFormData: allFormData,
-          unfilteredParameters: formDataProxy(allFormData),
-          headers,
-          target,
-          verb,
-          errors,
-          withCredentials:
-            etc.credentials ||
-            requestAttrValues.credentials ||
-            htmx.config.withCredentials,
-          timeout:
-            etc.timeout || requestAttrValues.timeout || htmx.config.timeout,
-          path,
-          triggeringEvent: event,
-        };
-        HnyOtelWeb.setAttributes({
-          "htmx.request-config": safeStringify(requestConfig),
-        });
-
-        if (!triggerEvent(elt, "htmx:configRequest", requestConfig)) {
-          maybeCall(resolve);
-          endRequestLock(); // JESS: what is this doing here?
-          return promise;
-        }
-
-        // copy out in case the object was overwritten
-        path = requestConfig.path;
-        verb = requestConfig.verb;
-        headers = requestConfig.headers;
-        filteredFormData = formDataFromObject(requestConfig.parameters);
-        errors = requestConfig.errors;
-        useUrlParams = requestConfig.useUrlParams;
-
-        if (errors && errors.length > 0) {
-          triggerEvent(elt, "htmx:validation:halted", requestConfig);
-          maybeCall(resolve);
-          endRequestLock();
-          return promise;
-        }
-
-        const splitPath = path.split("#");
-        const pathNoAnchor = splitPath[0];
-        const anchor = splitPath[1];
-
-        let finalPath = path;
-        if (useUrlParams) {
-          finalPath = pathNoAnchor;
-          const hasValues = !filteredFormData.keys().next().done;
-          if (hasValues) {
-            if (finalPath.indexOf("?") < 0) {
-              finalPath += "?";
-            } else {
-              finalPath += "&";
-            }
-            finalPath += urlEncode(filteredFormData);
-            if (anchor) {
-              finalPath += "#" + anchor;
-            }
-          }
-        }
-
-        HnyOtelWeb.setAttributes({ "htmx.final-path": finalPath });
-
-        if (!verifyPath(elt, finalPath, requestConfig)) {
-          triggerErrorEvent(elt, "htmx:invalidPath", requestConfig);
-          maybeCall(reject);
-          return promise;
-        }
-
-        xhr.open(verb.toUpperCase(), finalPath, true);
-        xhr.overrideMimeType("text/html"); // JESS: what effect does this have?
-        xhr.withCredentials = requestConfig.withCredentials;
-        xhr.timeout = requestConfig.timeout;
-
-        // request headers
-        if (requestAttrValues.noHeaders) {
-          // ignore all headers
-        } else {
-          for (const header in headers) {
-            if (headers.hasOwnProperty(header)) {
-              const headerValue = headers[header];
-              safelySetHeaderValue(xhr, header, headerValue);
-            }
-          }
-        }
-
-        /** @type {HtmxResponseInfo} */
-        const responseInfo = {
-          xhr,
-          target,
-          requestConfig,
-          etc,
-          boosted: eltIsBoosted,
-          select,
-          pathInfo: {
-            requestPath: path,
-            finalRequestPath: finalPath,
-            responsePath: null,
-            anchor,
-          },
-        };
-
-        xhr.onload = function () {
-          return HnyOtelWeb.inSpan(
-            HnyOtelWeb.INTERNAL_TRACER,
-            "xhr response received",
-            () => {
-              try {
-                const hierarchy = hierarchyForElt(elt);
-                responseInfo.pathInfo.responsePath = getPathFromResponse(xhr);
-                responseHandler(elt, responseInfo); // looks innocuous...
-                removeRequestIndicators(indicators, disableElts);
-                triggerEvent(elt, "htmx:afterRequest", responseInfo);
-                triggerEvent(elt, "htmx:afterOnLoad", responseInfo);
-                // if the body no longer contains the element, trigger the event on the closest parent
-                // remaining in the DOM
-                if (!bodyContains(elt)) {
-                  let secondaryTriggerElt = null;
-                  while (hierarchy.length > 0 && secondaryTriggerElt == null) {
-                    const parentEltInHierarchy = hierarchy.shift();
-                    if (bodyContains(parentEltInHierarchy)) {
-                      secondaryTriggerElt = parentEltInHierarchy;
-                    }
-                  }
-                  if (secondaryTriggerElt) {
-                    triggerEvent(
-                      secondaryTriggerElt,
-                      "htmx:afterRequest",
-                      responseInfo
-                    );
-                    triggerEvent(
-                      secondaryTriggerElt,
-                      "htmx:afterOnLoad",
-                      responseInfo
-                    );
-                  }
-                }
-                maybeCall(resolve);
-                endRequestLock();
-              } catch (e) {
-                triggerErrorEvent(
-                  elt,
-                  "htmx:onLoadError",
-                  mergeObjects({ error: e }, responseInfo)
-                );
-                throw e;
-              }
-            }
-          );
-        };
-        xhr.onerror = function () {
-          return HnyOtelWeb.inSpan(
-            HnyOtelWeb.INTERNAL_TRACER,
-            "xhr error received",
-            () => {
-              removeRequestIndicators(indicators, disableElts);
-              triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
-              triggerErrorEvent(elt, "htmx:sendError", responseInfo);
-              maybeCall(reject);
-              endRequestLock();
-            }
-          );
-        };
-        xhr.onabort = function () {
-          return HnyOtelWeb.inSpan(HnyOtelWeb.INTERNAL_TRACER, "xhr aborted", () => {
-            removeRequestIndicators(indicators, disableElts);
-            triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
-            triggerErrorEvent(elt, "htmx:sendAbort", responseInfo);
-            maybeCall(reject);
-            endRequestLock();
-          });
-        };
-        xhr.ontimeout = function () {
-          return HnyOtelWeb.inSpan(HnyOtelWeb.INTERNAL_TRACER, "xhr timeout", () => {
-            removeRequestIndicators(indicators, disableElts);
-            triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
-            triggerErrorEvent(elt, "htmx:timeout", responseInfo);
-            maybeCall(reject);
-            endRequestLock();
-          });
-        };
-        if (!triggerEvent(elt, "htmx:beforeRequest", responseInfo)) {
-          maybeCall(resolve);
-          endRequestLock();
-          return promise;
-        }
-        var indicators = addRequestIndicatorClasses(elt);
-        var disableElts = disableElements(elt);
-
-        forEach(
-          ["loadstart", "loadend", "progress", "abort"],
-          function (eventName) {
-            forEach([xhr, xhr.upload], function (target) {
-              target.addEventListener(eventName, function (event) {
-                triggerEvent(elt, "htmx:xhr:" + eventName, {
-                  lengthComputable: event.lengthComputable,
-                  loaded: event.loaded,
-                  total: event.total,
-                });
-              });
+          let resolve = null;
+          let reject = null;
+          etc = etc != null ? etc : {};
+          if (etc.returnPromise && typeof Promise !== "undefined") {
+            var promise = new Promise(function (_resolve, _reject) {
+              resolve = _resolve;
+              reject = _reject;
             });
           }
-        );
-        triggerEvent(elt, "htmx:beforeSend", responseInfo);
-        const params = useUrlParams
-          ? null
-          : encodeParamsForBody(xhr, elt, filteredFormData);
-        xhr.send(params); // JESS: omg did it finally do the thing???!??!
-        return promise;
-      });
+          if (elt == null) {
+            elt = getDocument().body;
+          }
+          const responseHandler = etc.handler || handleAjaxResponse;
+          const select = etc.select || null;
+
+          if (!bodyContains(elt)) {
+            // do not issue requests for elements removed from the DOM
+            maybeCall(resolve);
+            return promise; /// JESS: er... what if this was 'promise' var was never defined?
+          }
+          const target = etc.targetOverride || asElement(getTarget(elt));
+          if (target == null || target == DUMMY_ELT) {
+            triggerErrorEvent(elt, "htmx:targetError", {
+              target: getAttributeValue(elt, "hx-target"),
+            });
+            maybeCall(reject);
+            return promise;
+          }
+
+          let eltData = getInternalData(elt);
+          const submitter = eltData.lastButtonClicked; // JESS: this looks useful
+          HnyOtelWeb.setAttributes({ "htmx.submitter-id": submitter?.id });
+
+          if (submitter) {
+            const buttonPath = getRawAttribute(submitter, "formaction");
+            if (buttonPath != null) {
+              path = buttonPath;
+            }
+
+            const buttonVerb = getRawAttribute(submitter, "formmethod");
+            if (buttonVerb != null) {
+              // ignore buttons with formmethod="dialog"
+              if (buttonVerb.toLowerCase() !== "dialog") {
+                verb = /** @type HttpVerb */ (buttonVerb);
+              }
+            }
+          }
+
+          const confirmQuestion = getClosestAttributeValue(elt, "hx-confirm");
+          HnyOtelWeb.setAttributes({
+            "htmx.hx-confirm": confirmQuestion,
+            "htmx.confirmed": JSON.stringify(confirmed),
+          });
+          // allow event-based confirmation w/ a callback
+          if (confirmed === undefined) {
+            // JESS: this seems like the normal case... what is happening here?
+            const issueRequest = function (skipConfirmation) {
+              return issueAjaxRequest(
+                verb,
+                path,
+                elt,
+                event,
+                etc,
+                !!skipConfirmation
+              );
+            };
+            const confirmDetails = {
+              target,
+              elt,
+              path,
+              verb,
+              triggeringEvent: event,
+              etc,
+              issueRequest,
+              question: confirmQuestion,
+            };
+            if (triggerEvent(elt, "htmx:confirm", confirmDetails) === false) {
+              maybeCall(resolve);
+              return promise;
+            }
+          }
+
+          let syncElt = elt;
+          let syncStrategy = getClosestAttributeValue(elt, "hx-sync");
+          HnyOtelWeb.setAttributes({
+            "htmx.hx-sync": syncStrategy,
+          });
+          let queueStrategy = null;
+          let abortable = false;
+          if (syncStrategy) {
+            const syncStrings = syncStrategy.split(":");
+            const selector = syncStrings[0].trim();
+            if (selector === "this") {
+              syncElt = findThisElement(elt, "hx-sync");
+            } else {
+              syncElt = asElement(querySelectorExt(elt, selector));
+            }
+            // default to the drop strategy
+            syncStrategy = (syncStrings[1] || "drop").trim();
+            eltData = getInternalData(syncElt);
+            if (
+              syncStrategy === "drop" &&
+              eltData.xhr &&
+              eltData.abortable !== true
+            ) {
+              maybeCall(resolve);
+              return promise;
+            } else if (syncStrategy === "abort") {
+              if (eltData.xhr) {
+                maybeCall(resolve);
+                return promise;
+              } else {
+                abortable = true;
+              }
+            } else if (syncStrategy === "replace") {
+              triggerEvent(syncElt, "htmx:abort"); // abort the current request and continue
+            } else if (syncStrategy.indexOf("queue") === 0) {
+              const queueStrArray = syncStrategy.split(" ");
+              queueStrategy = (queueStrArray[1] || "last").trim();
+            }
+          }
+          HnyOtelWeb.setAttributes({
+            "htmx.abortable": eltData.abortable,
+            "htmx.sync-strategy": syncStrategy,
+            "htmx.queue-strategy": JSON.stringify(queueStrategy), // tell me if it's null
+            "htmx.queued-requests-count": (eltData || []).length,
+            "htmx.elt-data-xhr-defined": !!eltData.xhr,
+          });
+
+          if (eltData.xhr) {
+            if (eltData.abortable) {
+              triggerEvent(syncElt, "htmx:abort"); // abort the current request and continue
+            } else {
+              if (queueStrategy == null) {
+                if (event) {
+                  const eventData = getInternalData(event);
+                  if (
+                    eventData &&
+                    eventData.triggerSpec &&
+                    eventData.triggerSpec.queue
+                  ) {
+                    queueStrategy = eventData.triggerSpec.queue;
+                  }
+                }
+                if (queueStrategy == null) {
+                  queueStrategy = "last";
+                }
+              }
+              if (eltData.queuedRequests == null) {
+                eltData.queuedRequests = [];
+              }
+              if (
+                queueStrategy === "first" &&
+                eltData.queuedRequests.length === 0
+              ) {
+                eltData.queuedRequests.push(function () {
+                  issueAjaxRequest(verb, path, elt, event, etc);
+                });
+              } else if (queueStrategy === "all") {
+                eltData.queuedRequests.push(function () {
+                  issueAjaxRequest(verb, path, elt, event, etc);
+                });
+              } else if (queueStrategy === "last") {
+                eltData.queuedRequests = []; // dump existing queue
+                eltData.queuedRequests.push(function () {
+                  issueAjaxRequest(verb, path, elt, event, etc);
+                });
+              }
+              maybeCall(resolve);
+              return promise;
+            }
+          }
+
+          const xhr = new XMLHttpRequest();
+          eltData.xhr = xhr; // JESS: are we mutating the internal data on this object, or is this only a local var?
+          eltData.abortable = abortable;
+          const endRequestLock = function () {
+            eltData.xhr = null;
+            eltData.abortable = false;
+            if (
+              eltData.queuedRequests != null &&
+              eltData.queuedRequests.length > 0
+            ) {
+              const queuedRequest = eltData.queuedRequests.shift();
+              queuedRequest();
+            }
+          };
+          const promptQuestion = getClosestAttributeValue(elt, "hx-prompt");
+          if (promptQuestion) {
+            HnyOtelWeb.setAttributes({
+              "htmx.hx-prompt": promptQuestion,
+            });
+            var promptResponse = prompt(promptQuestion);
+            // prompt returns null if cancelled and empty string if accepted with no entry
+            if (
+              promptResponse === null ||
+              !triggerEvent(elt, "htmx:prompt", {
+                prompt: promptResponse,
+                target,
+              })
+            ) {
+              maybeCall(resolve);
+              endRequestLock();
+              return promise;
+            }
+          }
+
+          if (confirmQuestion && !confirmed) {
+            if (!confirm(confirmQuestion)) {
+              maybeCall(resolve);
+              endRequestLock();
+              return promise;
+            }
+          }
+
+          let headers = getHeaders(elt, target, promptResponse);
+
+          if (verb !== "get" && !usesFormData(elt)) {
+            headers["Content-Type"] = "application/x-www-form-urlencoded";
+          }
+
+          if (etc.headers) {
+            headers = mergeObjects(headers, etc.headers);
+          }
+          const results = getInputValues(elt, verb); // JESS: this looks useful (although not PII-safe) to report
+          let errors = results.errors;
+          const rawFormData = results.formData;
+          if (etc.values) {
+            overrideFormData(rawFormData, formDataFromObject(etc.values));
+          }
+          const expressionVars = formDataFromObject(getExpressionVars(elt));
+          const allFormData = overrideFormData(rawFormData, expressionVars);
+          let filteredFormData = filterValues(allFormData, elt);
+
+          if (htmx.config.getCacheBusterParam && verb === "get") {
+            // JESS: wtf is this?
+            filteredFormData.set(
+              "org.htmx.cache-buster",
+              getRawAttribute(target, "id") || "true"
+            );
+          }
+
+          // behavior of anchors w/ empty href is to use the current URL
+          if (path == null || path === "") {
+            path = getDocument().location.href;
+          }
+
+          /**
+           * JESS: wow this is some useful type declaration
+           * @type {Object}
+           * @property {boolean} [credentials]
+           * @property {number} [timeout]
+           * @property {boolean} [noHeaders]
+           */
+          const requestAttrValues = getValuesForElement(elt, "hx-request");
+
+          const eltIsBoosted = getInternalData(elt).boosted;
+
+          let useUrlParams =
+            htmx.config.methodsThatUseUrlParams.indexOf(verb) >= 0; // JESS: ah, so I could tell it to send a body for GET
+
+          /** @type HtmxRequestConfig */
+          const requestConfig = {
+            boosted: eltIsBoosted,
+            useUrlParams,
+            formData: filteredFormData,
+            parameters: formDataProxy(filteredFormData),
+            unfilteredFormData: allFormData,
+            unfilteredParameters: formDataProxy(allFormData),
+            headers,
+            target,
+            verb,
+            errors,
+            withCredentials:
+              etc.credentials ||
+              requestAttrValues.credentials ||
+              htmx.config.withCredentials,
+            timeout:
+              etc.timeout || requestAttrValues.timeout || htmx.config.timeout,
+            path,
+            triggeringEvent: event,
+          };
+          HnyOtelWeb.setAttributes({
+            "htmx.request-config": safeStringify(requestConfig),
+          });
+
+          if (!triggerEvent(elt, "htmx:configRequest", requestConfig)) {
+            maybeCall(resolve);
+            endRequestLock(); // JESS: what is this doing here?
+            return promise;
+          }
+
+          // copy out in case the object was overwritten
+          path = requestConfig.path;
+          verb = requestConfig.verb;
+          headers = requestConfig.headers;
+          filteredFormData = formDataFromObject(requestConfig.parameters);
+          errors = requestConfig.errors;
+          useUrlParams = requestConfig.useUrlParams;
+
+          if (errors && errors.length > 0) {
+            triggerEvent(elt, "htmx:validation:halted", requestConfig);
+            maybeCall(resolve);
+            endRequestLock();
+            return promise;
+          }
+
+          const splitPath = path.split("#");
+          const pathNoAnchor = splitPath[0];
+          const anchor = splitPath[1];
+
+          let finalPath = path;
+          if (useUrlParams) {
+            finalPath = pathNoAnchor;
+            const hasValues = !filteredFormData.keys().next().done;
+            if (hasValues) {
+              if (finalPath.indexOf("?") < 0) {
+                finalPath += "?";
+              } else {
+                finalPath += "&";
+              }
+              finalPath += urlEncode(filteredFormData);
+              if (anchor) {
+                finalPath += "#" + anchor;
+              }
+            }
+          }
+
+          HnyOtelWeb.setAttributes({ "htmx.final-path": finalPath });
+
+          if (!verifyPath(elt, finalPath, requestConfig)) {
+            triggerErrorEvent(elt, "htmx:invalidPath", requestConfig);
+            maybeCall(reject);
+            return promise;
+          }
+
+          xhr.open(verb.toUpperCase(), finalPath, true);
+          xhr.overrideMimeType("text/html"); // JESS: what effect does this have?
+          xhr.withCredentials = requestConfig.withCredentials;
+          xhr.timeout = requestConfig.timeout;
+
+          // request headers
+          if (requestAttrValues.noHeaders) {
+            // ignore all headers
+          } else {
+            for (const header in headers) {
+              if (headers.hasOwnProperty(header)) {
+                const headerValue = headers[header];
+                safelySetHeaderValue(xhr, header, headerValue);
+              }
+            }
+          }
+
+          /** @type {HtmxResponseInfo} */
+          const responseInfo = {
+            xhr,
+            target,
+            requestConfig,
+            etc,
+            boosted: eltIsBoosted,
+            select,
+            pathInfo: {
+              requestPath: path,
+              finalRequestPath: finalPath,
+              responsePath: null,
+              anchor,
+            },
+          };
+
+          xhr.onload = function () {
+            // TODO: I need to pass in the parent span for this
+            return HnyOtelWeb.inSpan(
+              HnyOtelWeb.INTERNAL_TRACER,
+              "xhr response received",
+              () => {
+                try {
+                  const hierarchy = hierarchyForElt(elt);
+                  responseInfo.pathInfo.responsePath = getPathFromResponse(xhr);
+                  responseHandler(elt, responseInfo); // looks innocuous...
+                  removeRequestIndicators(indicators, disableElts);
+                  triggerEvent(elt, "htmx:afterRequest", responseInfo);
+                  triggerEvent(elt, "htmx:afterOnLoad", responseInfo);
+                  // if the body no longer contains the element, trigger the event on the closest parent
+                  // remaining in the DOM
+                  if (!bodyContains(elt)) {
+                    let secondaryTriggerElt = null;
+                    while (
+                      hierarchy.length > 0 &&
+                      secondaryTriggerElt == null
+                    ) {
+                      const parentEltInHierarchy = hierarchy.shift();
+                      if (bodyContains(parentEltInHierarchy)) {
+                        secondaryTriggerElt = parentEltInHierarchy;
+                      }
+                    }
+                    if (secondaryTriggerElt) {
+                      triggerEvent(
+                        secondaryTriggerElt,
+                        "htmx:afterRequest",
+                        responseInfo
+                      );
+                      triggerEvent(
+                        secondaryTriggerElt,
+                        "htmx:afterOnLoad",
+                        responseInfo
+                      );
+                    }
+                  }
+                  maybeCall(resolve);
+                  endRequestLock();
+                } catch (e) {
+                  triggerErrorEvent(
+                    elt,
+                    "htmx:onLoadError",
+                    mergeObjects({ error: e }, responseInfo)
+                  );
+                  throw e;
+                }
+              }
+            );
+          };
+          xhr.onerror = function () {
+            return HnyOtelWeb.inSpan(
+              HnyOtelWeb.INTERNAL_TRACER,
+              "xhr error received",
+              () => {
+                removeRequestIndicators(indicators, disableElts);
+                triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
+                triggerErrorEvent(elt, "htmx:sendError", responseInfo);
+                maybeCall(reject);
+                endRequestLock();
+              }
+            );
+          };
+          xhr.onabort = function () {
+            return HnyOtelWeb.inSpan(
+              HnyOtelWeb.INTERNAL_TRACER,
+              "xhr aborted",
+              () => {
+                removeRequestIndicators(indicators, disableElts);
+                triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
+                triggerErrorEvent(elt, "htmx:sendAbort", responseInfo);
+                maybeCall(reject);
+                endRequestLock();
+              }
+            );
+          };
+          xhr.ontimeout = function () {
+            return HnyOtelWeb.inSpan(
+              HnyOtelWeb.INTERNAL_TRACER,
+              "xhr timeout",
+              () => {
+                removeRequestIndicators(indicators, disableElts);
+                triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
+                triggerErrorEvent(elt, "htmx:timeout", responseInfo);
+                maybeCall(reject);
+                endRequestLock();
+              }
+            );
+          };
+          if (!triggerEvent(elt, "htmx:beforeRequest", responseInfo)) {
+            maybeCall(resolve);
+            endRequestLock();
+            return promise;
+          }
+          var indicators = addRequestIndicatorClasses(elt);
+          var disableElts = disableElements(elt);
+
+          forEach(
+            ["loadstart", "loadend", "progress", "abort"],
+            function (eventName) {
+              forEach([xhr, xhr.upload], function (target) {
+                target.addEventListener(eventName, function (event) {
+                  triggerEvent(elt, "htmx:xhr:" + eventName, {
+                    lengthComputable: event.lengthComputable,
+                    loaded: event.loaded,
+                    total: event.total,
+                  });
+                });
+              });
+            }
+          );
+          triggerEvent(elt, "htmx:beforeSend", responseInfo);
+          const params = useUrlParams
+            ? null
+            : encodeParamsForBody(xhr, elt, filteredFormData);
+          xhr.send(params); // JESS: omg did it finally do the thing???!??!
+          return promise;
+        }
+      );
     }
 
     /**
