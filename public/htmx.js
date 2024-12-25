@@ -9,13 +9,14 @@ var htmx = (function () {
     return;
   }
 
-  // Requires version 0.10.2 or greater of jessitron/hny-otel-web, separately initialized.
+  // Requires version 0.10.4 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.6";
+  const INSTRUMENTATION_VERSION = "0.0.11";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
     note: "Honeycomb tracing not found; this is a stub implementation.",
+    activeContext() {},
     inSpan(_tracer, _span, fn) {
       return fn(this.emptySpan);
     },
@@ -3323,6 +3324,7 @@ var htmx = (function () {
             logError(detail.error);
             triggerEvent(elt, "htmx:error", { errorInfo: detail });
           }
+          event.otel_tracecontext = HnyOtelWeb.activeContext();
           let eventResult = elt.dispatchEvent(event); // JESS: can I put tracing detail on this event object?
           const kebabName = kebabEventName(eventName);
           if (eventResult && kebabName !== eventName) {
@@ -4622,8 +4624,10 @@ var htmx = (function () {
         return {};
       }
       const attributes = {};
-      for (const attr of elt.attributes) {
-        attributes[attr.name] = attr.value;
+      if (!!elt.attributes) {
+        for (const attr of elt.attributes) {
+          attributes[attr.name] = attr.value;
+        }
       }
       return {
         "htmx.element.id": elt.id,
@@ -4655,6 +4659,8 @@ var htmx = (function () {
             "htmx.verb": verb,
             "htmx.path": path,
             ...attributesAboutElement(elt),
+            "jess.event-exists": !!event,
+            "jess.event-has-context": !!event?.otel_tracecontext,
           });
           let resolve = null;
           let reject = null;
@@ -5144,7 +5150,8 @@ var htmx = (function () {
             : encodeParamsForBody(xhr, elt, filteredFormData);
           xhr.send(params); // JESS: omg did it finally do the thing???!??!
           return promise;
-        }
+        },
+        event?.otel_tracecontext // probably not populated, but hey, let's try it
       );
     }
 
