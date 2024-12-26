@@ -15,6 +15,7 @@ import { spanAttributesAboutAuth } from "./common";
 import { fakeAuthEndpoint, getAuthResult } from "./FakeRegion";
 import { report } from "./tracing-util";
 import { index } from "./index";
+import { TraceActions } from "./TraceSection";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -51,6 +52,17 @@ app.post("/validate", (req: Request, res: Response) => {
   const apiKeyInterpretation = commentOnApiKey(req.body.apikey);
   report({ "app.response": apiKeyInterpretation });
   res.send(apiKeyInterpretation);
+});
+
+app.post("/trace", async (req: Request, res: Response) => {
+  trace.getActiveSpan().setAttributes({
+    "noreally.request.body": "< " + JSON.stringify(req.body) + " >",
+    "noreally.request.query": "< " + JSON.stringify(req.query) + " >",
+    "noreally.request.params": "< " + JSON.stringify(req.params) + " >",
+    "app.traceId": req.body["trace-id"],
+    "app.apiKey.exists": !!req.body["apikey"],
+  });
+  res.send(TraceActions(req.body.apikey, req.body["trace-id"]));
 });
 
 app.post("/datasets", async (req: Request, res: Response) => {

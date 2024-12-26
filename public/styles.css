@@ -11,6 +11,7 @@
   --color-hny-indigo: #51368d;
   --color-hny-slate: #25303e;
   --lat-ref-color-gold-100: #ffeab2;
+  --lat-ref-color-sky-200: #8dcaf5;
 }
 
 body {
@@ -208,4 +209,19 @@ div.team {
 
 #bug {
   width: 10px;
+}
+
+input#trace-id {
+  width: 20em;
+}
+
+#trace-section {
+  background-color: var(--lat-ref-color-sky-200);
+}
+
+.section-title {
+  text-align: start;
+  margin-top: 5px;
+  margin-inline-start: 5px;
+  margin-bottom: 5px;
 }

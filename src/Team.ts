@@ -1,5 +1,6 @@
 import { trace } from "@opentelemetry/api";
 import { authorize, isAuthError, startingApiKeyPrompt } from "./ApiKeyPrompt";
+import { TraceSection } from "./TraceSection";
 import {
   HnyTricksAuthorization,
   HoneycombUIEndpointByRegion,
@@ -26,6 +27,8 @@ export async function team(apikey) {
   }
   span?.setAttributes(spanAttributesAboutAuth(authResult));
 
+  const traceSection = TraceSection(authResult);
+
   const datasetSection = html`<section
     name="dataset-section"
     id="dataset-section"
@@ -35,7 +38,7 @@ export async function team(apikey) {
   >
     Loading datasets...
   </section>`;
-  return teamDescription(authResult) + datasetSection;
+  return teamDescription(authResult) + traceSection + datasetSection;
 }
 
 export function teamDescription(auth: HnyTricksAuthorization) {
