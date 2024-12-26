@@ -35,11 +35,16 @@ export function ApiKeyPrompt(params: {
     <form hx-post="${params.endpointToPopulateItWith}" hx-target="#apikey-section" hx-swap="outerHTML" id="apikey-form" hx-indicator="#big-think">
       <div>
         <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
-        <input id="apikey" type="password" name="apikey" hx-trigger="keyup throttle:500ms" hx-post="${params.endpointForApiKeyValidation}" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
+        <input id="apikey" type="password" 
+          name="apikey"
+          hx-trigger="input changed throttle:200ms"
+          hx-post="${params.endpointForApiKeyValidation}"
+          hx-target="#apikey-opinion"
+          hx-include="#apikey" 
+          hx-swap="innerHTML"></input>
         <button>Check Permissions</button>
       </div>
-      <div>
-        <span id="apikey-opinion"></span>
+      <div id="apikey-opinion">
       </div>
     </form>
     <p class="fine-print">This API key will be sent to the Honeycomb Tricks backend, but we don't save it.
@@ -53,29 +58,50 @@ export function commentOnApiKey(apiKey: string): string {
     return "";
   }
   const keyInfo = interpretApiKey(apiKey);
+  const remark = remarkOnKeyInfo(keyInfo);
+
+  return html`<span
+    class="${remark.className}"
+    data-traceid="${currentTraceId()}"
+    >${remark.description}</span
+  >`;
+}
+
+function remarkOnKeyInfo(keyInfo): {
+  className: "happy" | "unhappy";
+  description: string;
+} {
   if (keyInfo.type === "ingest") {
     if (keyInfo.region !== "unknown") {
-      return html`<span class="happy"
-        >This looks like a ${keyInfo.region} ingest key</span
-      >`;
+      return {
+        className: "happy",
+        description: "This looks like a ${keyInfo.region} ingest key",
+      };
     } else {
-      return html`<span class="unhappy"
-        >This looks like an ingest key, but I can't tell which region</span
-      >`;
+      return {
+        className: "unhappy",
+        description:
+          "This looks like an ingest key, but I can't tell which region",
+      };
     }
   } else if (
     keyInfo.type === "configuration" &&
     keyInfo.environmentType === "classic"
   ) {
-    return html`<span class="happy">
-      That looks like a Honeycomb Classic configuration key.
-    </span>`;
+    return {
+      className: "happy",
+      description: "That looks like a Honeycomb Classic configuration key.",
+    };
   } else if (keyInfo.type === "configuration") {
-    return html`<span class="happy"
-      >That looks like a Honeycomb configuration key. Great.</span
-    >`;
+    return {
+      className: "happy",
+      description: "That looks like a Honeycomb configuration key. Great.",
+    };
   }
-  return html`<span class="unhappy">That doesn't look like an API key</span>`;
+  return {
+    className: "unhappy",
+    description: "That doesn't look like an API key",
+  };
 }
 
 export function interpretApiKey(apiKey: string): KeyInfo {

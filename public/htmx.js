@@ -9,9 +9,9 @@ var htmx = (function () {
     return;
   }
 
-  // Requires version 0.10.9 or greater of jessitron/hny-otel-web, separately initialized.
+  // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.18";
+  const INSTRUMENTATION_VERSION = "0.0.21";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -4676,7 +4676,7 @@ var htmx = (function () {
       return HnyOtelWeb.inSpan(
         HnyOtelWeb.APP_TRACER,
         "issueAjaxRequest",
-        () => {
+        (issueAjaxRequestSpan) => {
           HnyOtelWeb.setAttributes({
             "htmx.verb": verb,
             "htmx.path": path,
@@ -5055,9 +5055,10 @@ var htmx = (function () {
 
           xhr.onload = function () {
             // TODO: I need to pass in the parent span for this
-            return HnyOtelWeb.inSpan(
+            return HnyOtelWeb.inChildSpan(
               HnyOtelWeb.INTERNAL_TRACER,
               "xhr response received",
+              issueAjaxRequestSpan.spanContext(),
               () => {
                 try {
                   const hierarchy = hierarchyForElt(elt);
