@@ -98,3 +98,15 @@ export function spanAttributesAboutAuth(auth: HnyTricksAuthorization) {
     "honeycomb.team": auth.team.slug,
   };
 }
+
+export function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
+  // TODO: handle classic and get the endpoint right
+  const envSlug = auth.environment.slug || "$legacy$"; // Classic environment doesn't have a slug
+  return (
+    HoneycombUIEndpointByRegion[auth.keyInfo.region] +
+    auth.team.slug +
+    "/environments/" +
+    envSlug +
+    "/"
+  );
+}

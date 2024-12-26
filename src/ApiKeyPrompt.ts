@@ -1,6 +1,5 @@
 import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
-import { teamDescription } from "./Team";
 import {
   Region,
   KeyType,

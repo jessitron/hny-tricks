@@ -62,7 +62,7 @@ app.post("/trace", async (req: Request, res: Response) => {
     "app.traceId": req.body["trace-id"],
     "app.apiKey.exists": !!req.body["apikey"],
   });
-  res.send(TraceActions(req.body.apikey, req.body["trace-id"]));
+  res.send(await TraceActions(req.body.apikey, req.body["trace-id"]));
 });
 
 app.post("/datasets", async (req: Request, res: Response) => {

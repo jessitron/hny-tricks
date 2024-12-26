@@ -225,3 +225,7 @@ input#trace-id {
   margin-inline-start: 5px;
   margin-bottom: 5px;
 }
+
+.invisible {
+  display: none;
+}

@@ -2,6 +2,7 @@ import { trace } from "@opentelemetry/api";
 import { authorize, isAuthError, startingApiKeyPrompt } from "./ApiKeyPrompt";
 import { TraceSection } from "./TraceSection";
 import {
+  constructEnvironmentLink,
   HnyTricksAuthorization,
   HoneycombUIEndpointByRegion,
   spanAttributesAboutAuth,
@@ -45,10 +46,13 @@ export function teamDescription(auth: HnyTricksAuthorization) {
   const envLink = constructEnvironmentLink(auth);
   return html`<section class="team">
     <div class="team-description team-apikey">
-        <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
-            <input id="apikey" type="password" name="apikey" disabled="true" value="${
+        <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey-input">👁</span></label>
+            <input id="apikey-input" type="password" name="apikey-input" disabled="true" value="${
               auth.apiKey
             }" ></input>
+            <input class="invisible" id="apikey" name="apikey" value="${
+              auth.apiKey
+            }"></input>
             <button onclick="window.location = window.location" >Reset</button>
     </div>
     <div class="team-description team-region">Region: ${
@@ -63,14 +67,4 @@ export function teamDescription(auth: HnyTricksAuthorization) {
   </section>`;
 }
 
-function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
-  // TODO: handle classic and get the endpoint right
-  const envSlug = auth.environment.slug || "$legacy$"; // Classic environment doesn't have a slug
-  return (
-    HoneycombUIEndpointByRegion[auth.keyInfo.region] +
-    auth.team.slug +
-    "/environments/" +
-    envSlug +
-    "/"
-  );
-}
+
