@@ -35,7 +35,7 @@ export function ApiKeyPrompt(params: {
     <form hx-post="${params.endpointToPopulateItWith}" hx-target="#apikey-section" hx-swap="outerHTML" id="apikey-form" hx-indicator="#big-think">
       <div>
         <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
-        <input id="apikey" type="password" name="apikey" hx-post="${params.endpointForApiKeyValidation}" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
+        <input id="apikey" type="password" name="apikey" hx-trigger="keyup throttle:500ms" hx-post="${params.endpointForApiKeyValidation}" hx-target="#apikey-opinion" hx-include="#apikey" ></input>
         <button>Check Permissions</button>
       </div>
       <div>
@@ -63,6 +63,13 @@ export function commentOnApiKey(apiKey: string): string {
         >This looks like an ingest key, but I can't tell which region</span
       >`;
     }
+  } else if (
+    keyInfo.type === "configuration" &&
+    keyInfo.environmentType === "classic"
+  ) {
+    return html`<span class="happy">
+      That looks like a Honeycomb Classic configuration key.
+    </span>`;
   } else if (keyInfo.type === "configuration") {
     return html`<span class="happy"
       >That looks like a Honeycomb configuration key. Great.</span
