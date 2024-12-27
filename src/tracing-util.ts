@@ -60,11 +60,11 @@ function recordException(exception, additionalAttributes) {
   });
 }
 
-export function inSpan(tracerName, spanName, fn) {
+export function inSpan(spanName, fn) {
   if (fn === undefined) {
     console.log("USAGE: inSpan(tracerName, spanName, () => { ... })");
   }
-  return trace.getTracer(tracerName).startActiveSpan(spanName, (span) => {
+  return trace.getTracer("hny-tricks").startActiveSpan(spanName, (span) => {
     try {
       return fn();
     } catch (err) {
@@ -80,13 +80,13 @@ export function inSpan(tracerName, spanName, fn) {
   });
 }
 
-export async function inSpanAsync(tracerName, spanName, fn) {
+export async function inSpanAsync(spanName, fn) {
   if (fn === undefined) {
     console.log(
-      "USAGE: inSpanAsync(tracerName, spanName, async () => { ... })"
+      "USAGE: inSpanAsync(spanName, async () => { ... })"
     );
   }
-  return trace.getTracer(tracerName).startActiveSpan(spanName, async (span) => {
+  return trace.getTracer("hny-tricks").startActiveSpan(spanName, async (span) => {
     try {
       return await fn();
     } catch (err) {

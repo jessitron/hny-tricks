@@ -13,6 +13,7 @@ import {
 import { fetchFromHoneycombApi, isFetchError } from "./HoneycombApi";
 import {
   currentTraceId,
+  inSpan,
   inSpanAsync,
   recordError,
   report,
@@ -214,30 +215,30 @@ export async function authorize(
 }
 
 async function tryAllRegions(apiKey: string): Promise<Region> {
-  return inSpanAsync(
-    "hny-tricks/honeycomb-api-key",
-    "try all regions",
-    async (span) => {
-      const regions = Object.keys(HoneycombApiEndpointByRegion) as Region[]; // is there a cleverer way to do that?
-      let regionsTried = 0;
-      let regionIdentified: Region = "unknown";
-      for (const region of regions) {
-        const response = await fetchFromHoneycombApi<HoneycombAuthResponse>(
-          { apiKey, keyInfo: { region } },
-          "auth"
-        );
-        regionsTried++;
-        if (!isFetchError(response)) {
-          regionIdentified = region;
-          break;
-        }
-      }
+  return inSpanAsync("try the API key in all regions", async (span) => {
+    const regions = Object.keys(HoneycombApiEndpointByRegion) as Region[]; // is there a cleverer way to do that?
+    const regionIdentified = await Promise.any(
+      regions.map((region) =>
+        inSpanAsync("try region " + region, async () => {
+          const response = await fetchFromHoneycombApi<HoneycombAuthResponse>(
+            { apiKey, keyInfo: { region } },
+            "auth"
+          );
+          if (isFetchError(response)) {
+            throw new Error("Well, it didn't work in " + region);
+          } else {
+            return region;
+          }
+        })
+      )
+    ).catch((allRejected) => {
+      return "unknown";
+    });
 
-      report({
-        "honeycomb.region": regionIdentified,
-        "app.regionsTried": regionsTried,
-      });
-      return regionIdentified;
-    }
-  );
+    report({
+      "honeycomb.region": regionIdentified,
+      "app.regionsTried": regions.length,
+    });
+    return regionIdentified;
+  });
 }
