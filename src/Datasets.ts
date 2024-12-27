@@ -103,10 +103,23 @@ function DatasetsTable(params: {
     return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
   };
 
+  const COUNT_QUERY = {
+    time_range: 5184000, // last 60 days
+    granularity: 0,
+    calculations: [
+      {
+        op: "COUNT",
+      },
+    ],
+    filter_combination: "AND",
+    limit: 1000,
+  };
+
   const datasetRows = datasets.map((d) => {
-    // https://ui.honeycomb.io/modernity/environments/local/datasets/hny-tricks-web/overview
-    const linkToSettings =
-      constructEnvironmentLink(auth) + "datasets/" + d.slug + "/overview";
+    const datasetUrl = constructEnvironmentLink(auth) + "datasets/" + d.slug;
+    const linkToSettings = datasetUrl + "/overview";
+    const linkToCountQuery =
+      datasetUrl + "?query=" + encodeURIComponent(JSON.stringify(COUNT_QUERY));
     const daysSinceLastWritten = daysSince(d.last_written);
     const checkbox =
       daysSinceLastWritten > ASSUMED_RETENTION_TIME
@@ -115,12 +128,20 @@ function DatasetsTable(params: {
             type="checkbox"
             checked
           />`
-        : html`<input class="delete-dataset-checkbox" type="checkbox" />`; // not checked
+        : html`<input
+            class="delete-dataset-checkbox"
+            type="checkbox"
+            disabled
+          />`; // don't delete datasets with data in them
     return html`<tr>
       <th scope="row" class="dataset-name-col">${d.name}</th>
       <td>
         <a href="${linkToSettings}" target="_blank" class="link-symbol">⛭</a>
       </td>
+      <td>
+        <a href="${linkToCountQuery}" target="_blank" class="link-symbol">📉</a>
+      </td>
+
       <td>${"" + daysSinceLastWritten}</td>
       <td>${checkbox}</td>
     </tr>`;
@@ -130,6 +151,7 @@ function DatasetsTable(params: {
       <tr>
         <th scope="col" class="dataset-name-col">Dataset</th>
         <th scope="col">Settings</th>
+        <th scope="col">Query</th>
         <th scope="col">Days Since Last Data</th>
         <th scope="col">Delete?</th>
       </tr>
