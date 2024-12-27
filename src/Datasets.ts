@@ -113,41 +113,16 @@ function DatasetsTable(params: {
   auth: HnyTricksAuthorization;
 }) {
   const { datasets, auth } = params;
+
   const now = new Date();
   const daysSince = (date: Date) => {
     return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
   };
 
   const environmentUrl = constructEnvironmentLink(auth);
-  const datasetRows = datasets.map((d) => {
-    const datasetUrl = environmentUrl + "datasets/" + d.slug;
-    const linkToSettings = datasetUrl + "/overview";
-    const linkToCountQuery = datasetUrl + CountQueryUrlParams;
-    const daysSinceLastWritten = daysSince(d.last_written);
-    const checkbox =
-      daysSinceLastWritten > ASSUMED_RETENTION_TIME
-        ? html`<input
-            class="delete-dataset-checkbox"
-            type="checkbox"
-            checked
-          />`
-        : html`<input
-            class="delete-dataset-checkbox"
-            type="checkbox"
-            disabled
-          />`; // don't delete datasets with data in them
-    return html`<tr>
-      <th scope="row" class="dataset-name-col">${d.name}</th>
-      <td>
-        <a href="${linkToSettings}" target="_blank" class="link-symbol">⛭</a>
-      </td>
-      <td>
-        <a href="${linkToCountQuery}" target="_blank" class="link-symbol">📉</a>
-      </td>
-      <td>${"" + daysSinceLastWritten}</td>
-      <td>${checkbox}</td>
-    </tr>`;
-  });
+  const datasetRows = datasets.map((d) =>
+    datasetRow(environmentUrl, daysSince, d)
+  );
   return html`<table class="dataset-table">
     <thead>
       <tr>
@@ -186,4 +161,34 @@ function DatasetsTable(params: {
       </tr>
     </tfoot>
   </table>`;
+}
+
+function datasetRow(
+  environmentUrl: string,
+  daysSince: (t: Date) => number,
+  d: HnyTricksDataset
+) {
+  const datasetUrl = environmentUrl + "datasets/" + d.slug;
+  const linkToSettings = datasetUrl + "/overview";
+  const linkToCountQuery = datasetUrl + CountQueryUrlParams;
+  const daysSinceLastWritten = daysSince(d.last_written);
+  const checkbox =
+    daysSinceLastWritten > ASSUMED_RETENTION_TIME
+      ? html`<input class="delete-dataset-checkbox" type="checkbox" checked />`
+      : html`<input
+          class="delete-dataset-checkbox"
+          type="checkbox"
+          disabled
+        />`; // don't delete datasets with data in them
+  return html`<tr>
+    <th scope="row" class="dataset-name-col">${d.name}</th>
+    <td>
+      <a href="${linkToSettings}" target="_blank" class="link-symbol">⛭</a>
+    </td>
+    <td>
+      <a href="${linkToCountQuery}" target="_blank" class="link-symbol">📉</a>
+    </td>
+    <td>${"" + daysSinceLastWritten}</td>
+    <td>${checkbox}</td>
+  </tr>`;
 }
