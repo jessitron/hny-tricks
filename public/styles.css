@@ -12,6 +12,8 @@
   --color-hny-slate: #25303e;
   --lat-ref-color-gold-100: #ffeab2;
   --lat-ref-color-sky-200: #8dcaf5;
+  --lat-ref-color-purple-100: #dfd3eb;
+  --lat-ref-color-purple-500: #9b77c2;
 }
 
 body {
@@ -228,4 +230,47 @@ input#trace-id {
 
 .invisible {
   display: none;
+}
+
+.dataset-table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  width: 100%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.dataset-table thead tr {
+  background-color: var(--lat-ref-color-purple-500);
+  color: #ffffff;
+  text-align: center;
+}
+
+.dataset-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+  background-color: white;
+}
+
+.dataset-table tbody tr:nth-of-type(even) {
+  background-color: var(--lat-ref-color-purple-100);
+}
+
+.dataset-table tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+.dataset-table th,
+.dataset-table td {
+  padding: 12px 15px;
+}
+
+.dataset-table .dataset-name-col {
+  text-align: left;
+}
+
+.dataset-table tbody tr.active-row {
+  font-weight: bold;
+  color: var(--lat-ref-color-purple-500);
 }

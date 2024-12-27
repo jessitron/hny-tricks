@@ -102,19 +102,19 @@ function DatasetsTable(params: { datasets: HnyTricksDataset[] }) {
 
   const datasetRows = datasets.map((d) => {
     return html`<tr>
-      <th scope="row">${d.name}</th>
+      <th scope="row" class="dataset-name-col">${d.name}</th>
       <td>${daysSince(d.last_written)}</td>
       <td><input class="delete-dataset-checkbox" type="checkbox"></input></td>
     </tr>`;
   });
-  return html`<table>
+  return html`<table class="dataset-table">
     <thead>
       <tr>
-        <th scope="col">Dataset</th>
+        <th scope="col" class="dataset-name-col">Dataset</th>
         <th scope="col">Days Since Last Data</th>
         <th scope="col">Delete?</th>
       </tr>
-      ${datasetRows}
     </thead>
+    ${datasetRows}
   </table>`;
 }
