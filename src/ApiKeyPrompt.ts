@@ -10,10 +10,9 @@ import {
   describeAuthorization,
   HnyTricksAuthorization,
 } from "./common";
-import { fetchFromHoneycombApi, isErrorResponse } from "./HoneycombApi";
+import { fetchFromHoneycombApi, isFetchError } from "./HoneycombApi";
 import {
   currentTraceId,
-  inSpan,
   inSpanAsync,
   recordError,
   report,
@@ -203,7 +202,7 @@ export async function authorize(
   trace
     .getActiveSpan()
     ?.setAttributes({ "honeycomb.auth.response": JSON.stringify(response) });
-  if (isErrorResponse(response)) {
+  if (isFetchError(response)) {
     return authError(html`<div>
       <span class="unhappy">Auth check failed: ${response.message}</span>
     </div>`);
@@ -225,7 +224,7 @@ async function tryAllRegions(apiKey: string): Promise<Region> {
           "auth"
         );
         regionsTried++;
-        if (!isErrorResponse(response)) {
+        if (!isFetchError(response)) {
           regionIdentified = region;
           break;
         }

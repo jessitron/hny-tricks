@@ -32,11 +32,12 @@ app.get("/", (req, res) => {
   console.log("here we are at /");
   const fullResponse = `<!DOCTYPE html>${index()}`;
   trace.getActiveSpan()?.setAttribute("response.body", fullResponse);
-  res.send(fullResponse);
+  res.send(fullResponse); 
 });
 
 app.post("/team", async (req: Request, res: Response) => {
   console.log("here we are at /team");
+  throw new Error("barfy");
   res.send(await team(req.body.apikey));
 });
 

@@ -4,11 +4,13 @@ import { report, recordError } from "./tracing-util";
 
 type SomeResponse = object;
 
+const RECORD_BODY = true;
+
 export type FetchError = {
   fetchError: true;
   message: string;
 };
-export function isErrorResponse(
+export function isFetchError(
   response: SomeResponse | FetchError
 ): response is FetchError {
   return (response as FetchError).fetchError;
@@ -39,6 +41,12 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
           { "http.url": endpoint + path }
         );
         return { fetchError: true, message: result.statusText };
+      }
+      const resultJson = result.json();
+      if (RECORD_BODY) {
+        trace
+          .getActiveSpan()
+          .setAttributes({ "response.body": JSON.stringify(resultJson) });
       }
       return result.json();
     },

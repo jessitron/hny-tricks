@@ -44,7 +44,7 @@ export async function team(apikey) {
 
 export function teamDescription(auth: HnyTricksAuthorization) {
   const envLink = constructEnvironmentLink(auth);
-  return html`<section class="team">
+  return html`<section class="team" id="team-section">
     <div class="team-description team-apikey">
         <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey-input">👁</span></label>
             <input id="apikey-input" type="password" name="apikey-input" disabled="true" value="${
@@ -53,7 +53,10 @@ export function teamDescription(auth: HnyTricksAuthorization) {
             <input class="invisible" id="apikey" name="apikey" value="${
               auth.apiKey
             }"></input>
-            <button onclick="window.location = window.location" >Reset</button>
+            <button onclick="window.location = window.location"> Reset </button>
+        <button hx-post="/team" hx-target="team-section" hx-swap="outerHTML" hx-indicator="#big-think">Reload</button>
+      </div>
+    </form>
     </div>
     <div class="team-description team-region">Region: ${
       auth.keyInfo.region
@@ -66,5 +69,3 @@ export function teamDescription(auth: HnyTricksAuthorization) {
     <script src="/jess.js"></script>
   </section>`;
 }
-
-

@@ -11,7 +11,7 @@ var htmx = (function () {
 
   // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.25";
+  const INSTRUMENTATION_VERSION = "0.0.27";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -1494,7 +1494,7 @@ var htmx = (function () {
             return [DUMMY_ELT];
           } else {
             HnyOtelWeb.setAttributes({
-              ["htmx.targets." + attrName + "result.exists"]: !!result,
+              ["htmx.targets." + attrName + ".result.exists"]: !!result,
             });
             return result;
           }
@@ -3273,7 +3273,7 @@ var htmx = (function () {
       HnyOtelWeb.recordException(`${detail?.error || eventName}`, {
         "htmx.event.name": eventName,
         "htmx.element.oneline": describeAnElementInOneString(elt),
-        "htmx.event.detail": JSON.stringify(detail),
+        "htmx.event.detail": safeStringify(detail),
       });
       triggerEvent(elt, eventName, mergeObjects({ error: eventName }, detail));
     }
@@ -5060,7 +5060,6 @@ var htmx = (function () {
           };
 
           xhr.onload = function () {
-            // TODO: I need to pass in the parent span for this
             return HnyOtelWeb.inChildSpan(
               HnyOtelWeb.APP_TRACER,
               "xhr response received",
@@ -5116,7 +5115,12 @@ var htmx = (function () {
             return HnyOtelWeb.inSpan(
               HnyOtelWeb.INTERNAL_TRACER,
               "xhr error received",
+              issueAjaxRequestSpan.spanContext(),
               () => {
+                HnyOtelWeb.setAttributes({
+                  "htmx.request.path": responseInfo.pathInfo?.finalRequestPath,
+                  "htmx.request-config": safeStringify(requestConfig),
+                });
                 removeRequestIndicators(indicators, disableElts);
                 triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
                 triggerErrorEvent(elt, "htmx:sendError", responseInfo);

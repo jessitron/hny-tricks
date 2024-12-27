@@ -21242,7 +21242,7 @@ var $8d2dec6b2f42fe45$export$d1d5ca1ca02801e6 = "url.scheme";
 var $8d2dec6b2f42fe45$export$11d4f8ef7be26b3d = "user_agent.original";
 
 
-const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.14";
+const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.16";
 function $c9f3acea5fa71cd0$var$initializeTracing(params /* { apiKey: string, serviceName: string } */ ) {
     if (!params) params = {};
     if (!params.apiKey) throw new Error("Usage: initializeTracing({ apiKey: 'honeycomb api key', serviceName: 'name of this service' })");
@@ -21309,7 +21309,7 @@ function $c9f3acea5fa71cd0$var$getTracer(inputTracer) {
 }
 function $c9f3acea5fa71cd0$var$inSpan(inputTracer, spanName, fn, context) {
     if (fn === undefined) console.log("USAGE: inSpan(tracerName, spanName, () => { ... })");
-    return $c9f3acea5fa71cd0$var$getTracer(inputTracer).startActiveSpan(spanName, {}, context, (span)=>{
+    return $c9f3acea5fa71cd0$var$getTracer(inputTracer).startActiveSpan(spanName, {}, context || null, (span)=>{
         try {
             return fn(span);
         } catch (err) {
