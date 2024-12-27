@@ -54,9 +54,7 @@ export function teamDescription(auth: HnyTricksAuthorization) {
               auth.apiKey
             }"></input>
             <button onclick="window.location = window.location"> Reset </button>
-        <button hx-post="/team" hx-target="team-section" hx-swap="outerHTML" hx-indicator="#big-think">Reload</button>
-      </div>
-    </form>
+        <button hx-post="/team" hx-target="team-section" hx-swap="outerHTML" hx-indicator="#big-think"> Reload </button>
     </div>
     <div class="team-description team-region">Region: ${
       auth.keyInfo.region
