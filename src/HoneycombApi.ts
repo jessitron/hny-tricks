@@ -49,6 +49,9 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
           "request.url": endpoint + path,
           "response.status": result.status,
         });
+        console.log(
+          "Response from " + path + ": " + JSON.stringify(resultJson, null, 2)
+        );
       }
       return resultJson;
     },

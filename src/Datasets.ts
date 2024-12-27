@@ -1,5 +1,5 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization } from "./common";
+import { constructEnvironmentLink, HnyTricksAuthorization } from "./common";
 import {
   FetchError,
   fetchFromHoneycombApi,
@@ -32,7 +32,7 @@ export async function describeDatasets(
   });
 
   return html`<div data-traceId="${currentTraceId()}">
-    <${DatasetsTable} datasets=${datasets} />
+    <${DatasetsTable} datasets=${datasets} auth=${auth} />
   </div>`;
 }
 
@@ -93,16 +93,26 @@ async function retrieveDatasets(
 
 const ASSUMED_RETENTION_TIME = 60; // days
 
-function DatasetsTable(params: { datasets: HnyTricksDataset[] }) {
-  const { datasets } = params;
+function DatasetsTable(params: {
+  datasets: HnyTricksDataset[];
+  auth: HnyTricksAuthorization;
+}) {
+  const { datasets, auth } = params;
   const now = new Date();
   const daysSince = (date: Date) => {
-    return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    return (
+      // note: falsy values are not printed because htm is ... questionable
+      "" + Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+    );
   };
 
   const datasetRows = datasets.map((d) => {
+    // https://ui.honeycomb.io/modernity/environments/local/datasets/hny-tricks-web/overview
+    const linkToSettings =
+      constructEnvironmentLink(auth) + "datasets/" + d.slug + "/overview";
     return html`<tr>
       <th scope="row" class="dataset-name-col">${d.name}</th>
+      <td><a href="${linkToSettings}" target="_blank">↝</a></td>
       <td>${daysSince(d.last_written)}</td>
       <td><input class="delete-dataset-checkbox" type="checkbox"></input></td>
     </tr>`;
@@ -111,6 +121,7 @@ function DatasetsTable(params: { datasets: HnyTricksDataset[] }) {
     <thead>
       <tr>
         <th scope="col" class="dataset-name-col">Dataset</th>
+        <th scope="col">Settings</th>
         <th scope="col">Days Since Last Data</th>
         <th scope="col">Delete?</th>
       </tr>
