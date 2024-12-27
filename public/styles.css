@@ -232,6 +232,11 @@ input#trace-id {
   display: none;
 }
 
+.link-symbol {
+  text-decoration: none;
+  font-size: larger;
+}
+
 .dataset-table {
   border-collapse: collapse;
   margin: 25px 0;

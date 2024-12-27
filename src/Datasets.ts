@@ -100,21 +100,29 @@ function DatasetsTable(params: {
   const { datasets, auth } = params;
   const now = new Date();
   const daysSince = (date: Date) => {
-    return (
-      // note: falsy values are not printed because htm is ... questionable
-      "" + Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
-    );
+    return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
   };
 
   const datasetRows = datasets.map((d) => {
     // https://ui.honeycomb.io/modernity/environments/local/datasets/hny-tricks-web/overview
     const linkToSettings =
       constructEnvironmentLink(auth) + "datasets/" + d.slug + "/overview";
+    const daysSinceLastWritten = daysSince(d.last_written);
+    const checkbox =
+      daysSinceLastWritten > ASSUMED_RETENTION_TIME
+        ? html`<input
+            class="delete-dataset-checkbox"
+            type="checkbox"
+            checked
+          />`
+        : html`<input class="delete-dataset-checkbox" type="checkbox" />`; // not checked
     return html`<tr>
       <th scope="row" class="dataset-name-col">${d.name}</th>
-      <td><a href="${linkToSettings}" target="_blank">↝</a></td>
-      <td>${daysSince(d.last_written)}</td>
-      <td><input class="delete-dataset-checkbox" type="checkbox"></input></td>
+      <td>
+        <a href="${linkToSettings}" target="_blank" class="link-symbol">⛭</a>
+      </td>
+      <td>${"" + daysSinceLastWritten}</td>
+      <td>${checkbox}</td>
     </tr>`;
   });
   return html`<table class="dataset-table">
