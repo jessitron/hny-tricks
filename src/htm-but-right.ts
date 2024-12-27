@@ -29,6 +29,7 @@ export const html = (strings: TemplateStringsArray, ...values: any[]) => {
     console.log(err);
     console.log(err.printStackTrace);
     // "h.push is not a function", I got that when I had extra closing tags
+    // I got an error inside my own code when I forgot to have my component-function accept a params object
     return `<div data-traceid=${currentTraceId()} style='color:red'>Invalid HTML detected. Do you have an extra closing tag?<hr/>${JSON.stringify(
       strings
     )}<hr/></div>`;

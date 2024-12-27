@@ -93,7 +93,8 @@ async function retrieveDatasets(
 
 const ASSUMED_RETENTION_TIME = 60; // days
 
-function DatasetsTable(datasets: HnyTricksDataset[]) {
+function DatasetsTable(params: { datasets: HnyTricksDataset[] }) {
+  const { datasets } = params;
   const now = new Date();
   const daysSince = (date: Date) => {
     return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
@@ -114,7 +115,6 @@ function DatasetsTable(datasets: HnyTricksDataset[]) {
         <th scope="col">Delete?</th>
       </tr>
       ${datasetRows}
-
     </thead>
   </table>`;
 }
