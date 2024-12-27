@@ -45,7 +45,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
       const resultJson = result.json();
       if (RECORD_BODY) {
         trace.getActiveSpan().addEvent("fetch " + path, {
-          "response.body": JSON.stringify(resultJson, null, 2),
+          "response.body": JSON.stringify(resultJson, null, 2), // this gives me {} all the time and I don't know why
           "request.url": endpoint + path,
           "response.status": result.status,
         });

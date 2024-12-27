@@ -17,6 +17,10 @@ const sdk: NodeSDK = new NodeSDK({
       "@opentelemetry/instrumentation-fs": {
         enabled: false,
       },
+      // tcp connections are boring
+      "@opentelemetry/instrumentation-net": {
+        enabled: false,
+      },
       "@opentelemetry/instrumentation-express": {
         ignoreLayersType: [ExpressLayerType.MIDDLEWARE],
       },
