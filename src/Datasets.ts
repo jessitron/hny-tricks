@@ -93,6 +93,21 @@ async function retrieveDatasets(
 
 const ASSUMED_RETENTION_TIME = 60; // days
 
+const COUNT_QUERY = {
+  time_range: 5184000, // last 60 days
+  granularity: 0,
+  calculations: [
+    {
+      op: "COUNT",
+    },
+  ],
+  filter_combination: "AND",
+  limit: 1000,
+};
+
+const CountQueryUrlParams =
+  "?query=" + encodeURIComponent(JSON.stringify(COUNT_QUERY));
+
 function DatasetsTable(params: {
   datasets: HnyTricksDataset[];
   auth: HnyTricksAuthorization;
@@ -103,23 +118,11 @@ function DatasetsTable(params: {
     return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
   };
 
-  const COUNT_QUERY = {
-    time_range: 5184000, // last 60 days
-    granularity: 0,
-    calculations: [
-      {
-        op: "COUNT",
-      },
-    ],
-    filter_combination: "AND",
-    limit: 1000,
-  };
-
+  const environmentUrl = constructEnvironmentLink(auth);
   const datasetRows = datasets.map((d) => {
-    const datasetUrl = constructEnvironmentLink(auth) + "datasets/" + d.slug;
+    const datasetUrl = environmentUrl + "datasets/" + d.slug;
     const linkToSettings = datasetUrl + "/overview";
-    const linkToCountQuery =
-      datasetUrl + "?query=" + encodeURIComponent(JSON.stringify(COUNT_QUERY));
+    const linkToCountQuery = datasetUrl + CountQueryUrlParams;
     const daysSinceLastWritten = daysSince(d.last_written);
     const checkbox =
       daysSinceLastWritten > ASSUMED_RETENTION_TIME
@@ -141,7 +144,6 @@ function DatasetsTable(params: {
       <td>
         <a href="${linkToCountQuery}" target="_blank" class="link-symbol">📉</a>
       </td>
-
       <td>${"" + daysSinceLastWritten}</td>
       <td>${checkbox}</td>
     </tr>`;
@@ -157,5 +159,31 @@ function DatasetsTable(params: {
       </tr>
     </thead>
     ${datasetRows}
+    <tfoot>
+      <tr>
+        <td>${datasets.length} datasets in ${auth.environment.name}</td>
+        <td>
+          <a
+            href="${environmentUrl + "overview"}"
+            target="_blank"
+            class="link-symbol"
+          >
+            ⛭
+          </a>
+        </td>
+        <td>
+          <a
+            href="${environmentUrl + CountQueryUrlParams}"
+            target="_blank"
+            class="link-symbol"
+            >📈</a
+          >
+        </td>
+        <td>
+          ${"" + Math.min(...datasets.map((d) => daysSince(d.last_written)))}
+        </td>
+        <td>Delete Old Dataset</td>
+      </tr>
+    </tfoot>
   </table>`;
 }

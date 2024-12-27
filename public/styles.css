@@ -237,9 +237,14 @@ input#trace-id {
   font-size: larger;
 }
 
+section#dataset-section {
+  padding: 0px;
+  border-color: var(--color-hny-indigo);
+}
+
 .dataset-table {
   border-collapse: collapse;
-  margin: 25px 0;
+  margin: 0px;
   font-size: 0.9em;
   font-family: sans-serif;
   min-width: 400px;
@@ -248,6 +253,12 @@ input#trace-id {
 }
 
 .dataset-table thead tr {
+  background-color: var(--lat-ref-color-purple-500);
+  color: #ffffff;
+  text-align: center;
+}
+
+.dataset-table tfoot tr {
   background-color: var(--lat-ref-color-purple-500);
   color: #ffffff;
   text-align: center;
