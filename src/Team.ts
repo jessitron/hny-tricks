@@ -1,5 +1,11 @@
 import { trace } from "@opentelemetry/api";
-import { authorize, isAuthError, startingApiKeyPrompt } from "./ApiKeyPrompt";
+import {
+  authorize,
+  ELEMENT_CONTAINING_ALL_SECTIONS,
+  ENDPOINT_TO_POPULATE_ALL_SECTIONS,
+  isAuthError,
+  startingApiKeyPrompt,
+} from "./ApiKeyPrompt";
 import { TraceSection } from "./TraceSection";
 import {
   constructEnvironmentLink,
@@ -54,7 +60,7 @@ export function teamDescription(auth: HnyTricksAuthorization) {
               auth.apiKey
             }"></input>
             <button onclick="window.location = window.location"> Reset </button>
-        <button hx-post="/team" hx-target="#team-section" hx-swap="outerHTML" hx-indicator="#big-think"> Reload </button>
+        <button hx-post="${ENDPOINT_TO_POPULATE_ALL_SECTIONS}" hx-include="#apikey" hx-target="${ELEMENT_CONTAINING_ALL_SECTIONS}" hx-swap="innerHTML" hx-indicator="#big-think"> Reload </button>
     </div>
     <div class="team-description team-region">Region: ${
       auth.keyInfo.region

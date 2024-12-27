@@ -42,8 +42,7 @@ export function index() {
             </p>
           </div>
         </div>
-        ${startingApiKeyPrompt}
-        <div id="stuff"></div>
+        <div id="stuff">${startingApiKeyPrompt}</div>
         <div id="big-think" class="htmx-indicator">
           <img src="./spin.gif" />
         </div>

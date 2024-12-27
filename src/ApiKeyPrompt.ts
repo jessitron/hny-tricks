@@ -18,9 +18,12 @@ import {
   report,
 } from "./tracing-util";
 
+export const ELEMENT_CONTAINING_ALL_SECTIONS = "#stuff";
+export const ENDPOINT_TO_POPULATE_ALL_SECTIONS = "/team";
+
 export const startingApiKeyPrompt = html`<${ApiKeyPrompt}
-  destinationElement="#stuff"
-  endpointToPopulateItWith="/team"
+  destinationElement="${ELEMENT_CONTAINING_ALL_SECTIONS}"
+  endpointToPopulateItWith="${ENDPOINT_TO_POPULATE_ALL_SECTIONS}"
   endpointForApiKeyValidation="/validate"
 />`;
 
@@ -30,7 +33,7 @@ export function ApiKeyPrompt(params: {
   endpointForApiKeyValidation: string;
 }): string {
   return html`<section id="apikey-section" class="apiKey">
-    <form hx-post="${params.endpointToPopulateItWith}" hx-target="#apikey-section" hx-swap="outerHTML" id="apikey-form" hx-indicator="#big-think">
+    <form hx-post="${params.endpointToPopulateItWith}" hx-target="${params.destinationElement}" hx-swap="innerHTML" id="apikey-form" hx-indicator="#big-think">
       <div>
         <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
         <input id="apikey" type="password" 
