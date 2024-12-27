@@ -4,7 +4,7 @@ import { report, recordError } from "./tracing-util";
 
 type SomeResponse = object;
 
-const RECORD_BODY = true;
+const RECORD_BODY = true; // turn this off for production
 
 export type FetchError = {
   fetchError: true;
@@ -44,9 +44,11 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
       }
       const resultJson = result.json();
       if (RECORD_BODY) {
-        trace
-          .getActiveSpan()
-          .setAttributes({ "response.body": JSON.stringify(resultJson) });
+        trace.getActiveSpan().addEvent("fetch " + path, {
+          "response.body": JSON.stringify(resultJson, null, 2),
+          "request.url": endpoint + path,
+          "response.status": result.status,
+        });
       }
       return resultJson;
     },

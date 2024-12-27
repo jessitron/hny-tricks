@@ -11,7 +11,7 @@ var htmx = (function () {
 
   // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.30";
+  const INSTRUMENTATION_VERSION = "0.0.31";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -4681,7 +4681,7 @@ var htmx = (function () {
     function issueAjaxRequest(verb, path, elt, event, etc, confirmed) {
       return HnyOtelWeb.inSpan(
         HnyOtelWeb.APP_TRACER,
-        "issueAjaxRequest",
+        "issue " + path,
         (issueAjaxRequestSpan) => {
           const issueAjaxRequestSpanContext =
             issueAjaxRequestSpan.spanContext();

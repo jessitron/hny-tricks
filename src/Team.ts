@@ -14,6 +14,7 @@ import {
   spanAttributesAboutAuth,
 } from "./common";
 import { html } from "./htm-but-right";
+import { currentTraceId } from "./tracing-util";
 
 /**
  * why is this file capitalized?
@@ -45,7 +46,9 @@ export async function team(apikey) {
   >
     Loading datasets...
   </section>`;
-  return teamDescription(authResult) + traceSection + datasetSection;
+  return html`<div data-traceid=${currentTraceId()}>
+    ${teamDescription(authResult)} ${traceSection} ${datasetSection}
+  </div>`;
 }
 
 export function teamDescription(auth: HnyTricksAuthorization) {

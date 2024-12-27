@@ -1,4 +1,9 @@
 import { Attributes, context, trace } from "@opentelemetry/api";
+import {
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+} from "@opentelemetry/semantic-conventions";
 
 const REPORT_ATTRIBUTES_TO_CONSOLE = true;
 
@@ -10,7 +15,7 @@ export function report(attributes: Attributes) {
 }
 
 export function recordError(error: any, attributes?: Attributes) {
-  trace.getActiveSpan().recordException(error);
+  recordException(error, attributes);
   if (REPORT_ATTRIBUTES_TO_CONSOLE) {
     if (error.printStackTrace) {
       error.printStackTrace();
@@ -19,6 +24,40 @@ export function recordError(error: any, attributes?: Attributes) {
     }
     console.log(JSON.stringify(attributes, null, 2));
   }
+}
+
+/**
+ * Do Things Right - copy of recordException that accepts more attributes.
+ * @param exception
+ * @param additionalAttributes
+ */
+function recordException(exception, additionalAttributes) {
+  const span = trace.getActiveSpan();
+
+  // I took this from the sdk-trace-base, except I'm gonna support additional attributes.
+  // https://github.com/open-telemetry/opentelemetry-js/blob/90afa2850c0690f7a18ecc511c04927a3183490b/packages/opentelemetry-sdk-trace-base/src/Span.ts#L321
+  const attributes = {};
+  if (typeof exception === "string") {
+    attributes[ATTR_EXCEPTION_MESSAGE] = exception;
+  } else if (exception) {
+    if (exception.code) {
+      attributes[ATTR_EXCEPTION_TYPE] = exception.code.toString();
+    } else if (exception.name) {
+      attributes[ATTR_EXCEPTION_TYPE] = exception.name;
+    }
+    if (exception.message) {
+      attributes[ATTR_EXCEPTION_MESSAGE] = exception.message;
+    }
+    if (exception.stack) {
+      attributes[ATTR_EXCEPTION_STACKTRACE] = exception.stack;
+    }
+  }
+  const allAttributes = { ...attributes, ...additionalAttributes };
+  span.addEvent("exception", allAttributes);
+  span.setStatus({
+    code: 2, // SpanStatusCode.ERROR,
+    message: attributes[ATTR_EXCEPTION_MESSAGE],
+  });
 }
 
 export function inSpan(tracerName, spanName, fn) {
