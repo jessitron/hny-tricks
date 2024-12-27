@@ -48,7 +48,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
           .getActiveSpan()
           .setAttributes({ "response.body": JSON.stringify(resultJson) });
       }
-      return result.json();
+      return resultJson;
     },
     (error) => {
       recordError(error, { "http.url": endpoint + path });
