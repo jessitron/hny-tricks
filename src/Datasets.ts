@@ -108,7 +108,7 @@ const COUNT_QUERY = {
 const CountQueryUrlParams =
   "?query=" + encodeURIComponent(JSON.stringify(COUNT_QUERY));
 
-function DatasetsTable(params: {
+export function DatasetsTable(params: {
   datasets: HnyTricksDataset[];
   auth: HnyTricksAuthorization;
 }) {

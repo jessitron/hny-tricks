@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DatasetsTable outputs the same thing as before 1`] = `
+<table class="dataset-table yes">
+  <thead>
+    <tr>
+      <th scope="col" class="dataset-name-col">Dataset</th>
+      <th scope="col">Settings</th>
+      <th scope="col">Query</th>
+      <th scope="col">Days Since Last Data</th>
+      <th scope="col">Delete?</th>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr>
+      <td> datasets in my environment</td>
+      <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/overview" target="_blank" class="link-symbol">⛭</a></td>
+      <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
+      <td>Infinity</td>
+      <td>Delete Old Dataset</td>
+    </tr>
+  </tfoot>
+</table>
+`;
