@@ -66,7 +66,9 @@ type HnyApiDataset = {
   regular_columns_count: number;
 };
 
-type HnyTricksDataset = {
+
+// exported for testing
+export type HnyTricksDataset = {
   name: string;
   slug: DatasetSlug;
   created: Date;

@@ -1,7 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DatasetsTable outputs the same thing as before 1`] = `
-<table class="dataset-table yes">
+exports[`DatasetsTable Renders datasets, the same as before 1`] = `
+<table class="dataset-table">
+  <thead>
+    <tr>
+      <th scope="col" class="dataset-name-col">Dataset</th>
+      <th scope="col">Settings</th>
+      <th scope="col">Query</th>
+      <th scope="col">Days Since Last Data</th>
+      <th scope="col">Delete?</th>
+    </tr>
+  </thead>
+  <tr>
+    <th scope="row" class="dataset-name-col">API gateway</th>
+    <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/api-gateway/overview" target="_blank" class="link-symbol">⛭</a></td>
+    <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/api-gateway?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📉</a></td>
+    <td>2</td>
+    <td><input class="delete-dataset-checkbox" type="checkbox" disabled="true"></td>
+  </tr>
+  <tr>
+    <th scope="row" class="dataset-name-col">ye olde proxy</th>
+    <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/olde-proxy/overview" target="_blank" class="link-symbol">⛭</a></td>
+    <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/olde-proxy?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📉</a></td>
+    <td>365</td>
+    <td><input class="delete-dataset-checkbox" type="checkbox" checked="true"></td>
+  </tr>
+  <tfoot>
+    <tr>
+      <td>2 datasets in my environment</td>
+      <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/overview" target="_blank" class="link-symbol">⛭</a></td>
+      <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
+      <td>2</td>
+      <td>Delete Old Dataset</td>
+    </tr>
+  </tfoot>
+</table>
+`;
+
+exports[`DatasetsTable outputs the same thing as before, for an empty one 1`] = `
+<table class="dataset-table">
   <thead>
     <tr>
       <th scope="col" class="dataset-name-col">Dataset</th>
