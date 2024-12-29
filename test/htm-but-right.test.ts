@@ -1,4 +1,4 @@
-const { html } = require("../src/htm-but-right");
+import { html } from "../src/htm-but-right";
 
 describe("making htm work better in error cases", () => {
   it("when I forget to close a tag, gives me a recognizable error", () => {
