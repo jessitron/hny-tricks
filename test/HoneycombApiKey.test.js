@@ -1,4 +1,4 @@
-const { interpretApiKey } = require("../src/HoneycombApiKey");
+const { interpretApiKey } = require("../src/ApiKeyPrompt");
 
 describe("checking the API key", () => {
   it("recognizes dogfood in the EU", () => {

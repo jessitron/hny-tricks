@@ -103,5 +103,5 @@ export async function inSpanAsync(spanName, fn) {
 }
 
 export function currentTraceId() {
-  return trace.getSpanContext(context.active()).traceId;
+  return trace.getSpanContext(context.active())?.traceId;
 }
