@@ -11,7 +11,7 @@ var htmx = (function () {
 
   // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.31";
+  const INSTRUMENTATION_VERSION = "0.0.37";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -2887,12 +2887,18 @@ var htmx = (function () {
           nodeData.verb = verb;
           triggerSpecs.forEach(function (triggerSpec) {
             addTriggerHandler(elt, triggerSpec, nodeData, function (node, evt) {
-              const elt = asElement(node);
-              if (closest(elt, htmx.config.disableSelector)) {
-                cleanUpElement(elt);
-                return;
-              }
-              issueAjaxRequest(verb, path, elt, evt);
+              HnyOtelWeb.inSpanAsync(
+                HnyOtelWeb.INTERNAL_TRACER,
+                "process hx-" + verb,
+                () => {
+                  const elt = asElement(node);
+                  if (closest(elt, htmx.config.disableSelector)) {
+                    cleanUpElement(elt);
+                    return;
+                  }
+                  issueAjaxRequest(verb, path, elt, evt);
+                }
+              );
             });
           });
         }
@@ -2912,7 +2918,32 @@ var htmx = (function () {
      * @param {HtmxNodeInternalData} nodeData
      * @param {TriggerHandler} handler
      */
-    function addTriggerHandler(elt, triggerSpec, nodeData, handler) {
+    function addTriggerHandler(elt, triggerSpec, nodeData, inputHandler) {
+      const handler = (elt, evt) =>
+        HnyOtelWeb.inSpan(
+          HnyOtelWeb.INTERNAL_TRACER,
+          "handle " + triggerSpec.trigger,
+          (span) => {
+            span.setAttributes({
+              "htmx.trigger": triggerSpec.trigger,
+              "htmx.trigger.pollInterval": triggerSpec.pollInterval,
+              "htmx.trigger.conditionalFunction.exists":
+                !!triggerSpec.eventFilter,
+              "htmx.trigger.changed": triggerSpec.changed,
+              "htmx.trigger.once": triggerSpec.once,
+              "htmx.trigger.consume": triggerSpec.consume,
+              "htmx.trigger.delay": triggerSpec.delay,
+              "htmx.trigger.from": triggerSpec.from,
+              "htmx.trigger.target": triggerSpec.target,
+              "htmx.trigger.throttle": triggerSpec.throttle,
+              "htmx.trigger.queue": triggerSpec.queue,
+              "htmx.trigger.root": triggerSpec.root,
+              "htmx.trigger.threshold": triggerSpec.threshold,
+              ...attributesAboutElement(elt),
+            });
+            return inputHandler(elt, evt);
+          }
+        );
       if (triggerSpec.trigger === "revealed") {
         initScrollHandler();
         addEventListener(elt, handler, nodeData, triggerSpec);
