@@ -266,6 +266,6 @@ class DeleteMe implements Column {
     return html`<td>${checkbox}</td>`;
   }
   footer(): Html {
-    return html`<td>Delete Old Dataset</td>`;
+    return html`<td><button>Delete Old Datasets</button></td>`;
   }
 }
