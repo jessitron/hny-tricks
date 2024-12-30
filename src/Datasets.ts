@@ -124,6 +124,7 @@ export function DatasetsTable(params: {
     new LinkToQuery(environmentUrl),
     new DaysSinceLastWritten(datasets.map((d) => d.last_written)),
     new DeleteMe(),
+    new DerivedColumnForDatasetName(),
   ];
   return html`<form id="dataset-table-form">
     <table class="dataset-table">
@@ -279,6 +280,35 @@ class DeleteMe implements Column {
     return html`<td>
       <button
         hx-post="/datasets/delete"
+        hx-target="#dataset-section"
+        hx-include="#auth_data"
+      >
+        Delete Old Datasets
+      </button>
+    </td>`;
+  }
+}
+
+class DerivedColumnForDatasetName implements Column {
+  constructor() {}
+
+  header(): Html {
+    return html`<th scope="col">dc.dataset</th>`;
+  }
+  row(d: HnyTricksDataset, i: number): Html {
+    const url = `/datasets/dc/exists?slug=${d.slug}&alias=dc.dataset`;
+    return html`<td
+      hx-trigger="intersect"
+      hx-post=${url}
+      hx-include="#auth_data"
+    >
+      💬
+    </td>`;
+  }
+  footer(): Html {
+    return html`<td>
+      <button
+        hx-post="/datasets/dc/create-all?alias=dc.dataset"
         hx-target="#dataset-section"
         hx-include="#auth_data"
       >
