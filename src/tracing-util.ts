@@ -5,7 +5,7 @@ import {
   ATTR_EXCEPTION_TYPE,
 } from "@opentelemetry/semantic-conventions";
 
-const REPORT_ATTRIBUTES_TO_CONSOLE = true;
+const REPORT_ATTRIBUTES_TO_CONSOLE = false;
 
 export function report(attributes: Attributes) {
   trace.getActiveSpan()?.setAttributes(attributes);

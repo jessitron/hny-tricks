@@ -70,29 +70,21 @@ app.post("/validate", (req: Request, res: Response) => {
 });
 
 app.post("/trace", async (req: Request, res: Response) => {
+  const { auth_data, ...formData } = req.body;
+
+  const auth = parseAuthData(auth_data, req.path);
+
   trace.getActiveSpan().setAttributes({
-    "app.traceId": req.body["trace-id"],
-    "app.apiKey.exists": !!req.body["apikey"],
+    "app.traceId": formData["trace-id"],
   });
-  res.send(await TraceActions(req.body.apikey, req.body["trace-id"]));
+  res.send(await TraceActions(auth, formData["trace-id"]));
 });
 
-// TODO: this should be a get
 app.post("/datasets", async (req: Request, res: Response) => {
-  const span = trace.getActiveSpan();
-  // TODO: should we cache this? or pass all the data back and forth from the UI?
-  const authResult: HnyTricksAuthorization | AuthError = await authorize(
-    req.body.apikey
-  ); // TODO: cache?
-  if (isAuthError(authResult)) {
-    span?.setAttributes({ "hny.authError": authResult.html });
-    span?.setStatus({ code: 2, message: "auth failed" });
-    res.send(authResult.html);
-    return;
-  }
-  span?.setAttributes(spanAttributesAboutAuth(authResult));
+  const { auth_data } = req.body;
+  const auth = parseAuthData(auth_data, req.path);
 
-  const output = await describeDatasets(authResult);
+  const output = await describeDatasets(auth);
   res.send(output);
 });
 

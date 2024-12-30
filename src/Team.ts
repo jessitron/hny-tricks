@@ -42,7 +42,7 @@ export async function team(apikey) {
     id="dataset-section"
     hx-trigger="load"
     hx-post="/datasets"
-    hx-include="#apikey"
+    hx-include="#auth_data"
   >
     Loading datasets...
   </section>`;

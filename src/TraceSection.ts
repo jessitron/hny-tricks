@@ -14,23 +14,19 @@ export function TraceSection(authResult: HnyTricksAuthorization) {
           hx-target="#trace-actions"
           hx-swap="innerHTML"
           hx-trigger="input changed throttle:200ms"
-          hx-include="#apikey">
+          hx-include="#auth_data">
         </input>
         <span id="trace-actions"></span>
     </div>
 </section>`;
 }
 
-export async function TraceActions(apikey: string, traceId: string) {
-  const span = trace.getActiveSpan();
-  const authResult = await authorize(apikey);
-  if (isAuthError(authResult)) {
-    span?.setAttributes({ "hny.authError": authResult.html });
-    span?.setStatus({ code: 2, message: "auth failed" });
-    return authResult.html;
-  }
+export async function TraceActions(
+  auth: HnyTricksAuthorization,
+  traceId: string
+) {
   const traceUrl =
-    constructEnvironmentLink(authResult) + `/trace?trace_id=${traceId}`;
+    constructEnvironmentLink(auth) + `/trace?trace_id=${traceId}`;
   return html`<span>
     <a class="button-link" href="${traceUrl}" target="_blank">
       Look for it <img src="external-link.svg" />

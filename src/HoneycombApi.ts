@@ -5,7 +5,7 @@ import * as pathUtil from "path";
 
 type SomeResponse = object;
 
-const RECORD_BODY = true; // turn this off for production
+const RECORD_BODY = false; // turn this off for production
 
 export type FetchError = {
   fetchError: true;

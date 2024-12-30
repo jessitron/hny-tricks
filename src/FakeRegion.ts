@@ -32,7 +32,6 @@ export function getAuthResult(apikey: string) {
 
 export const fakeAuthEndpoint = async (req: Request, res: Response) => {
   const apikey = req.headers["x-honeycomb-team"]; // i think express lowercases them
-  console.log(JSON.stringify(req.headers));
   const fakeAuthResult = getAuthResult(apikey);
   if (!!fakeAuthResult) {
     res.send(fakeAuthResult);
