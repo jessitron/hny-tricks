@@ -270,6 +270,7 @@ class DeleteMe implements Column {
         : html`<input
             class="delete-dataset-checkbox"
             type="checkbox"
+            title="I only delete empty datasets"
             disabled
           />`; // don't delete datasets with data in them
     return html`<td>${slug}${checkbox}</td>`;
