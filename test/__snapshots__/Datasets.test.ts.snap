@@ -32,7 +32,7 @@ exports[`DatasetsTable Renders datasets, the same as before 1`] = `
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/overview" target="_blank" class="link-symbol">⛭</a></td>
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
         <td>2</td>
-        <td><button hx-post="/datasets/delete" hx-target="#dataset-section">Delete Old Datasets</button></td>
+        <td><button hx-post="/datasets/delete" hx-target="#dataset-section" hx-include="#auth_data">Delete Old Datasets</button></td>
       </tr>
     </tfoot>
   </table>
@@ -57,7 +57,7 @@ exports[`DatasetsTable outputs the same thing as before, for an empty one 1`] = 
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/overview" target="_blank" class="link-symbol">⛭</a></td>
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
         <td>Infinity</td>
-        <td><button hx-post="/datasets/delete" hx-target="#dataset-section">Delete Old Datasets</button></td>
+        <td><button hx-post="/datasets/delete" hx-target="#dataset-section" hx-include="#auth_data">Delete Old Datasets</button></td>
       </tr>
     </tfoot>
   </table>
