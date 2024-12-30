@@ -273,3 +273,9 @@ class DeleteMe implements Column {
     </td>`;
   }
 }
+
+export function deleteDatasets(auth: HnyTricksAuthorization) {
+  return html`<div traceId=${currentTraceId()}>
+    deleted datasets, yeah haha
+  </div>`;
+}

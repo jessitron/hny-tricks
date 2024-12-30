@@ -9,7 +9,7 @@ import {
 } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
 import { team } from "./Team";
-import { describeDatasets } from "./Datasets";
+import { deleteDatasets, describeDatasets } from "./Datasets";
 import { HnyTricksAuthorization, spanAttributesAboutAuth } from "./common";
 import { fakeAuthEndpoint, getAuthResult } from "./FakeRegion";
 import { report } from "./tracing-util";
@@ -64,6 +64,7 @@ app.post("/trace", async (req: Request, res: Response) => {
   res.send(await TraceActions(req.body.apikey, req.body["trace-id"]));
 });
 
+// TODO: this should be a get
 app.post("/datasets", async (req: Request, res: Response) => {
   console.log("here we are at /datasets");
   const span = trace.getActiveSpan();
@@ -80,6 +81,14 @@ app.post("/datasets", async (req: Request, res: Response) => {
   span?.setAttributes(spanAttributesAboutAuth(authResult));
 
   const output = await describeDatasets(authResult);
+  res.send(output);
+});
+
+app.post("/datasets/delete", async (req: Request, res: Response) => {
+  const span = trace.getActiveSpan();
+  // span?.setAttributes(spanAttributesAboutAuth(authResult));
+
+  const output = await deleteDatasets(undefined);
   res.send(output);
 });
 
