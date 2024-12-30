@@ -9,6 +9,7 @@ const RECORD_BODY = false; // turn this off for production
 
 export type FetchError = {
   fetchError: true;
+  statusCode: number;
   message: string;
 };
 export function isFetchError(
@@ -52,6 +53,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
         });
         return {
           fetchError: true,
+          statusCode: result.status,
           message: `Received ${result.status} from ${fullUrl}. ${result.statusText}`,
         };
       }
