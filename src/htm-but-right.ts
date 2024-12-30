@@ -24,7 +24,12 @@ export const html = (strings: TemplateStringsArray, ...values: any[]) => {
       "app.htm_result_type": typeof result,
       "app.htm_result": JSON.stringify(result),
     });
-    return `<div data-traceid=${currentTraceId()} style='color:red'>Invalid HTML detected. Did you forget to close a tag?<hr/>${result}<hr/></div>`;
+    return `<div data-traceid=${currentTraceId()} style="color:red">
+      Invalid HTML detected. Did you forget to close a tag?
+      <hr />
+      ${result}
+      <hr />
+    </div>`;
   } catch (err) {
     console.log(err);
     console.log(err.printStackTrace);
