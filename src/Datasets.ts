@@ -7,10 +7,10 @@ import {
 } from "./HoneycombApi";
 import { html } from "./htm-but-right";
 import { currentTraceId, inSpanAsync } from "./tracing-util";
-import { env } from "process";
 
 export async function describeDatasets(
-  auth: HnyTricksAuthorization
+  auth: HnyTricksAuthorization,
+  status?: Html
 ): Promise<string> {
   const span = trace.getActiveSpan();
   span?.setAttribute(
@@ -33,6 +33,7 @@ export async function describeDatasets(
   });
 
   return html`<div data-traceId="${currentTraceId()}">
+    <div class="status">${status}</div>
     <${DatasetsTable} datasets=${datasets} auth=${auth} />
   </div>`;
 }
@@ -312,18 +313,19 @@ export async function deleteDatasets(
     )
   );
 
-  const resultHtml = results.map((r) => {
-    if (r.deleted === true) {
-      return html`<p class="success-result">${r.slug} deleted 🙂</p>`;
-    }
-    return html`<p class="failure-result">
-      ${r.slug} not deleted: ${r.error} 😭
-    </p>`;
-  });
+  const status =
+    results.length === 0
+      ? "Zero datasets deleted"
+      : results.map((r) => {
+          if (r.deleted === true) {
+            return html`<p class="success-result">${r.slug} deleted 🙂</p>`;
+          }
+          return html`<p class="failure-result">
+            ${r.slug} not deleted: ${r.error} 😭
+          </p>`;
+        });
 
-  return html`<div traceId=${currentTraceId()}>
-    while deleting datasets: ${datasetSlugs.join(", ")}... ${resultHtml}
-  </div>`;
+  return describeDatasets(auth, html`${status}`);
 }
 
 async function enableDatasetDeletion(
