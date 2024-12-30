@@ -32,7 +32,11 @@ export function index() {
       </header>
       <main>
         <div class="hero">
-          <img id="hero-image" src="./bug-thinks-nuggs.jpg" />
+          <img
+            id="hero-image"
+            src="./bug-thinks-nuggs.jpg"
+            alt="extremely arbitrary image"
+          />
           <div>
             <h1>🪩 Welcome 🪩</h1>
             <p>
