@@ -294,7 +294,7 @@ class DeleteMe implements Column {
  * }
  */
 export type DeleteDatasetInputs = Record<string, string>;
-export function deleteDatasets(
+export async function deleteDatasets(
   auth: HnyTricksAuthorization,
   inputs: DeleteDatasetInputs
 ) {
@@ -302,10 +302,23 @@ export function deleteDatasets(
   span?.setAttributes({ "app.datasets.delete.input": JSON.stringify(inputs) });
   const datasetSlugs = datasetSlugsToDelete(inputs);
 
+  await Promise.all(
+    datasetSlugs.map((slug) =>
+      enableDatasetDeletion(auth, slug).then((_) => deleteDataset(auth, slug))
+    )
+  );
+
   return html`<div traceId=${currentTraceId()}>
     delete datasets: ${datasetSlugs.join(", ")}, yeah haha
   </div>`;
 }
+
+async function enableDatasetDeletion(
+  auth: HnyTricksAuthorization,
+  slug: DatasetSlug
+) {}
+
+async function deleteDataset(auth: HnyTricksAuthorization, slug: DatasetSlug) {}
 
 // exported for testing
 export function datasetSlugsToDelete(inputs: DeleteDatasetInputs): any[] {

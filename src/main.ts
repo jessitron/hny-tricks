@@ -126,7 +126,10 @@ app.post("/datasets/delete", async (req: Request, res: Response) => {
   ) as HnyTricksAuthorization;
   span?.setAttributes(spanAttributesAboutAuth(auth));
 
-  const output = deleteDatasets(undefined, formData as DeleteDatasetInputs);
+  const output = await deleteDatasets(
+    undefined,
+    formData as DeleteDatasetInputs
+  );
   res.send(output);
 });
 
