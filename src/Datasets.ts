@@ -124,24 +124,26 @@ export function DatasetsTable(params: {
     new DaysSinceLastWritten(datasets.map((d) => d.last_written)),
     new DeleteMe(),
   ];
-  return html`<table class="dataset-table">
-    <thead>
-      <tr>
-        ${columns.map((c) => c.header())}
-      </tr>
-    </thead>
-    ${datasets.map(
-      (d, i) =>
-        html`<tr>
-          ${columns.map((c) => c.row(d, i))}
-        </tr>`
-    )}
-    <tfoot>
-      <tr>
-        ${columns.map((c) => c.footer())}
-      </tr>
-    </tfoot>
-  </table>`;
+  return html`<form id="dataset-table-form">
+    <table class="dataset-table">
+      <thead>
+        <tr>
+          ${columns.map((c) => c.header())}
+        </tr>
+      </thead>
+      ${datasets.map(
+        (d, i) =>
+          html`<tr>
+            ${columns.map((c) => c.row(d, i))}
+          </tr>`
+      )}
+      <tfoot>
+        <tr>
+          ${columns.map((c) => c.footer())}
+        </tr>
+      </tfoot>
+    </table>
+  </form>`;
 }
 
 type Html = string;
