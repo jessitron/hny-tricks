@@ -33,7 +33,7 @@ export async function describeDatasets(
   });
 
   return html`<div data-traceId="${currentTraceId()}">
-    <div class="status">${status}</div>
+    ${status}
     <${DatasetsTable} datasets=${datasets} auth=${auth} />
   </div>`;
 }
@@ -313,6 +313,9 @@ export async function deleteDatasets(
     )
   );
 
+  const allSuccessful = results.every((r) => r.deleted);
+  const statusClass = allSuccessful ? "happy" : "unhappy";
+
   const status =
     results.length === 0
       ? "Zero datasets deleted"
@@ -325,7 +328,10 @@ export async function deleteDatasets(
           </p>`;
         });
 
-  return describeDatasets(auth, html`${status}`);
+  return describeDatasets(
+    auth,
+    html`<div class="status ${statusClass}">${status}</div>`
+  );
 }
 
 async function enableDatasetDeletion(

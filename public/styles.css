@@ -291,3 +291,8 @@ section#dataset-section {
   font-weight: bold;
   color: var(--lat-ref-color-purple-500);
 }
+
+div.status {
+  text-align: start;
+  padding-inline-start: 5px;
+}
