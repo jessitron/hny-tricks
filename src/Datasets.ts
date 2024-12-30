@@ -256,6 +256,7 @@ class DeleteMe implements Column {
         ? html`<input
             class="delete-dataset-checkbox"
             type="checkbox"
+            name="delete-dataset-${i}"
             checked
           />`
         : html`<input
