@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Automate some maintenance operations for my honeycomb teams",
   "scripts": {
-    "start": "tsc && jest && node src/main.js",
+    "start": "tsc && node src/main.js",
     "test": "tsc && jest"
   },
   "author": "",
