@@ -24,6 +24,7 @@ import { currentTraceId, report } from "./tracing-util";
 import { index } from "./index";
 import { TraceActions } from "./TraceSection";
 import { html } from "./htm-but-right";
+import { derivedColumnExists } from "./derivedColumns";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -94,6 +95,19 @@ app.post("/datasets/delete", async (req: Request, res: Response) => {
   const auth = parseAuthData(auth_data, req.path);
 
   const output = await deleteDatasets(auth, formData as DeleteDatasetInputs);
+  res.send(output);
+});
+
+app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
+  const { apikey, auth_data, ...formData } = req.body;
+
+  const auth = parseAuthData(auth_data, req.path);
+
+  const output = await derivedColumnExists(
+    auth,
+    req.query["slug"],
+    req.query["alias"]
+  );
   res.send(output);
 });
 

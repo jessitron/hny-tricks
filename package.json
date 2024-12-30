@@ -4,7 +4,8 @@
   "description": "Automate some maintenance operations for my honeycomb teams",
   "scripts": {
     "start": "tsc && node src/main.js",
-    "test": "tsc && jest"
+    "test": "tsc && jest",
+    "clean": "rm src/*.js test/*.js"
   },
   "author": "",
   "license": "ISC",
