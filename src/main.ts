@@ -109,25 +109,33 @@ app.post("/datasets", async (req: Request, res: Response) => {
 });
 
 app.post("/datasets/delete", async (req: Request, res: Response) => {
-  const span = trace.getActiveSpan();
-  const { apikey, auth_response, ...formData } = req.body;
-  span?.setAttributes({
-    "app.input.auth_response.exists": !!auth_response,
-    "app.input.apikey.exists": !!apikey,
-  });
-  if (!auth_response) {
-    throw new HnyTricksAuthError(
-      "auth_response not provided",
-      `receiving ${req.path}`
-    );
-  }
-  const auth = JSON.parse(
-    decodeURIComponent(auth_response)
-  ) as HnyTricksAuthorization;
-  span?.setAttributes(spanAttributesAboutAuth(auth));
+  const { apikey, auth_data, ...formData } = req.body;
+
+  const auth = parseAuthData(auth_data, req.path);
 
   const output = await deleteDatasets(auth, formData as DeleteDatasetInputs);
   res.send(output);
 });
+
+function parseAuthData(
+  auth_data: string | undefined,
+  requestPath: string
+): HnyTricksAuthorization {
+  const span = trace.getActiveSpan();
+  span?.setAttributes({
+    "app.input.auth_data.exists": !!auth_data,
+  });
+  if (!auth_data) {
+    throw new HnyTricksAuthError(
+      "auth_data not provided",
+      `receiving ${requestPath}`
+    );
+  }
+  const auth = JSON.parse(
+    decodeURIComponent(auth_data)
+  ) as HnyTricksAuthorization;
+  span?.setAttributes(spanAttributesAboutAuth(auth));
+  return auth;
+}
 
 app.get("/test-region/api/auth", fakeAuthEndpoint);

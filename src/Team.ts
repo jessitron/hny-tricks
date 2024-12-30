@@ -62,7 +62,7 @@ export function teamDescription(auth: HnyTricksAuthorization) {
             <input class="invisible" id="apikey" name="apikey" value="${
               auth.apiKey
             }" />
-            <input class="invisible" id="auth_response" name="auth_response" value=${encodeURIComponent(
+            <input class="invisible" id="auth_data" name="auth_data" value=${encodeURIComponent(
               JSON.stringify(auth)
             )} />
             <button onclick="window.location = window.location"> Reset </button>

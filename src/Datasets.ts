@@ -278,7 +278,7 @@ class DeleteMe implements Column {
       <button
         hx-post="/datasets/delete"
         hx-target="#dataset-section"
-        hx-include="#auth_response"
+        hx-include="#auth_data"
       >
         Delete Old Datasets
       </button>
