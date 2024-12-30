@@ -21242,7 +21242,7 @@ var $8d2dec6b2f42fe45$export$d1d5ca1ca02801e6 = "url.scheme";
 var $8d2dec6b2f42fe45$export$11d4f8ef7be26b3d = "user_agent.original";
 
 
-const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.23";
+const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.29";
 function $c9f3acea5fa71cd0$var$initializeTracing(params /* { apiKey: string, serviceName: string } */ ) {
     if (!params) params = {};
     if (!params.apiKey) throw new Error("Usage: initializeTracing({ apiKey: 'honeycomb api key', serviceName: 'name of this service' })");
@@ -21280,8 +21280,23 @@ function $c9f3acea5fa71cd0$var$initializeTracing(params /* { apiKey: string, ser
     });
     sdk.start();
     if (params.debug) $c9f3acea5fa71cd0$var$sendTestSpan();
+    if (params.provideOneLinkToHoneycomb) {
+        const tracesEndpoint = params.endpoint || "https://api.honeycomb.io";
+        const apiOrigin = new URL(tracesEndpoint).origin;
+        const authEndpoint = apiOrigin + "/1/auth";
+        const uiOrigin = apiOrigin.replace("api", "ui");
+        const datasetSlug = params.serviceName || "unknown_service";
+        fetch(authEndpoint, {
+            headers: {
+                "X-Honeycomb-Team": params.apiKey
+            }
+        }).then((result)=>result.json()).then((data)=>{
+            const datasetQueryUrl = `${uiOrigin}/${data.team.slug}/environments/${data.environment.slug}/datasets/${datasetSlug}`;
+            console.log(`Query your traces: ${datasetQueryUrl}`);
+        });
+    }
     // TODO: Can i get parcel to import a json file?
-    console.log(`Tracing initialized, ${$c9f3acea5fa71cd0$var$MY_VERSION} at last update of this message`);
+    console.log(`Hny-otel-web tracing initialized, ${$c9f3acea5fa71cd0$var$MY_VERSION} at last update of this message`);
 }
 function $c9f3acea5fa71cd0$var$sendTestSpan() {
     const span = $c9f3acea5fa71cd0$var$getTracer({

@@ -1,9 +1,6 @@
 var htmx = (function () {
   "use strict";
 
-  // JESS is here. Note: We are looking for @jessitronica/hny-otel-web:0.8.0 (or probably later versions)
-  console.log("JESS IS HERE IN HTMX a");
-
   if (typeof window === "undefined") {
     console.log("JESS: NO WINDOW");
     return;
@@ -11,7 +8,7 @@ var htmx = (function () {
 
   // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.49";
+  const INSTRUMENTATION_VERSION = "0.0.50";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -30,10 +27,13 @@ var htmx = (function () {
 
   //@ts-ignore
   if (typeof window.Hny == "undefined") {
-    console.log("JESS: NO HNY, tracing won't work", HnyOtelWeb);
+    console.log(
+      "JESS: hny-otel-web not found, there shall be no instrumentation",
+      HnyOtelWeb
+    );
   } else {
     console.log(
-      `JESS: HNY IS HERE, instrumentation version ${INSTRUMENTATION_VERSION}`
+      `Welcome to Jess's htmx instrumentation, version ${INSTRUMENTATION_VERSION}`
     );
   }
 

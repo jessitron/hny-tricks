@@ -19,6 +19,7 @@ export function index() {
       <script src="/htmx.js"></script>
       <title>Hny Tricks</title>
       <link rel="stylesheet" href="styles.css" />
+      <link rel="icon" type="image/png" href="/honeycomb-heart.png" />
     </head>
     <body data-traceid="${currentTraceId()}">
       <header>
@@ -69,7 +70,8 @@ const javascriptToStartTracing = `
      process.env.HONEYCOMB_INGEST_API_KEY || process.env.HONEYCOMB_API_KEY
    }",
           serviceName: "hny-tricks-web",
-          debug: true,
+          debug: false,
+          provideOneLinkToHoneycomb: true,
         });
 `;
 

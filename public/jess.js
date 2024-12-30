@@ -1,11 +1,10 @@
 (() => {
-  console.log("JESS I SHERE");
   const elementsOfInterest = document.querySelectorAll("[tron-reveal]");
   console.log(elementsOfInterest);
 
   elementsOfInterest.forEach((element) => {
     const revealMe = element.getAttribute("tron-reveal");
-    console.log(`Element ${element.id} will reveal ${revealMe} on hover`);
+    // console.log(`Element ${element.id} will reveal ${revealMe} on hover`);
     const revealElement = document.querySelector(revealMe);
     if (!revealElement) {
       console.error(
