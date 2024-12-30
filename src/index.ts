@@ -40,13 +40,14 @@ export function index() {
           <div>
             <h1>🪩 Welcome 🪩</h1>
             <p>
-              Have a Honeycomb.io API key, and want to know where it goes? This
-              app will call the Honeycomb Auth endpoint to find out.
+              Have a ${" "}<a href="https://honeycomb.io">Honeycomb.io</a>${" "}
+              API key, and want to know where it goes? This app will call the
+              Honeycomb Auth endpoint to find out.
             </p>
             <p>
-              Use at your own risk. I won't save your API key, but this
-              deployment is not particularly secure. To use this app on
-              production data, ${" "}
+              Use at your own risk. Honeycomb does not publish or support this
+              app. I won't save your API key, but this deployment is not
+              particularly secure. To use this app on production data, ${" "}
               <a href="https://github.com/jessitron/hny-tricks" target="_blank"
                 >clone it</a
               >${" "} and run it yourself.
