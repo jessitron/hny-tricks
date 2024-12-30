@@ -90,7 +90,8 @@ header .span {
   width: 150px;
 }
 
-button {
+button,
+.button-link {
   margin: 5px;
   color: white;
   background-color: var(--color-hny-tango);

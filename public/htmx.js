@@ -11,7 +11,7 @@ var htmx = (function () {
 
   // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.37";
+  const INSTRUMENTATION_VERSION = "0.0.38";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -3998,6 +3998,10 @@ var htmx = (function () {
       // values from a <form> take precedence, overriding the regular values
       overrideFormData(formData, priorityFormData);
 
+      HnyOtelWeb.setAttributes({
+        "htmx.include.values": JSON.stringify(formData.keys),
+      });
+
       return { errors, formData, values: formDataProxy(formData) };
     }
 
@@ -4800,6 +4804,7 @@ var htmx = (function () {
               question: confirmQuestion,
             };
             if (triggerEvent(elt, "htmx:confirm", confirmDetails) === false) {
+              // what is the return of a trigger? that's weird
               maybeCall(resolve);
               return promise;
             }

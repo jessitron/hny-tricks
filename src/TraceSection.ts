@@ -16,8 +16,8 @@ export function TraceSection(authResult: HnyTricksAuthorization) {
           hx-trigger="input changed throttle:200ms"
           hx-include="#apikey">
         </input>
+        <span id="trace-actions"></span>
     </div>
-    <div id="trace-actions"></div>
 </section>`;
 }
 
@@ -31,7 +31,9 @@ export async function TraceActions(apikey: string, traceId: string) {
   }
   const traceUrl =
     constructEnvironmentLink(authResult) + `/trace?trace_id=${traceId}`;
-  return html`<span
-    ><a href="${traceUrl}" target="_blank">Look for it (new tab)</a></span
-  >`;
+  return html`<span>
+    <a class="button-link" href="${traceUrl}" target="_blank">
+      Look for it <img src="external-link.svg" />
+    </a>
+  </span>`;
 }
