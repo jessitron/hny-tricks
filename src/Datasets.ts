@@ -66,7 +66,6 @@ type HnyApiDataset = {
   regular_columns_count: number;
 };
 
-
 // exported for testing
 export type HnyTricksDataset = {
   name: string;
@@ -125,10 +124,11 @@ export function DatasetsTable(params: {
   const datasetRows = datasets.map((d) =>
     datasetRow(environmentUrl, daysSince, d)
   );
+  const col1 = new DatasetName(datasets.length, auth.environment.name);
   return html`<table class="dataset-table">
     <thead>
       <tr>
-        <th scope="col" class="dataset-name-col">Dataset</th>
+        ${col1.header()}
         <th scope="col">Settings</th>
         <th scope="col">Query</th>
         <th scope="col">Days Since Last Data</th>
@@ -138,7 +138,7 @@ export function DatasetsTable(params: {
     ${datasetRows}
     <tfoot>
       <tr>
-        <td>${datasets.length} datasets in ${auth.environment.name}</td>
+        ${col1.footer()}
         <td>
           <a
             href="${environmentUrl + "overview"}"
@@ -183,7 +183,7 @@ function datasetRow(
           disabled
         />`; // don't delete datasets with data in them
   return html`<tr>
-    <th scope="row" class="dataset-name-col">${d.name}</th>
+    ${new DatasetName(undefined, undefined).row(d)}
     <td>
       <a href="${linkToSettings}" target="_blank" class="link-symbol">⛭</a>
     </td>
@@ -193,4 +193,29 @@ function datasetRow(
     <td>${"" + daysSinceLastWritten}</td>
     <td>${checkbox}</td>
   </tr>`;
+}
+
+type Html = string;
+interface Column {
+  header(): Html;
+  row(d: HnyTricksDataset): Html;
+  footer(): Html;
+}
+
+class DatasetName implements Column {
+  constructor(
+    private countOfDatasets: number,
+    private environmentName: string
+  ) {}
+  header(): Html {
+    return html`<th scope="col" class="dataset-name-col">Dataset</th>`;
+  }
+  row(d: HnyTricksDataset): Html {
+    return html`<th scope="row" class="dataset-name-col">${d.name}</td>`;
+  }
+  footer(): Html {
+    return html`<td>
+      ${this.countOfDatasets} datasets in ${this.environmentName}
+    </td>`;
+  }
 }
