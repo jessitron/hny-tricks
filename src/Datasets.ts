@@ -305,7 +305,9 @@ export async function deleteDatasets(
   const results = await Promise.all(
     datasetSlugs.map((slug) =>
       inSpanAsync("delete dataset " + slug, () =>
-        enableDatasetDeletion(auth, slug).then((_) => deleteDataset(auth, slug))
+        enableDatasetDeletion(auth, slug).then((status) =>
+          deleteDataset(auth, status)
+        )
       )
     )
   );
@@ -327,28 +329,70 @@ export async function deleteDatasets(
 async function enableDatasetDeletion(
   auth: HnyTricksAuthorization,
   slug: DatasetSlug
-) {}
-
-type DatasetDeletionStatus =
-  | { slug: DatasetSlug; deleted: true }
-  | { slug: DatasetSlug; deleted: false; error: string };
-
-async function deleteDataset(
-  auth: HnyTricksAuthorization,
-  slug: DatasetSlug
 ): Promise<DatasetDeletionStatus> {
+  // the [docs](https://api-docs.honeycomb.io/api/datasets/updatedataset) for this say that I should
+  // send all fields or else they'll be wiped out (like the description) but wth we're deleting it anyway
+  const newDatasetSettings = {
+    settings: {
+      delete_protected: false,
+    },
+  };
   const result = await fetchFromHoneycombApi(
-    { apiKey: auth.apiKey, method: "DELETE", keyInfo: auth.keyInfo },
+    {
+      apiKey: auth.apiKey,
+      method: "PUT",
+      keyInfo: auth.keyInfo,
+      body: newDatasetSettings,
+      whatToExpectBack: "nothing",
+    },
     "datasets/" + slug
   );
   if (isFetchError(result)) {
-    return { slug, deleted: false, error: result.message };
+    return {
+      slug,
+      deletionEnabled: false,
+      deleted: false,
+      error: result.message,
+    };
   }
-  return { slug, deleted: true };
+  return { slug, deletionEnabled: true, deleted: false };
+}
+
+type DatasetDeletionStatus = {
+  slug: DatasetSlug;
+  deleted: boolean;
+  deletionEnabled: boolean;
+  error?: string;
+};
+
+async function deleteDataset(
+  auth: HnyTricksAuthorization,
+  status: DatasetDeletionStatus
+): Promise<DatasetDeletionStatus> {
+  const { slug } = status;
+  if (!status.deletionEnabled) {
+    return status;
+  }
+
+  const result = await fetchFromHoneycombApi(
+    {
+      apiKey: auth.apiKey,
+      method: "DELETE",
+      keyInfo: auth.keyInfo,
+      whatToExpectBack: "nothing",
+    },
+    "datasets/" + slug
+  );
+  if (isFetchError(result)) {
+    return { ...status, deleted: false, error: result.message };
+  }
+  return { ...status, deleted: true };
 }
 
 // exported for testing
-export function datasetSlugsToDelete(inputs: DeleteDatasetInputs): any[] {
+export function datasetSlugsToDelete(
+  inputs: DeleteDatasetInputs
+): DatasetSlug[] {
   const datasetSlugs = Object.keys(inputs)
     .filter((k) => k.startsWith("delete-dataset-"))
     .map((k) => k.split("-"))

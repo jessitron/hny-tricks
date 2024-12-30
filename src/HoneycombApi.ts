@@ -17,21 +17,30 @@ export function isFetchError(
   return (response as FetchError).fetchError;
 }
 
+type WhatToExpectBack = "json" | "string" | "nothing";
+
 export async function fetchFromHoneycombApi<T extends SomeResponse>(
   params: {
     apiKey: string;
-    method?: "GET" | "DELETE";
+    method?: "GET" | "DELETE" | "PUT";
     keyInfo: { region: Region };
+    whatToExpectBack?: WhatToExpectBack;
+    body?: string | object; // we'll stringify it for you
   },
   path: string
 ): Promise<T | FetchError> {
   const endpoint = HoneycombApiEndpointByRegion[params.keyInfo.region];
   report({ "honeycomb.endpoint": endpoint });
-  const { apiKey, method } = { method: "GET", ...params };
+  const { apiKey, method, body, whatToExpectBack } = {
+    method: "GET",
+    whatToExpectBack: "json",
+    ...params,
+  };
   const fullUrl = pathUtil.join(endpoint, path);
   return fetch(fullUrl, {
     method,
     headers: { "X-Honeycomb-Team": `${apiKey}` },
+    body: body ? JSON.stringify(body) : undefined,
   }).then(
     async (result) => {
       if (!result.ok) {
@@ -46,18 +55,29 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
           message: `Received ${result.status} from ${fullUrl}. ${result.statusText}`,
         };
       }
-      const resultJson = result.json();
+      const resultText = await result.text();
+
       if (RECORD_BODY) {
         trace.getActiveSpan().addEvent("fetch " + path, {
-          "response.body": JSON.stringify(resultJson, null, 2), // this gives me {} all the time and I don't know why
+          "response.body": resultText, // this gives me {} all the time and I don't know why
           "request.url": endpoint + path,
           "response.status": result.status,
         });
-        console.log(
-          "Response from " + path + ": " + JSON.stringify(resultJson, null, 2)
-        );
+        console.log("Response from " + path + ": " + resultText);
       }
-      return resultJson as T;
+
+      if (whatToExpectBack !== "json") {
+        return resultText as unknown as T; // hopefully you asked for a string or nothing, I'm not policing this
+      }
+      try {
+        return JSON.parse(resultText) as T;
+      } catch (e) {
+        return {
+          fetchError: true,
+          message:
+            `Response to ${fullUrl} was not parsable as JSON: ` + resultText,
+        };
+      }
     },
     (error) => {
       recordError(error, { "http.url": endpoint + path });
