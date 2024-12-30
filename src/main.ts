@@ -30,7 +30,14 @@ app.listen(port, () => {
 app.get("/", (req, res) => {
   console.log("here we are at /");
   const fullResponse = `<!DOCTYPE html>${index()}`;
-  trace.getActiveSpan()?.setAttribute("response.body", fullResponse);
+  const span = trace.getActiveSpan();
+  span?.setAttribute("response.body", fullResponse);
+  span?.setAttributes({
+    "jess.empty-object-string": "{}",
+    "jess.empty-array-string": "[]",
+    "jess.empty-string": "",
+    "jess.zero": 0,
+  });
   res.send(fullResponse);
 });
 
