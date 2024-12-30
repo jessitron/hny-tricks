@@ -32,12 +32,6 @@ app.get("/", (req, res) => {
   const fullResponse = `<!DOCTYPE html>${index()}`;
   const span = trace.getActiveSpan();
   span?.setAttribute("response.body", fullResponse);
-  span?.setAttributes({
-    "jess.empty-object-string": "{}",
-    "jess.empty-array-string": "[]",
-    "jess.empty-string": "",
-    "jess.zero": 0,
-  });
   res.send(fullResponse);
 });
 
