@@ -19,15 +19,16 @@ export function isFetchError(
 export async function fetchFromHoneycombApi<T extends SomeResponse>(
   params: {
     apiKey: string;
+    method?: "GET" | "DELETE";
     keyInfo: { region: Region };
   },
   path: string
 ): Promise<T | FetchError> {
   const endpoint = HoneycombApiEndpointByRegion[params.keyInfo.region];
   report({ "honeycomb.endpoint": endpoint });
-  const { apiKey } = params;
+  const { apiKey, method } = { method: "GET", ...params };
   return fetch(endpoint + path, {
-    method: "GET",
+    method,
     headers: { "X-Honeycomb-Team": `${apiKey}` },
   }).then(
     (result) => {

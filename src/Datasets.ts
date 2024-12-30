@@ -320,7 +320,10 @@ async function enableDatasetDeletion(
   slug: DatasetSlug
 ) {}
 
-async function deleteDataset(auth: HnyTricksAuthorization, slug: DatasetSlug) {}
+async function deleteDataset(auth: HnyTricksAuthorization, slug: DatasetSlug) {
+   
+
+}
 
 // exported for testing
 export function datasetSlugsToDelete(inputs: DeleteDatasetInputs): any[] {
