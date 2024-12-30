@@ -61,7 +61,10 @@ export function teamDescription(auth: HnyTricksAuthorization) {
             }" ></input>
             <input class="invisible" id="apikey" name="apikey" value="${
               auth.apiKey
-            }"></input>
+            }" />
+            <input class="invisible" id="auth-response" name="auth-response" value=${JSON.stringify(
+              auth
+            )} />
             <button onclick="window.location = window.location"> Reset </button>
     </div>
     <div class="team-description team-region">Region: ${
