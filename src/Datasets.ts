@@ -116,60 +116,36 @@ export function DatasetsTable(params: {
 }) {
   const { datasets, auth } = params;
 
-  const now = new Date();
-  const daysSince = (date: Date) => {
-    return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-  };
-
   const environmentUrl = constructEnvironmentLink(auth);
-  const datasetRows = datasets.map((d) =>
-    datasetRow(environmentUrl, daysSince, d)
-  );
+  const datasetRows = datasets.map((d) => datasetRow(environmentUrl, d));
   const col1 = new DatasetName(datasets.length, auth.environment.name);
   const col2 = new LinkToSettings(environmentUrl);
   const col3 = new LinkToQuery(environmentUrl);
+  const col4 = new DaysSinceLastWritten(datasets.map((d) => d.last_written));
+  const col5 = new DeleteMe();
   return html`<table class="dataset-table">
     <thead>
       <tr>
-        ${col1.header()} ${col2.header()} ${col3.header()}
-        <th scope="col">Days Since Last Data</th>
-        <th scope="col">Delete?</th>
+        ${col1.header()} ${col2.header()} ${col3.header()} ${col4.header()}
+        ${col5.header()}
       </tr>
     </thead>
     ${datasetRows}
     <tfoot>
       <tr>
-        ${col1.footer()} ${col2.footer()} ${col3.footer()}
-        <td>
-          ${"" + Math.min(...datasets.map((d) => daysSince(d.last_written)))}
-        </td>
-        <td>Delete Old Dataset</td>
+        ${col1.footer()} ${col2.footer()} ${col3.footer()} ${col4.footer()}
+        ${col5.footer()}
       </tr>
     </tfoot>
   </table>`;
 }
 
-function datasetRow(
-  environmentUrl: string,
-  daysSince: (t: Date) => number,
-  d: HnyTricksDataset
-) {
-  const datasetUrl = environmentUrl + "datasets/" + d.slug;
-  const daysSinceLastWritten = daysSince(d.last_written);
-  const checkbox =
-    daysSinceLastWritten > ASSUMED_RETENTION_TIME
-      ? html`<input class="delete-dataset-checkbox" type="checkbox" checked />`
-      : html`<input
-          class="delete-dataset-checkbox"
-          type="checkbox"
-          disabled
-        />`; // don't delete datasets with data in them
+function datasetRow(environmentUrl: string, d: HnyTricksDataset) {
   return html`<tr>
     ${new DatasetName(undefined, undefined).row(d)}
     ${new LinkToSettings(environmentUrl).row(d)}
     ${new LinkToQuery(environmentUrl).row(d)}
-    <td>${"" + daysSinceLastWritten}</td>
-    <td>${checkbox}</td>
+    ${new DaysSinceLastWritten([]).row(d)} ${new DeleteMe().row(d)}
   </tr>`;
 }
 
@@ -239,5 +215,62 @@ class LinkToQuery implements Column {
         📈
       </a>
     </td>`;
+  }
+}
+
+class DaysSinceLastWritten implements Column {
+  private minDaysSinceLastWrite: number;
+  private now = new Date();
+  private daysSince(date: Date) {
+    return Math.floor(
+      (this.now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+    );
+  }
+  constructor(allLastWrittenDates: Date[]) {
+    this.minDaysSinceLastWrite = Math.min(
+      ...allLastWrittenDates.map((a) => this.daysSince(a))
+    );
+  }
+
+  header(): Html {
+    return html`<th scope="col">Days Since Last Data</th>`;
+  }
+  row(d: HnyTricksDataset): Html {
+    return html`<td>${"" + this.daysSince(d.last_written)}</td>`;
+  }
+  footer(): Html {
+    return html`<td>${"" + this.minDaysSinceLastWrite}</td>`;
+  }
+}
+
+class DeleteMe implements Column {
+  private now = new Date();
+  private daysSince(date: Date) {
+    return Math.floor(
+      (this.now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+    );
+  }
+  constructor() {}
+
+  header(): Html {
+    return html`<th scope="col">Delete?</th>`;
+  }
+  row(d: HnyTricksDataset): Html {
+    const checkbox =
+      this.daysSince(d.last_written) > ASSUMED_RETENTION_TIME
+        ? html`<input
+            class="delete-dataset-checkbox"
+            type="checkbox"
+            checked
+          />`
+        : html`<input
+            class="delete-dataset-checkbox"
+            type="checkbox"
+            disabled
+          />`; // don't delete datasets with data in them
+    return html`<td>${checkbox}</td>`;
+  }
+  footer(): Html {
+    return html`<td>Delete Old Dataset</td>`;
   }
 }
