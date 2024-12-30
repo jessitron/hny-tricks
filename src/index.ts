@@ -41,8 +41,15 @@ export function index() {
             <h1>🪩 Welcome 🪩</h1>
             <p>
               Have a Honeycomb.io API key, and want to know where it goes? This
-              app will call the Honeycomb Auth endpoint to find out. It does not
-              store your API key, or anything else.
+              app will call the Honeycomb Auth endpoint to find out.
+            </p>
+            <p>
+              Use at your own risk. I won't save your API key, but this
+              deployment is not particularly secure. To use this app on
+              production data, ${" "}
+              <a href="https://github.com/jessitron/hny-tricks" target="_blank"
+                >clone it</a
+              >${" "} and run it yourself.
             </p>
           </div>
         </div>
