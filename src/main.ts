@@ -1,17 +1,16 @@
 import "./tracing";
 import express, { Request, Response } from "express";
-import { html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
 import {
+  AuthError,
   authorize,
   commentOnApiKey,
   isAuthError,
-  startingApiKeyPrompt,
 } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
-import { team, teamDescription } from "./Team";
+import { team } from "./Team";
 import { describeDatasets } from "./Datasets";
-import { spanAttributesAboutAuth } from "./common";
+import { HnyTricksAuthorization, spanAttributesAboutAuth } from "./common";
 import { fakeAuthEndpoint, getAuthResult } from "./FakeRegion";
 import { report } from "./tracing-util";
 import { index } from "./index";
@@ -69,7 +68,9 @@ app.post("/datasets", async (req: Request, res: Response) => {
   console.log("here we are at /datasets");
   const span = trace.getActiveSpan();
   // TODO: should we cache this? or pass all the data back and forth from the UI?
-  const authResult = await authorize(req.body.apikey); // TODO: cache?
+  const authResult: HnyTricksAuthorization | AuthError = await authorize(
+    req.body.apikey
+  ); // TODO: cache?
   if (isAuthError(authResult)) {
     span?.setAttributes({ "hny.authError": authResult.html });
     span?.setStatus({ code: 2, message: "auth failed" });

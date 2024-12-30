@@ -151,7 +151,7 @@ export function interpretApiKey(apiKey: string): KeyInfo {
   return { type: keyType, environmentType, region };
 }
 
-type AuthError = {
+export type AuthError = {
   authError: true;
   html: string;
 };
