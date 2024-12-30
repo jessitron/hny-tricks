@@ -6,7 +6,7 @@ import {
   isFetchError,
 } from "./HoneycombApi";
 import { html } from "./htm-but-right";
-import { currentTraceId } from "./tracing-util";
+import { currentTraceId, inSpanAsync } from "./tracing-util";
 import { env } from "process";
 
 export async function describeDatasets(
@@ -304,7 +304,9 @@ export async function deleteDatasets(
 
   await Promise.all(
     datasetSlugs.map((slug) =>
-      enableDatasetDeletion(auth, slug).then((_) => deleteDataset(auth, slug))
+      inSpanAsync("delete dataset " + slug, () =>
+        enableDatasetDeletion(auth, slug).then((_) => deleteDataset(auth, slug))
+      )
     )
   );
 
