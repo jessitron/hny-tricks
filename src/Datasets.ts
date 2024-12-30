@@ -131,9 +131,9 @@ export function DatasetsTable(params: {
       </tr>
     </thead>
     ${datasets.map(
-      (d) =>
+      (d, i) =>
         html`<tr>
-          ${columns.map((c) => c.row(d))}
+          ${columns.map((c) => c.row(d, i))}
         </tr>`
     )}
     <tfoot>
@@ -147,7 +147,7 @@ export function DatasetsTable(params: {
 type Html = string;
 interface Column {
   header(): Html;
-  row(d: HnyTricksDataset): Html;
+  row(d: HnyTricksDataset, i: number): Html;
   footer(): Html;
 }
 
@@ -250,7 +250,7 @@ class DeleteMe implements Column {
   header(): Html {
     return html`<th scope="col">Delete?</th>`;
   }
-  row(d: HnyTricksDataset): Html {
+  row(d: HnyTricksDataset, i: number): Html {
     const checkbox =
       this.daysSince(d.last_written) > ASSUMED_RETENTION_TIME
         ? html`<input
