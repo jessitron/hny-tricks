@@ -302,7 +302,7 @@ export async function deleteDatasets(
   span?.setAttributes({ "app.datasets.delete.input": JSON.stringify(inputs) });
   const datasetSlugs = datasetSlugsToDelete(inputs);
 
-  await Promise.all(
+  const results = await Promise.all(
     datasetSlugs.map((slug) =>
       inSpanAsync("delete dataset " + slug, () =>
         enableDatasetDeletion(auth, slug).then((_) => deleteDataset(auth, slug))
@@ -310,8 +310,18 @@ export async function deleteDatasets(
     )
   );
 
+  const resultHtml = results.map((r) => {
+    if (r.deleted) {
+      return html`<p class="success-result">${r.slug} deleted 🙂</p>`;
+    } else {
+      return html`<p class="failure-result">
+        ${r.slug} not deleted: ${r.message} 😭
+      </p>`;
+    }
+  });
+
   return html`<div traceId=${currentTraceId()}>
-    delete datasets: ${datasetSlugs.join(", ")}, yeah haha
+    while deleting datasets: ${datasetSlugs.join(", ")}... ${resultHtml}
   </div>`;
 }
 
@@ -320,9 +330,22 @@ async function enableDatasetDeletion(
   slug: DatasetSlug
 ) {}
 
-async function deleteDataset(auth: HnyTricksAuthorization, slug: DatasetSlug) {
-   
+type DatasetDeletionStatus =
+  | { slug: DatasetSlug; deleted: true }
+  | { slug: DatasetSlug; deleted: false; error: string };
 
+async function deleteDataset(
+  auth: HnyTricksAuthorization,
+  slug: DatasetSlug
+): Promise<DatasetDeletionStatus> {
+  const result = fetchFromHoneycombApi(
+    { apiKey: auth.apiKey, method: "DELETE", keyInfo: auth.keyInfo },
+    "/1/datasets/" + slug
+  );
+  if (isFetchError(result)) {
+    return { slug, deleted: false, error: result.message };
+  }
+  return { slug, deleted: true };
 }
 
 // exported for testing
