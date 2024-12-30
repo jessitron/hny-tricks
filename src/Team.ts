@@ -63,16 +63,17 @@ export function teamDescription(auth: HnyTricksAuthorization) {
               auth.apiKey
             }"></input>
             <button onclick="window.location = window.location"> Reset </button>
-        <button hx-post="${ENDPOINT_TO_POPULATE_ALL_SECTIONS}" hx-include="#apikey" hx-target="${ELEMENT_CONTAINING_ALL_SECTIONS}" hx-swap="innerHTML" hx-indicator="#big-think"> Reload </button>
     </div>
     <div class="team-description team-region">Region: ${
       auth.keyInfo.region
     }</div>
     <div class="team-description team-name">Team: ${auth.team.name}</div>
     <div class="team-description team-env">
-      Environment: ${auth.environment.name || "Classic"}
+      Environment: ${auth.environment.name || "Classic"} 
     </div>
-    <div class="team-link"><a href=${envLink}> ${envLink} </a></div>
+    <div class="team-link"><a href=${envLink}> ${envLink} </a>   
+      <button hx-post="${ENDPOINT_TO_POPULATE_ALL_SECTIONS}" hx-include="#apikey" hx-target="${ELEMENT_CONTAINING_ALL_SECTIONS}" hx-swap="innerHTML" hx-indicator="#big-think"> Reload </button>
+    </div>
     <script src="/jess.js"></script>
   </section>`;
 }
