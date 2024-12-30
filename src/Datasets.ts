@@ -128,20 +128,13 @@ export function DatasetsTable(params: {
   return html`<table class="dataset-table">
     <thead>
       <tr>
-        ${columns.map((c) => c.header()).join(" ")}
+        ${columns.map((c) => c.header())}
       </tr>
     </thead>
-    ${datasets
-      .map(
-        (d) =>
-          html`<tr>
-            ${columns.map((c) => c.row(d)).join(" ")}
-          </tr>`
-      )
-      .join(" ")}
+    ${datasetRows}
     <tfoot>
       <tr>
-        ${columns.map((c) => c.footer()).join(" ")}
+        ${columns.map((c) => c.footer())}
       </tr>
     </tfoot>
   </table>`;
