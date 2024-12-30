@@ -9,7 +9,11 @@ import {
 } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
 import { team } from "./Team";
-import { deleteDatasets, describeDatasets } from "./Datasets";
+import {
+  DeleteDatasetInputs,
+  deleteDatasets,
+  describeDatasets,
+} from "./Datasets";
 import { HnyTricksAuthorization, spanAttributesAboutAuth } from "./common";
 import { fakeAuthEndpoint, getAuthResult } from "./FakeRegion";
 import { report } from "./tracing-util";
@@ -87,9 +91,11 @@ app.post("/datasets", async (req: Request, res: Response) => {
 
 app.post("/datasets/delete", async (req: Request, res: Response) => {
   const span = trace.getActiveSpan();
-  // span?.setAttributes(spanAttributesAboutAuth(authResult));
+  const { apikey, auth_response, ...formData } = req.body;
+  const auth = auth_response ? JSON.parse(auth_response) : undefined;
+  span?.setAttributes(spanAttributesAboutAuth(auth));
 
-  const output = await deleteDatasets(undefined);
+  const output = deleteDatasets(undefined, formData as DeleteDatasetInputs);
   res.send(output);
 });
 

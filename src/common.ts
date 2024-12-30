@@ -90,12 +90,12 @@ export function describeAuthorization(
 }
 export function spanAttributesAboutAuth(auth: HnyTricksAuthorization) {
   return {
-    "honeycomb.key.type": auth.keyInfo.type,
-    "honeycomb.key.region": auth.keyInfo.region,
-    "honeycomb.key.environmentType": auth.keyInfo.environmentType,
-    "honeycomb.key.id": auth.apiKeyId,
-    "honeycomb.environment": auth.environment.slug,
-    "honeycomb.team": auth.team.slug,
+    "honeycomb.key.type": auth?.keyInfo?.type,
+    "honeycomb.key.region": auth?.keyInfo?.region,
+    "honeycomb.key.environmentType": auth?.keyInfo?.environmentType,
+    "honeycomb.key.id": auth?.apiKeyId,
+    "honeycomb.environment": auth?.environment?.slug,
+    "honeycomb.team": auth?.team?.slug,
   };
 }
 

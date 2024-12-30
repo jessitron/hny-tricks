@@ -253,6 +253,11 @@ class DeleteMe implements Column {
     return html`<th scope="col">Delete?</th>`;
   }
   row(d: HnyTricksDataset, i: number): Html {
+    const slug = html`<input
+      name="dataset-slug-${i}"
+      value="${d.slug}"
+      type="hidden"
+    />`;
     const checkbox =
       this.daysSince(d.last_written) > ASSUMED_RETENTION_TIME
         ? html`<input
@@ -266,7 +271,7 @@ class DeleteMe implements Column {
             type="checkbox"
             disabled
           />`; // don't delete datasets with data in them
-    return html`<td>${checkbox}</td>`;
+    return html`<td>${slug}${checkbox}</td>`;
   }
   footer(): Html {
     return html`<td>
@@ -277,8 +282,32 @@ class DeleteMe implements Column {
   }
 }
 
-export function deleteDatasets(auth: HnyTricksAuthorization) {
+/**
+ * for indexes i...
+ * {
+ * delete-dataset-${i} : "on" // or else it's absent
+ * dataset-slug-${i}: string
+ * }
+ */
+export type DeleteDatasetInputs = Record<string, string>;
+export function deleteDatasets(
+  auth: HnyTricksAuthorization,
+  inputs: DeleteDatasetInputs
+) {
+  const span = trace.getActiveSpan();
+  span?.setAttributes({ "app.datasets.delete.input": JSON.stringify(inputs) });
+  const datasetSlugs = datasetSlugsToDelete(inputs);
   return html`<div traceId=${currentTraceId()}>
-    deleted datasets, yeah haha
+    delete datasets: ${datasetSlugs.join(", ")}, yeah haha
   </div>`;
+}
+
+// exported for testing
+export function datasetSlugsToDelete(inputs: DeleteDatasetInputs): any[] {
+  const datasetSlugs = Object.keys(inputs)
+    .filter((k) => k.startsWith("delete-dataset-"))
+    .map((k) => k.split("-"))
+    .map((parts) => parts[2]) // get just the number
+    .map((i) => inputs[`dataset-slug-${i}`]); // get the slug for that number
+  return datasetSlugs;
 }

@@ -1,5 +1,9 @@
 import { HnyTricksAuthorization } from "../src/common";
-import { DatasetsTable, HnyTricksDataset } from "../src/Datasets";
+import {
+  datasetSlugsToDelete,
+  DatasetsTable,
+  HnyTricksDataset,
+} from "../src/Datasets";
 import pretty from "pretty";
 
 expect.addSnapshotSerializer({
@@ -55,5 +59,26 @@ describe("DatasetsTable", () => {
       auth: fakeAuth,
     });
     expect(html).toMatchSnapshot();
+  });
+});
+
+describe("deleting datasets", () => {
+  it("parses the input", () => {
+    const input = {
+      "dataset-slug-0": "hny-tricks-nodejs",
+      "dataset-slug-1": "hny-otel-web-test",
+      "dataset-slug-2": "hny-tricks-web",
+      "dataset-slug-3": "backend-for-frontend",
+      "delete-dataset-3": "on",
+      "dataset-slug-4": "unknown_metrics",
+      "dataset-slug-5": "phrase-picker-java",
+      "dataset-slug-6": "image-picker-java",
+      "dataset-slug-7": "meminator-java",
+      "dataset-slug-8": "unknown_service",
+      "dataset-slug-9": "website",
+    };
+
+    const output = datasetSlugsToDelete(input);
+    expect(output).toStrictEqual(["backend-for-frontend"]);
   });
 });

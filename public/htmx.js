@@ -11,7 +11,7 @@ var htmx = (function () {
 
   // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.48";
+  const INSTRUMENTATION_VERSION = "0.0.49";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -3999,7 +3999,7 @@ var htmx = (function () {
       overrideFormData(formData, priorityFormData);
 
       HnyOtelWeb.setAttributes({
-        "htmx.include.values": JSON.stringify(Array.from(formData.keys())),
+        "htmx.include.keys": JSON.stringify(Array.from(formData.keys())),
       });
 
       return { errors, formData, values: formDataProxy(formData) };
