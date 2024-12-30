@@ -117,7 +117,6 @@ export function DatasetsTable(params: {
   const { datasets, auth } = params;
 
   const environmentUrl = constructEnvironmentLink(auth);
-  const datasetRows = datasets.map((d) => datasetRow(environmentUrl, d));
   const columns = [
     new DatasetName(datasets.length, auth.environment.name),
     new LinkToSettings(environmentUrl),
@@ -131,22 +130,18 @@ export function DatasetsTable(params: {
         ${columns.map((c) => c.header())}
       </tr>
     </thead>
-    ${datasetRows}
+    ${datasets.map(
+      (d) =>
+        html`<tr>
+          ${columns.map((c) => c.row(d))}
+        </tr>`
+    )}
     <tfoot>
       <tr>
         ${columns.map((c) => c.footer())}
       </tr>
     </tfoot>
   </table>`;
-}
-
-function datasetRow(environmentUrl: string, d: HnyTricksDataset) {
-  return html`<tr>
-    ${new DatasetName(undefined, undefined).row(d)}
-    ${new LinkToSettings(environmentUrl).row(d)}
-    ${new LinkToQuery(environmentUrl).row(d)}
-    ${new DaysSinceLastWritten([]).row(d)} ${new DeleteMe().row(d)}
-  </tr>`;
 }
 
 type Html = string;
