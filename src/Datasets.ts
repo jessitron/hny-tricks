@@ -118,23 +118,30 @@ export function DatasetsTable(params: {
 
   const environmentUrl = constructEnvironmentLink(auth);
   const datasetRows = datasets.map((d) => datasetRow(environmentUrl, d));
-  const col1 = new DatasetName(datasets.length, auth.environment.name);
-  const col2 = new LinkToSettings(environmentUrl);
-  const col3 = new LinkToQuery(environmentUrl);
-  const col4 = new DaysSinceLastWritten(datasets.map((d) => d.last_written));
-  const col5 = new DeleteMe();
+  const columns = [
+    new DatasetName(datasets.length, auth.environment.name),
+    new LinkToSettings(environmentUrl),
+    new LinkToQuery(environmentUrl),
+    new DaysSinceLastWritten(datasets.map((d) => d.last_written)),
+    new DeleteMe(),
+  ];
   return html`<table class="dataset-table">
     <thead>
       <tr>
-        ${col1.header()} ${col2.header()} ${col3.header()} ${col4.header()}
-        ${col5.header()}
+        ${columns.map((c) => c.header()).join(" ")}
       </tr>
     </thead>
-    ${datasetRows}
+    ${datasets
+      .map(
+        (d) =>
+          html`<tr>
+            ${columns.map((c) => c.row(d)).join(" ")}
+          </tr>`
+      )
+      .join(" ")}
     <tfoot>
       <tr>
-        ${col1.footer()} ${col2.footer()} ${col3.footer()} ${col4.footer()}
-        ${col5.footer()}
+        ${columns.map((c) => c.footer()).join(" ")}
       </tr>
     </tfoot>
   </table>`;
