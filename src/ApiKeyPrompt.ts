@@ -217,7 +217,7 @@ export async function authorize(
 async function tryAllRegions(apiKey: string): Promise<Region> {
   return inSpanAsync("try the API key in all regions", async (span) => {
     const regions = Object.keys(HoneycombApiEndpointByRegion) as Region[]; // is there a cleverer way to do that?
-    const regionIdentified = await Promise.any(
+    const regionIdentified = (await Promise.any(
       regions.map((region) =>
         inSpanAsync("try region " + region, async () => {
           const response = await fetchFromHoneycombApi<HoneycombAuthResponse>(
@@ -233,7 +233,7 @@ async function tryAllRegions(apiKey: string): Promise<Region> {
       )
     ).catch((allRejected) => {
       return "unknown";
-    });
+    })) as Region;
 
     report({
       "honeycomb.region": regionIdentified,

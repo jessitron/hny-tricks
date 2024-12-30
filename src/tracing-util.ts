@@ -1,4 +1,4 @@
-import { Attributes, context, trace } from "@opentelemetry/api";
+import { Attributes, context, Span, trace } from "@opentelemetry/api";
 import {
   ATTR_EXCEPTION_MESSAGE,
   ATTR_EXCEPTION_STACKTRACE,
@@ -80,26 +80,29 @@ export function inSpan(spanName, fn) {
   });
 }
 
-export async function inSpanAsync(spanName, fn) {
+export async function inSpanAsync<T>(
+  spanName,
+  fn: (span: Span) => Promise<T>
+): Promise<T> {
   if (fn === undefined) {
-    console.log(
-      "USAGE: inSpanAsync(spanName, async () => { ... })"
-    );
+    console.log("USAGE: inSpanAsync(spanName, async () => { ... })");
   }
-  return trace.getTracer("hny-tricks").startActiveSpan(spanName, async (span) => {
-    try {
-      return await fn();
-    } catch (err) {
-      span.setStatus({
-        code: 2, // trace.SpanStatusCode.ERROR,
-        message: err.message,
-      });
-      span.recordException(err);
-      throw err;
-    } finally {
-      span.end();
-    }
-  });
+  return trace
+    .getTracer("hny-tricks")
+    .startActiveSpan(spanName, async (span) => {
+      try {
+        return await fn(span);
+      } catch (err) {
+        span.setStatus({
+          code: 2, // trace.SpanStatusCode.ERROR,
+          message: err.message,
+        });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
 }
 
 export function currentTraceId() {

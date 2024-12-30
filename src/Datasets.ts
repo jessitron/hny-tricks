@@ -311,13 +311,12 @@ export async function deleteDatasets(
   );
 
   const resultHtml = results.map((r) => {
-    if (r.deleted) {
+    if (r.deleted === true) {
       return html`<p class="success-result">${r.slug} deleted 🙂</p>`;
-    } else {
-      return html`<p class="failure-result">
-        ${r.slug} not deleted: ${r.message} 😭
-      </p>`;
     }
+    return html`<p class="failure-result">
+      ${r.slug} not deleted: ${r.error} 😭
+    </p>`;
   });
 
   return html`<div traceId=${currentTraceId()}>
@@ -338,7 +337,7 @@ async function deleteDataset(
   auth: HnyTricksAuthorization,
   slug: DatasetSlug
 ): Promise<DatasetDeletionStatus> {
-  const result = fetchFromHoneycombApi(
+  const result = await fetchFromHoneycombApi(
     { apiKey: auth.apiKey, method: "DELETE", keyInfo: auth.keyInfo },
     "/1/datasets/" + slug
   );
