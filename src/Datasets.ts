@@ -275,7 +275,11 @@ class DeleteMe implements Column {
   }
   footer(): Html {
     return html`<td>
-      <button hx-post="/datasets/delete" hx-target="#dataset-section">
+      <button
+        hx-post="/datasets/delete"
+        hx-target="#dataset-section"
+        hx-include="#auth_response"
+      >
         Delete Old Datasets
       </button>
     </td>`;
@@ -297,6 +301,7 @@ export function deleteDatasets(
   const span = trace.getActiveSpan();
   span?.setAttributes({ "app.datasets.delete.input": JSON.stringify(inputs) });
   const datasetSlugs = datasetSlugsToDelete(inputs);
+
   return html`<div traceId=${currentTraceId()}>
     delete datasets: ${datasetSlugs.join(", ")}, yeah haha
   </div>`;

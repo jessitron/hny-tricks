@@ -14,11 +14,16 @@ import {
   deleteDatasets,
   describeDatasets,
 } from "./Datasets";
-import { HnyTricksAuthorization, spanAttributesAboutAuth } from "./common";
-import { fakeAuthEndpoint, getAuthResult } from "./FakeRegion";
-import { report } from "./tracing-util";
+import {
+  HnyTricksAuthError,
+  HnyTricksAuthorization,
+  spanAttributesAboutAuth,
+} from "./common";
+import { fakeAuthEndpoint } from "./FakeRegion";
+import { currentTraceId, report } from "./tracing-util";
 import { index } from "./index";
 import { TraceActions } from "./TraceSection";
+import { html } from "./htm-but-right";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,6 +31,20 @@ const port = process.env.PORT || 3000;
 // serve files from the public directory
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
+// Error handling middleware
+app.use((err, req, res, next) => {
+  if (err instanceof HnyTricksAuthError) {
+    res.status(400).send(html`
+      <div traceId=${currentTraceId()}>
+        <p>Problem with Authorization.</p>
+        <p>Message: ${err.message}</p>
+        <p>Context: ${err.contextMessage}</p>
+      </div>
+    `);
+  } else {
+    next(err);
+  }
+});
 
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
@@ -92,7 +111,19 @@ app.post("/datasets", async (req: Request, res: Response) => {
 app.post("/datasets/delete", async (req: Request, res: Response) => {
   const span = trace.getActiveSpan();
   const { apikey, auth_response, ...formData } = req.body;
-  const auth = auth_response ? JSON.parse(auth_response) : undefined;
+  span?.setAttributes({
+    "app.input.auth_response.exists": !!auth_response,
+    "app.input.apikey.exists": !!apikey,
+  });
+  if (!auth_response) {
+    throw new HnyTricksAuthError(
+      "auth_response not provided",
+      `receiving ${req.path}`
+    );
+  }
+  const auth = JSON.parse(
+    decodeURIComponent(auth_response)
+  ) as HnyTricksAuthorization;
   span?.setAttributes(spanAttributesAboutAuth(auth));
 
   const output = deleteDatasets(undefined, formData as DeleteDatasetInputs);
