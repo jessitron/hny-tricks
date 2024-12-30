@@ -127,11 +127,11 @@ export function DatasetsTable(params: {
   );
   const col1 = new DatasetName(datasets.length, auth.environment.name);
   const col2 = new LinkToSettings(environmentUrl);
+  const col3 = new LinkToQuery(environmentUrl);
   return html`<table class="dataset-table">
     <thead>
       <tr>
-        ${col1.header()} ${col2.header()}
-        <th scope="col">Query</th>
+        ${col1.header()} ${col2.header()} ${col3.header()}
         <th scope="col">Days Since Last Data</th>
         <th scope="col">Delete?</th>
       </tr>
@@ -139,15 +139,7 @@ export function DatasetsTable(params: {
     ${datasetRows}
     <tfoot>
       <tr>
-        ${col1.footer()} ${col2.footer()}
-        <td>
-          <a
-            href="${environmentUrl + CountQueryUrlParams}"
-            target="_blank"
-            class="link-symbol"
-            >📈</a
-          >
-        </td>
+        ${col1.footer()} ${col2.footer()} ${col3.footer()}
         <td>
           ${"" + Math.min(...datasets.map((d) => daysSince(d.last_written)))}
         </td>
@@ -163,7 +155,6 @@ function datasetRow(
   d: HnyTricksDataset
 ) {
   const datasetUrl = environmentUrl + "datasets/" + d.slug;
-  const linkToCountQuery = datasetUrl + CountQueryUrlParams;
   const daysSinceLastWritten = daysSince(d.last_written);
   const checkbox =
     daysSinceLastWritten > ASSUMED_RETENTION_TIME
@@ -176,12 +167,35 @@ function datasetRow(
   return html`<tr>
     ${new DatasetName(undefined, undefined).row(d)}
     ${new LinkToSettings(environmentUrl).row(d)}
-    <td>
-      <a href="${linkToCountQuery}" target="_blank" class="link-symbol">📉</a>
-    </td>
+    ${new LinkToQuery(environmentUrl).row(d)}
     <td>${"" + daysSinceLastWritten}</td>
     <td>${checkbox}</td>
   </tr>`;
+}
+
+type Html = string;
+interface Column {
+  header(): Html;
+  row(d: HnyTricksDataset): Html;
+  footer(): Html;
+}
+
+class DatasetName implements Column {
+  constructor(
+    private countOfDatasets: number,
+    private environmentName: string
+  ) {}
+  header(): Html {
+    return html`<th scope="col" class="dataset-name-col">Dataset</th>`;
+  }
+  row(d: HnyTricksDataset): Html {
+    return html`<th scope="row" class="dataset-name-col">${d.name}</td>`; // TODO: closing tag is wrong
+  }
+  footer(): Html {
+    return html`<td>
+      ${this.countOfDatasets} datasets in ${this.environmentName}
+    </td>`;
+  }
 }
 
 class LinkToSettings implements Column {
@@ -206,27 +220,24 @@ class LinkToSettings implements Column {
   }
 }
 
-type Html = string;
-interface Column {
-  header(): Html;
-  row(d: HnyTricksDataset): Html;
-  footer(): Html;
-}
-
-class DatasetName implements Column {
-  constructor(
-    private countOfDatasets: number,
-    private environmentName: string
-  ) {}
+class LinkToQuery implements Column {
+  constructor(private environmentUrl: string) {}
   header(): Html {
-    return html`<th scope="col" class="dataset-name-col">Dataset</th>`;
+    return html`<th scope="col">Query</th>`;
   }
   row(d: HnyTricksDataset): Html {
-    return html`<th scope="row" class="dataset-name-col">${d.name}</td>`; // TODO: closing tag is wrong
+    const datasetUrl = this.environmentUrl + "datasets/" + d.slug;
+    const linkToCountQuery = datasetUrl + CountQueryUrlParams;
+    return html`<td>
+      <a href="${linkToCountQuery}" target="_blank" class="link-symbol">📉</a>
+    </td>`;
   }
   footer(): Html {
+    const environmentQueryUrl = this.environmentUrl + CountQueryUrlParams;
     return html`<td>
-      ${this.countOfDatasets} datasets in ${this.environmentName}
+      <a href="${environmentQueryUrl}" target="_blank" class="link-symbol">
+        📈
+      </a>
     </td>`;
   }
 }
