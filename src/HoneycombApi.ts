@@ -33,16 +33,14 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
     method,
     headers: { "X-Honeycomb-Team": `${apiKey}` },
   }).then(
-    (result) => {
+    async (result) => {
       if (!result.ok) {
-        recordError(
-          {
-            statusText: result.statusText,
-            status: result.status,
-            body: result.body,
-          },
-          { "http.url": fullUrl }
-        );
+        recordError("Result not OK", {
+          "response.statusText": result.statusText,
+          "response.status": result.status,
+          "response.body": await result.text(),
+          "http.url": fullUrl,
+        });
         return {
           fetchError: true,
           message: `Received ${result.status} from ${fullUrl}. ${result.statusText}`,
@@ -59,7 +57,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
           "Response from " + path + ": " + JSON.stringify(resultJson, null, 2)
         );
       }
-      return resultJson;
+      return resultJson as T;
     },
     (error) => {
       recordError(error, { "http.url": endpoint + path });

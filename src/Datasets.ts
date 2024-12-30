@@ -339,7 +339,7 @@ async function deleteDataset(
 ): Promise<DatasetDeletionStatus> {
   const result = await fetchFromHoneycombApi(
     { apiKey: auth.apiKey, method: "DELETE", keyInfo: auth.keyInfo },
-    "/1/datasets/" + slug
+    "datasets/" + slug
   );
   if (isFetchError(result)) {
     return { slug, deleted: false, error: result.message };
