@@ -113,7 +113,7 @@ export async function createDerivedColumns(
       : results.map((r) => {
           if (r.created === true) {
             return html`<p class="success-result">
-              Column ${alias} created in }${r.slug} 🙂
+              Column ${alias} created in ${r.slug} 🙂
             </p>`;
           }
           return html`<p class="failure-result">

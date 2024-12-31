@@ -1,4 +1,5 @@
 import { HnyTricksAuthorization } from "./common";
+import { fetchFromHoneycombApi, isFetchError } from "./HoneycombApi";
 import { Html, html } from "./htm-but-right";
 import { StatusUpdate } from "./status";
 
@@ -29,5 +30,23 @@ export async function sendEvent(
   auth: HnyTricksAuthorization,
   input: SendEventInput
 ): Promise<StatusUpdate> {
-  return { success: false, html: "unimplemented" };
+  const data = { ...TestEvent, service_name: input.service_name };
+
+  const dataset = input.service_name;
+  const url = "events/" + encodeURIComponent(dataset);
+
+  const result = await fetchFromHoneycombApi(
+    {
+      apiKey: auth.apiKey,
+      keyInfo: auth.keyInfo,
+      method: "POST",
+      body: data,
+      whatToExpectBack: "string",
+    },
+    url
+  );
+  if (isFetchError(result)) {
+    return { success: false, html: result.message };
+  }
+  return { success: true, html: "1 event sent" };
 }

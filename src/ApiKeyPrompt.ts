@@ -77,7 +77,7 @@ function remarkOnKeyInfo(keyInfo): {
     if (keyInfo.region !== "unknown") {
       return {
         className: "happy",
-        description: "This looks like a ${keyInfo.region} ingest key",
+        description: `This looks like a ${keyInfo.region} ingest key`,
       };
     } else {
       return {
