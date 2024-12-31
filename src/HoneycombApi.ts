@@ -23,7 +23,7 @@ type WhatToExpectBack = "json" | "string" | "nothing";
 export async function fetchFromHoneycombApi<T extends SomeResponse>(
   params: {
     apiKey: string;
-    method?: "GET" | "DELETE" | "PUT";
+    method?: "GET" | "DELETE" | "PUT" | "POST";
     keyInfo: { region: Region };
     whatToExpectBack?: WhatToExpectBack;
     body?: string | object; // we'll stringify it for you

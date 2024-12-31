@@ -104,7 +104,8 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   const output = await derivedColumnExists(
     auth,
     req.query["slug"],
-    req.query["alias"]
+    req.query["alias"],
+    req.query["row"]
   );
   res.send(output);
 });

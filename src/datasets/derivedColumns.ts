@@ -15,7 +15,7 @@ export class DerivedColumnForDatasetName implements Column {
     return html`<th scope="col">dc.dataset</th>`;
   }
   row(d: HnyTricksDataset, i: number): Html {
-    const url = `/datasets/dc/exists?slug=${d.slug}&alias=dc.dataset`;
+    const url = `/datasets/dc/exists?slug=${d.slug}&alias=dc.dataset&row=${i}`;
     return html`<td
       hx-trigger="intersect"
       hx-post=${url}
@@ -41,7 +41,8 @@ export class DerivedColumnForDatasetName implements Column {
 export async function derivedColumnExists(
   auth: HnyTricksAuthorization,
   slug: DatasetSlug,
-  alias: DerivedColumnAlias
+  alias: DerivedColumnAlias,
+  row: string
 ) {
   const span = trace.getActiveSpan();
   span.setAttributes({
@@ -61,7 +62,7 @@ export async function derivedColumnExists(
           class="create-dc-checkbox"
           type="checkbox"
           checked
-          name="create_${encodeURIComponent(alias)}_for_${slug}"
+          name="create_${encodeURIComponent(alias)}_for_${row}"
           title="absent. create?"
       /></span>`;
     } else {
@@ -77,7 +78,7 @@ export async function derivedColumnExists(
 
 /**
  * {
- * [create_${encodeURIComponent(alias)}_for_${slug}]: "on"
+ * [create_${encodeURIComponent(alias)}_for_${i}]: "on"
  * }
  */
 type CreateDerivedColumnsInput = Record<string, string>;
@@ -88,12 +89,19 @@ export async function createDerivedColumns(
 ): Promise<StatusUpdate> {
   const input_prefix = `create_${encodeURIComponent(alias)}_for_`;
 
-  const datasetSlugs = Object.keys(inputs)
+  const datasetRows = Object.keys(inputs)
     .filter((k) => k.startsWith(input_prefix))
     .map((k) => k.substring(input_prefix.length));
 
   const results = await Promise.all(
-    datasetSlugs.map((slug) => createDerivedColumn(auth, slug, alias))
+    datasetRows.map((i) =>
+      createDerivedColumn(
+        auth,
+        inputs[`dataset-slug-${i}`],
+        decodeURIComponent(inputs[`dataset-name-${i}`]),
+        alias
+      )
+    )
   );
 
   const success = results.every((r) => r.created);
@@ -121,7 +129,29 @@ type DerivedColumnCreationStatus =
 async function createDerivedColumn(
   auth: HnyTricksAuthorization,
   slug: DatasetSlug,
+  datasetName: string,
   alias: string
 ): Promise<DerivedColumnCreationStatus> {
-  return { slug, created: false, error: "unimplemented" };
+  const url = "/derived_columns/" + slug;
+
+  // only one is implemented right now
+  const expression = `COALESCE("${datasetName}")`;
+  const data = {
+    alias,
+    expression,
+    description: "Where is this data? Created by jessitron/hny-tricks",
+  };
+  const result = await fetchFromHoneycombApi(
+    {
+      apiKey: auth.apiKey,
+      keyInfo: auth.keyInfo,
+      method: "POST",
+      body: data,
+    },
+    url
+  );
+  if (isFetchError(result)) {
+    return { slug, created: false, error: result.message };
+  }
+  return { slug, created: true };
 }

@@ -49,8 +49,12 @@ class DatasetName implements Column {
   header(): Html {
     return html`<th scope="col" class="dataset-name-col">Dataset</th>`;
   }
-  row(d: HnyTricksDataset): Html {
-    return html`<th scope="row" class="dataset-name-col">${d.name}</td>`; // TODO: closing tag is wrong
+  row(d: HnyTricksDataset, i: number): Html {
+    return html`<th scope="row" class="dataset-name-col">${
+      d.name
+    }<input type="hidden" name="dataset_name_${i}" value="${encodeURIComponent(
+      d.name
+    )}"/></td>`; // TODO: closing tag is wrong
   }
   footer(): Html {
     return html`<td>
