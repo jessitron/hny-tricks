@@ -9,6 +9,7 @@ import {
 import { TraceSection } from "./TraceSection";
 import {
   constructEnvironmentLink,
+  HnyTricksAuthError,
   HnyTricksAuthorization,
   HoneycombUIEndpointByRegion,
   spanAttributesAboutAuth,
@@ -79,4 +80,25 @@ export function teamDescription(auth: HnyTricksAuthorization) {
     </div>
     <script src="/jess.js"></script>
   </section>`;
+}
+
+export function parseAuthData(
+  auth_data: string | undefined,
+  requestPath: string
+): HnyTricksAuthorization {
+  const span = trace.getActiveSpan();
+  span?.setAttributes({
+    "app.input.auth_data.exists": !!auth_data,
+  });
+  if (!auth_data) {
+    throw new HnyTricksAuthError(
+      "auth_data not provided",
+      `receiving ${requestPath}`
+    );
+  }
+  const auth = JSON.parse(
+    decodeURIComponent(auth_data)
+  ) as HnyTricksAuthorization;
+  span?.setAttributes(spanAttributesAboutAuth(auth));
+  return auth;
 }

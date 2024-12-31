@@ -1,5 +1,5 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization } from "../common";
+import { HnyTricksAuthorization, StatusUpdate } from "../common";
 import { html } from "../htm-but-right";
 import { currentTraceId } from "../tracing-util";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
@@ -38,7 +38,6 @@ export class DerivedColumnForDatasetName implements Column {
   }
 }
 
-
 export async function derivedColumnExists(
   auth: HnyTricksAuthorization,
   slug: DatasetSlug,
@@ -62,7 +61,7 @@ export async function derivedColumnExists(
           class="create-dc-checkbox"
           type="checkbox"
           checked
-          name="create_dc_dataset_for_${slug}"
+          name="create_${encodeURIComponent(alias)}_for_${slug}"
           title="absent. create?"
       /></span>`;
     } else {
@@ -74,4 +73,18 @@ export async function derivedColumnExists(
     data-traceid=${currentTraceId()}
     >☘️</span
   >`;
+}
+
+/**
+ * {
+ * [create_${encodeURIComponent(alias)}_for_${slug}]: "on"
+ * }
+ */
+type CreateDerivedColumnsInput = Record<string, string>;
+export async function createDerivedColumns(
+  auth: HnyTricksAuthorization,
+  alias: string,
+  inputs: CreateDerivedColumnsInput
+): Promise<StatusUpdate> {
+  return { success: false, html: html`stuff and things` };
 }

@@ -1,5 +1,5 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization } from "../common";
+import { HnyTricksAuthorization, StatusUpdate } from "../common";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
 import { html } from "../htm-but-right";
 import { inSpanAsync } from "../tracing-util";
@@ -90,7 +90,7 @@ export type DeleteDatasetInputs = Record<string, string>;
 export async function deleteDatasets(
   auth: HnyTricksAuthorization,
   inputs: DeleteDatasetInputs
-) {
+): Promise<StatusUpdate> {
   const span = trace.getActiveSpan();
   span?.setAttributes({ "app.datasets.delete.input": JSON.stringify(inputs) });
   const datasetSlugs = datasetSlugsToDelete(inputs);
@@ -105,7 +105,7 @@ export async function deleteDatasets(
     )
   );
 
-  const successful = results.every((r) => r.deleted);
+  const success = results.every((r) => r.deleted);
 
   const status =
     results.length === 0
@@ -119,7 +119,7 @@ export async function deleteDatasets(
           </p>`;
         });
 
-  return { successful, html: status };
+  return { success, html: html`${status}` };
 }
 
 async function enableDatasetDeletion(

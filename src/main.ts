@@ -3,18 +3,17 @@ import express, { Request, Response } from "express";
 import { trace } from "@opentelemetry/api";
 import { commentOnApiKey } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
-import { team } from "./Team";
-import {
-  HnyTricksAuthError,
-  HnyTricksAuthorization,
-  spanAttributesAboutAuth,
-} from "./common";
+import { parseAuthData, team } from "./Team";
+import { HnyTricksAuthError } from "./common";
 import { fakeAuthEndpoint } from "./FakeRegion";
 import { currentTraceId, report } from "./tracing-util";
 import { index } from "./index";
 import { TraceActions } from "./TraceSection";
 import { html } from "./htm-but-right";
-import { derivedColumnExists } from "./datasets/derivedColumns";
+import {
+  createDerivedColumns,
+  derivedColumnExists,
+} from "./datasets/derivedColumns";
 import { DeleteDatasetInputs, deleteDatasets } from "./datasets/deletion";
 import { describeDatasets } from "./datasets/datasets";
 
@@ -82,15 +81,15 @@ app.post("/datasets", async (req: Request, res: Response) => {
 });
 
 app.post("/datasets/delete", async (req: Request, res: Response) => {
-  const { apikey, auth_data, ...formData } = req.body;
+  const { auth_data, ...formData } = req.body;
 
   const auth = parseAuthData(auth_data, req.path);
 
   const status = await deleteDatasets(auth, formData as DeleteDatasetInputs);
 
-  const output = describeDatasets(
+  const output = await describeDatasets(
     auth,
-    html`<div class="status ${status.successful ? "happy" : "unhappy"}">
+    html`<div class="status ${status.success ? "happy" : "unhappy"}">
       ${status.html}
     </div>`
   );
@@ -110,25 +109,28 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   res.send(output);
 });
 
-function parseAuthData(
-  auth_data: string | undefined,
-  requestPath: string
-): HnyTricksAuthorization {
-  const span = trace.getActiveSpan();
-  span?.setAttributes({
-    "app.input.auth_data.exists": !!auth_data,
-  });
-  if (!auth_data) {
-    throw new HnyTricksAuthError(
-      "auth_data not provided",
-      `receiving ${requestPath}`
-    );
-  }
-  const auth = JSON.parse(
-    decodeURIComponent(auth_data)
-  ) as HnyTricksAuthorization;
-  span?.setAttributes(spanAttributesAboutAuth(auth));
-  return auth;
-}
+app.post("/datasets/dc/create", async (req: Request, res: Response) => {
+  const { auth_data, ...formData } = req.body;
+
+  const auth = parseAuthData(auth_data, req.path);
+
+  const alias = req.query["alias"];
+
+  const status = await createDerivedColumns(
+    auth,
+    alias,
+    formData as DeleteDatasetInputs
+  );
+
+  const output = describeDatasets(
+    auth,
+    html`<div class="status ${status.success ? "happy" : "unhappy"}">
+      ${status.html}
+    </div>`
+  );
+  res.send(output);
+});
 
 app.get("/test-region/api/auth", fakeAuthEndpoint);
+
+console.log("end of file");
