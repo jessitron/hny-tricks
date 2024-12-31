@@ -1,8 +1,8 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization } from "./common";
-import { html } from "./htm-but-right";
-import { currentTraceId } from "./tracing-util";
-import { fetchFromHoneycombApi, isFetchError } from "./HoneycombApi";
+import { HnyTricksAuthorization } from "../common";
+import { html } from "../htm-but-right";
+import { currentTraceId } from "../tracing-util";
+import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
 
 type DatasetSlug = string;
 type DerivedColumnAlias = string;

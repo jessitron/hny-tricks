@@ -5,7 +5,7 @@
   "scripts": {
     "start": "tsc && node src/main.js",
     "test": "tsc && jest",
-    "clean": "rm src/*.js test/*.js"
+    "clean": "rm src/**/*.js"
   },
   "author": "",
   "license": "ISC",

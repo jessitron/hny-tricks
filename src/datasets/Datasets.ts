@@ -1,12 +1,12 @@
 import { trace } from "@opentelemetry/api";
-import { constructEnvironmentLink, HnyTricksAuthorization } from "./common";
+import { constructEnvironmentLink, HnyTricksAuthorization } from "../common";
 import {
   FetchError,
   fetchFromHoneycombApi,
   isFetchError,
-} from "./HoneycombApi";
-import { html } from "./htm-but-right";
-import { currentTraceId, inSpanAsync } from "./tracing-util";
+} from "../HoneycombApi";
+import { html } from "../htm-but-right";
+import { currentTraceId, inSpanAsync } from "../tracing-util";
 import { urlForDerivedColumnExists } from "./derivedColumns";
 
 export async function describeDatasets(

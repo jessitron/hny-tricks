@@ -13,7 +13,7 @@ import {
   DeleteDatasetInputs,
   deleteDatasets,
   describeDatasets,
-} from "./Datasets";
+} from "./datasets/Datasets";
 import {
   HnyTricksAuthError,
   HnyTricksAuthorization,
@@ -24,7 +24,7 @@ import { currentTraceId, report } from "./tracing-util";
 import { index } from "./index";
 import { TraceActions } from "./TraceSection";
 import { html } from "./htm-but-right";
-import { derivedColumnExists } from "./derivedColumns";
+import { derivedColumnExists } from "./datasets/derivedColumns";
 
 const app = express();
 const port = process.env.PORT || 3000;
