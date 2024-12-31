@@ -7,6 +7,7 @@ import {
 } from "./HoneycombApi";
 import { html } from "./htm-but-right";
 import { currentTraceId, inSpanAsync } from "./tracing-util";
+import { urlForDerivedColumnExists } from "./derivedColumns";
 
 export async function describeDatasets(
   auth: HnyTricksAuthorization,
@@ -296,7 +297,7 @@ class DerivedColumnForDatasetName implements Column {
     return html`<th scope="col">dc.dataset</th>`;
   }
   row(d: HnyTricksDataset, i: number): Html {
-    const url = `/datasets/dc/exists?slug=${d.slug}&alias=dc.dataset`;
+    const url = urlForDerivedColumnExists(d.slug);
     return html`<td
       hx-trigger="intersect"
       hx-post=${url}
@@ -311,8 +312,9 @@ class DerivedColumnForDatasetName implements Column {
         hx-post="/datasets/dc/create-all?alias=dc.dataset"
         hx-target="#dataset-section"
         hx-include="#auth_data"
+        title="make these derived columns"
       >
-        Delete Old Datasets
+        Create
       </button>
     </td>`;
   }

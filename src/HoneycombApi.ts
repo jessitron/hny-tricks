@@ -76,6 +76,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
       } catch (e) {
         return {
           fetchError: true,
+          statusCode: result.status,
           message:
             `Response to ${fullUrl} was not parsable as JSON: ` + resultText,
         };
@@ -83,7 +84,7 @@ export async function fetchFromHoneycombApi<T extends SomeResponse>(
     },
     (error) => {
       recordError(error, { "http.url": endpoint + path });
-      return { fetchError: true, message: error.message };
+      return { fetchError: true, statusCode: 0, message: error.message };
     }
   );
 }
