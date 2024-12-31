@@ -10,6 +10,8 @@ import { currentTraceId } from "./tracing-util";
  */
 const htmlOriginal = htm.bind(vhtml);
 
+export type Html = string;
+
 export const html = (strings: TemplateStringsArray, ...values: any[]) => {
   try {
     const result = htmlOriginal(strings, ...values);
