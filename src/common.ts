@@ -111,11 +111,15 @@ export function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
   );
 }
 
+export class StatusUpdate {
+  success: boolean;
+  html: string;
+}
 
 // First define your custom error class
 export class HnyTricksAuthError extends Error {
   constructor(public message: string, public contextMessage: string) {
     super(message);
-    this.name = 'CustomError';
+    this.name = "CustomError";
   }
 }

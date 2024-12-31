@@ -3,13 +3,42 @@ import { HnyTricksAuthorization } from "../common";
 import { html } from "../htm-but-right";
 import { currentTraceId } from "../tracing-util";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
+import { Column, Html, HnyTricksDataset } from "./dataset_common";
 
 type DatasetSlug = string;
 type DerivedColumnAlias = string;
 
-export function urlForDerivedColumnExists(slug: DatasetSlug) {
-  return `/datasets/dc/exists?slug=${slug}&alias=dc.dataset`;
+export class DerivedColumnForDatasetName implements Column {
+  constructor() {}
+
+  header(): Html {
+    return html`<th scope="col">dc.dataset</th>`;
+  }
+  row(d: HnyTricksDataset, i: number): Html {
+    const url = `/datasets/dc/exists?slug=${d.slug}&alias=dc.dataset`;
+    return html`<td
+      hx-trigger="intersect"
+      hx-post=${url}
+      hx-include="#auth_data"
+    >
+      💬
+    </td>`;
+  }
+  footer(): Html {
+    return html`<td>
+      <button
+        hx-post="/datasets/dc/create-all?alias=dc.dataset"
+        hx-target="#dataset-section"
+        hx-include="#auth_data"
+        title="make these derived columns"
+      >
+        Create
+      </button>
+    </td>`;
+  }
 }
+
+
 export async function derivedColumnExists(
   auth: HnyTricksAuthorization,
   slug: DatasetSlug,

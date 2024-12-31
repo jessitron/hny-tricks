@@ -1,19 +1,9 @@
 import "./tracing";
 import express, { Request, Response } from "express";
 import { trace } from "@opentelemetry/api";
-import {
-  AuthError,
-  authorize,
-  commentOnApiKey,
-  isAuthError,
-} from "./ApiKeyPrompt";
+import { commentOnApiKey } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
 import { team } from "./Team";
-import {
-  DeleteDatasetInputs,
-  deleteDatasets,
-  describeDatasets,
-} from "./datasets/Datasets";
 import {
   HnyTricksAuthError,
   HnyTricksAuthorization,
@@ -25,6 +15,8 @@ import { index } from "./index";
 import { TraceActions } from "./TraceSection";
 import { html } from "./htm-but-right";
 import { derivedColumnExists } from "./datasets/derivedColumns";
+import { DeleteDatasetInputs, deleteDatasets } from "./datasets/deletion";
+import { describeDatasets } from "./datasets/datasets";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -94,7 +86,14 @@ app.post("/datasets/delete", async (req: Request, res: Response) => {
 
   const auth = parseAuthData(auth_data, req.path);
 
-  const output = await deleteDatasets(auth, formData as DeleteDatasetInputs);
+  const status = await deleteDatasets(auth, formData as DeleteDatasetInputs);
+
+  const output = describeDatasets(
+    auth,
+    html`<div class="status ${status.successful ? "happy" : "unhappy"}">
+      ${status.html}
+    </div>`
+  );
   res.send(output);
 });
 
