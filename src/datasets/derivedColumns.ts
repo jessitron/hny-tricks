@@ -1,9 +1,10 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization, StatusUpdate } from "../common";
+import { HnyTricksAuthorization } from "../common";
 import { html } from "../htm-but-right";
 import { currentTraceId } from "../tracing-util";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
 import { Column, Html, HnyTricksDataset } from "./dataset_common";
+import { StatusUpdate } from "../status";
 
 type DatasetSlug = string;
 type DerivedColumnAlias = string;

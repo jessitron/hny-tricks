@@ -16,6 +16,8 @@ import {
 } from "./datasets/derivedColumns";
 import { DeleteDatasetInputs, deleteDatasets } from "./datasets/deletion";
 import { describeDatasets } from "./datasets/datasets";
+import { sendEvent, sendEventSection } from "./SendEvent";
+import { statusDiv } from "./status";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -87,12 +89,7 @@ app.post("/datasets/delete", async (req: Request, res: Response) => {
 
   const status = await deleteDatasets(auth, formData as DeleteDatasetInputs);
 
-  const output = await describeDatasets(
-    auth,
-    html`<div class="status ${status.success ? "happy" : "unhappy"}">
-      ${status.html}
-    </div>`
-  );
+  const output = await describeDatasets(auth, statusDiv(status));
   res.send(output);
 });
 
@@ -123,12 +120,35 @@ app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
     formData as DeleteDatasetInputs
   );
 
-  const output = await describeDatasets(
+  const output = await describeDatasets(auth, statusDiv(status));
+  res.send(output);
+});
+
+app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
+  const { auth_data, ...formData } = req.body;
+
+  const auth = parseAuthData(auth_data, req.path);
+
+  const alias = req.query["alias"];
+
+  const status = await createDerivedColumns(
     auth,
-    html`<div class="status ${status.success ? "happy" : "unhappy"}">
-      ${status.html}
-    </div>`
+    alias,
+    formData as DeleteDatasetInputs
   );
+
+  const output = await describeDatasets(auth, statusDiv(status));
+  res.send(output);
+});
+
+app.post("/event/send", async (req: Request, res: Response) => {
+  const { auth_data, ...formData } = req.body;
+
+  const auth = parseAuthData(auth_data, req.path);
+
+  const status = await sendEvent(auth, formData);
+
+  const output = sendEventSection(statusDiv(status));
   res.send(output);
 });
 

@@ -1,9 +1,10 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization, StatusUpdate } from "../common";
+import { HnyTricksAuthorization } from "../common";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
 import { html } from "../htm-but-right";
 import { inSpanAsync } from "../tracing-util";
 import { Column, DatasetSlug, HnyTricksDataset, Html } from "./dataset_common";
+import { StatusUpdate } from "../status";
 
 const ASSUMED_RETENTION_TIME = 60; // days
 

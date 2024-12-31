@@ -1,3 +1,5 @@
+import { html } from "./htm-but-right";
+
 export type HoneycombAuthResponse = {
   id: string;
   type: "configuration" | "ingest";
@@ -109,11 +111,6 @@ export function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
     envSlug +
     "/"
   );
-}
-
-export class StatusUpdate {
-  success: boolean;
-  html: string;
 }
 
 // First define your custom error class

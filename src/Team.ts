@@ -16,6 +16,7 @@ import {
 } from "./common";
 import { html } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
+import { sendEventSection } from "./SendEvent";
 
 /**
  * why is this file capitalized?
@@ -23,6 +24,7 @@ import { currentTraceId } from "./tracing-util";
  */
 
 export async function team(apikey) {
+  // TODO: do this part in main?
   const span = trace.getActiveSpan();
   if (!apikey) {
     span.setAttribute("warning", "no api key received");
@@ -32,12 +34,13 @@ export async function team(apikey) {
   if (isAuthError(authResult)) {
     span?.setAttributes({ "hny.authError": authResult.html });
     span?.setStatus({ code: 2, message: "auth failed" });
-    return authResult.html;
+    return authResult.html; // TODO: return the ApiKeyPrompt again
   }
   span?.setAttributes(spanAttributesAboutAuth(authResult));
 
   const traceSection = TraceSection(authResult);
 
+  // TODO: move to datasets.ts
   const datasetSection = html`<section
     name="dataset-section"
     id="dataset-section"
@@ -49,6 +52,7 @@ export async function team(apikey) {
   </section>`;
   return html`<div data-traceid=${currentTraceId()}>
     ${teamDescription(authResult)} ${traceSection} ${datasetSection}
+    ${sendEventSection()}
   </div>`;
 }
 
