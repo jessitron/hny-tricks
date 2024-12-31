@@ -10,6 +10,7 @@ exports[`DatasetsTable Renders datasets, the same as before 1`] = `
         <th scope="col">Query</th>
         <th scope="col">Days Since Last Data</th>
         <th scope="col">Delete?</th>
+        <th scope="col">dc.dataset</th>
       </tr>
     </thead>
     <tr>
@@ -17,7 +18,8 @@ exports[`DatasetsTable Renders datasets, the same as before 1`] = `
       <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/api-gateway/overview" target="_blank" class="link-symbol">⛭</a></td>
       <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/api-gateway?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📉</a></td>
       <td>2</td>
-      <td><input name="dataset-slug-0" value="api-gateway" type="hidden"><input class="delete-dataset-checkbox" type="checkbox" disabled="true"></td>
+      <td><input name="dataset-slug-0" value="api-gateway" type="hidden"><input class="delete-dataset-checkbox" type="checkbox" title="I only delete empty datasets" disabled="true"></td>
+      <td hx-trigger="intersect" hx-post="/datasets/dc/exists?slug=api-gateway&amp;alias=dc.dataset" hx-include="#auth_data">💬</td>
     </tr>
     <tr>
       <th scope="row" class="dataset-name-col">ye olde proxy</th>
@@ -25,6 +27,7 @@ exports[`DatasetsTable Renders datasets, the same as before 1`] = `
       <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/olde-proxy?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📉</a></td>
       <td>365</td>
       <td><input name="dataset-slug-1" value="olde-proxy" type="hidden"><input class="delete-dataset-checkbox" type="checkbox" name="delete-dataset-1" checked="true"></td>
+      <td hx-trigger="intersect" hx-post="/datasets/dc/exists?slug=olde-proxy&amp;alias=dc.dataset" hx-include="#auth_data">💬</td>
     </tr>
     <tfoot>
       <tr>
@@ -33,6 +36,7 @@ exports[`DatasetsTable Renders datasets, the same as before 1`] = `
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
         <td>2</td>
         <td><button hx-post="/datasets/delete" hx-target="#dataset-section" hx-include="#auth_data">Delete Old Datasets</button></td>
+        <td><button hx-post="/datasets/dc/create-all?alias=dc.dataset" hx-target="#dataset-section" hx-include="#auth_data" title="make these derived columns">Create</button></td>
       </tr>
     </tfoot>
   </table>
@@ -49,6 +53,7 @@ exports[`DatasetsTable outputs the same thing as before, for an empty one 1`] = 
         <th scope="col">Query</th>
         <th scope="col">Days Since Last Data</th>
         <th scope="col">Delete?</th>
+        <th scope="col">dc.dataset</th>
       </tr>
     </thead>
     <tfoot>
@@ -58,6 +63,7 @@ exports[`DatasetsTable outputs the same thing as before, for an empty one 1`] = 
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
         <td>Infinity</td>
         <td><button hx-post="/datasets/delete" hx-target="#dataset-section" hx-include="#auth_data">Delete Old Datasets</button></td>
+        <td><button hx-post="/datasets/dc/create-all?alias=dc.dataset" hx-target="#dataset-section" hx-include="#auth_data" title="make these derived columns">Create</button></td>
       </tr>
     </tfoot>
   </table>

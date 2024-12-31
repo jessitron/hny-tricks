@@ -12,5 +12,18 @@ describe("making htm work better in error cases", () => {
     expect(result).toBe("<div><span>hello</span></div>");
   });
 
+  // nm, maybe it can't
+  // it("Can concatenate an array of 2 strings", () => {
+  //   const array = ["<p>stringy</p>", "<p>thingy</p>"];
+  //   const result = html`<p>${array}</p> `;
+  //   expect(result).toBe("stringy thingy");
+  // });
+
+  // it("Can concatenate an array of strings", () => {
+  //   const array = ["stringy"];
+  //   const result = html`${array}`;
+  //   expect(result).toBe("stringy");
+  // });
+
   // WISH: it("accepts the empty tag")
 });

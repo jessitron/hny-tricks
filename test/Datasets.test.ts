@@ -1,10 +1,8 @@
 import { HnyTricksAuthorization } from "../src/common";
-import {
-  datasetSlugsToDelete,
-  DatasetsTable,
-  HnyTricksDataset,
-} from "../src/Datasets";
 import pretty from "pretty";
+import { HnyTricksDataset } from "../src/datasets/dataset_common";
+import { DatasetsTable } from "../src/datasets/DatasetsTable";
+import { datasetSlugsToDelete } from "../src/datasets/deletion";
 
 expect.addSnapshotSerializer({
   test: (val) => typeof val === "string",

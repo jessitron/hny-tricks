@@ -86,5 +86,42 @@ export async function createDerivedColumns(
   alias: string,
   inputs: CreateDerivedColumnsInput
 ): Promise<StatusUpdate> {
-  return { success: false, html: html`stuff and things` };
+  const input_prefix = `create_${encodeURIComponent(alias)}_for_`;
+
+  const datasetSlugs = Object.keys(inputs)
+    .filter((k) => k.startsWith(input_prefix))
+    .map((k) => k.substring(input_prefix.length));
+
+  const results = await Promise.all(
+    datasetSlugs.map((slug) => createDerivedColumn(auth, slug, alias))
+  );
+
+  const success = results.every((r) => r.created);
+
+  const status =
+    results.length === 0
+      ? ["Zero columns created"]
+      : results.map((r) => {
+          if (r.created === true) {
+            return html`<p class="success-result">
+              Column ${alias} created in }${r.slug} 🙂
+            </p>`;
+          }
+          return html`<p class="failure-result">
+            No column ${alias} for ${r.slug}... ${r.error} 😭
+          </p>`;
+        });
+
+  return { success, html: status.join(" ") };
+}
+
+type DerivedColumnCreationStatus =
+  | { slug: DatasetSlug; created: true }
+  | { slug: DatasetSlug; created: false; error: string };
+async function createDerivedColumn(
+  auth: HnyTricksAuthorization,
+  slug: DatasetSlug,
+  alias: string
+): Promise<DerivedColumnCreationStatus> {
+  return { slug, created: false, error: "unimplemented" };
 }

@@ -109,7 +109,7 @@ export async function deleteDatasets(
 
   const status =
     results.length === 0
-      ? "Zero datasets deleted"
+      ? ["Zero datasets deleted"]
       : results.map((r) => {
           if (r.deleted === true) {
             return html`<p class="success-result">${r.slug} deleted 🙂</p>`;
@@ -119,7 +119,7 @@ export async function deleteDatasets(
           </p>`;
         });
 
-  return { success, html: html`${status}` };
+  return { success, html: status.join(" ") };
 }
 
 async function enableDatasetDeletion(

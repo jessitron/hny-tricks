@@ -109,7 +109,7 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   res.send(output);
 });
 
-app.post("/datasets/dc/create", async (req: Request, res: Response) => {
+app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
   const { auth_data, ...formData } = req.body;
 
   const auth = parseAuthData(auth_data, req.path);
@@ -122,7 +122,7 @@ app.post("/datasets/dc/create", async (req: Request, res: Response) => {
     formData as DeleteDatasetInputs
   );
 
-  const output = describeDatasets(
+  const output = await describeDatasets(
     auth,
     html`<div class="status ${status.success ? "happy" : "unhappy"}">
       ${status.html}
