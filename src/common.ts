@@ -84,7 +84,10 @@ export function describeAuthorization(
     apiKeyId: hnyAuthResponse.id, // this is safe to print
     keyInfo,
     permissions: {
-      canManageDatasets: hnyAuthResponse.api_key_access.createDatasets,
+      // Honeycomb subtlety: createDatasets perms bestows dataset management only for configuration keys.
+      canManageDatasets:
+        hnyAuthResponse.api_key_access.createDatasets &&
+        hnyAuthResponse.type === "configuration",
     },
     environment: hnyAuthResponse.environment,
     team: hnyAuthResponse.team,
