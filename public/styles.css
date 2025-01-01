@@ -323,6 +323,15 @@ section#send-event-section {
 
 .event-selection div {
   margin: 0.5em 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.event-selection .icon {
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
 }
 
 .event-selection input[type="radio"] {

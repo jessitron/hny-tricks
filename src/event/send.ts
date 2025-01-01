@@ -5,9 +5,14 @@ import { StatusUpdate } from "../status";
 import { fetchEventJson, isFetchEventError } from "./fetch";
 import { RandomIdGenerator } from "./RandomIdGenerator";
 
-const Event1 = {
+export const Event1 = {
   description: "one root span",
   url: "https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d/raw",
+};
+
+export const Event2 = {
+  description: "structured log",
+  url: "https://gist.github.com/jessitron/91fc3fb3416afe6e6957b6c48290fe61/raw",
 };
 
 function queryByTransmission(transmissionId: string) {
