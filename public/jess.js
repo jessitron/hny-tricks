@@ -1,6 +1,5 @@
 (() => {
   const elementsOfInterest = document.querySelectorAll("[tron-reveal]");
-  console.log(elementsOfInterest);
 
   elementsOfInterest.forEach((element) => {
     const revealMe = element.getAttribute("tron-reveal");
