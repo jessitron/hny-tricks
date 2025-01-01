@@ -27,11 +27,6 @@ export const AVAILABLE_EVENTS: Record<string, AvailableEvent> = {
     rawUrl:
       "https://gist.githubusercontent.com/jessitron/ec40d3622721177d2fbdb7195aac2c39/raw/0f1bba813f1454dd374f9db3344bc6b732dcc1b9/structured-log.json",
   },
-  custom: {
-    description: "custom event (provide URL)",
-    userViewableUrl: "",
-    rawUrl: "",
-  },
 };
 
 function queryByTransmission(transmissionId: string) {
@@ -61,7 +56,7 @@ function queryByTransmission(transmissionId: string) {
 
 type SendEventInput = {
   service_name: string;
-  event_choice: string;
+  event_choice: "custom" | keyof typeof AVAILABLE_EVENTS;
   custom_url?: string;
 };
 
@@ -74,14 +69,15 @@ export async function sendEvent(
   const spanId = gen.generateSpanId();
   const transmissionId = gen.generateSpanId();
 
-  const chosenEvent = AVAILABLE_EVENTS[input.event_choice];
-  if (!chosenEvent) {
-    throw new Error("Bug. What kind of event choice is " + input.event_choice);
-  }
-
-  const rawUrl = input.event_choice === "custom" ? input.custom_url : chosenEvent.rawUrl;
+  const rawUrl =
+    input.event_choice === "custom"
+      ? input.custom_url
+      : AVAILABLE_EVENTS[input.event_choice]?.rawUrl;
   if (!rawUrl) {
-    return { success: false, html: "Please provide a URL for the custom event" };
+    return {
+      success: false,
+      html: "I need a URL to pull some JSON from",
+    };
   }
 
   const rawData = await fetchEventJson(rawUrl);

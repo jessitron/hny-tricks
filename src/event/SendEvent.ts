@@ -36,27 +36,32 @@ export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
                   checked=${key === "event1"}
                 />
                 <label for=${key}>${event.description}</label>
-                ${key !== "custom" && html`
-                  <a href=${event.userViewableUrl} target="_blank">
-                    <img
-                      src="external-link.svg"
-                      class="icon"
-                      alt="view event definition"
-                    />
-                  </a>
-                `}
-                ${key === "custom" && html`
-                  <input 
-                    type="text" 
-                    name="custom_url" 
-                    placeholder="Enter raw JSON URL"
-                    style="margin-left: 1em; width: 20em;"
-                    oninput="if(this.value) document.querySelector('input[value=custom]').checked = true"
+                <a href=${event.userViewableUrl} target="_blank">
+                  <img
+                    src="external-link.svg"
+                    class="icon"
+                    alt="view event definition"
                   />
-                `}
+                </a>
               </div>
             `
           )}
+          <div>
+            <input
+              type="radio"
+              id="custom_event"
+              name="event_choice"
+              value="custom"
+            />
+            <label for="custom_event">custom:</label>
+            <input
+              type="text"
+              name="custom_url"
+              placeholder="Enter raw JSON URL"
+              style="margin-left: 1em; width: 20em;"
+              oninput="if(this.value) document.querySelector('#custom_event').checked = true"
+            />
+          </div>
         </div>
         <div>
           <label for="service_name">Service name (determines dataset):</label>
