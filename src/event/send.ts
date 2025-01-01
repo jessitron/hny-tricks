@@ -2,6 +2,7 @@ import { HnyTricksAuthorization, constructEnvironmentLink } from "../common";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
 import { html } from "../htm-but-right";
 import { StatusUpdate } from "../status";
+import { fetchEventJson, isFetchEventError } from "./fetch";
 import { RandomIdGenerator } from "./RandomIdGenerator";
 
 const TEST_EVENT_VERSION = "0.0.4";
@@ -13,6 +14,11 @@ const TestEvent = JSON.stringify({
   "library.name": "hny-tricks",
   "library.version": TEST_EVENT_VERSION,
 });
+
+const Event1 = {
+  description: "one root span",
+  url: "https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d/raw",
+};
 
 function queryByTransmission(transmissionId: string) {
   return {
@@ -51,8 +57,14 @@ export async function sendEvent(
   const spanId = gen.generateSpanId();
   const transmissionId = gen.generateSpanId();
 
+  const rawData = await fetchEventJson(Event1.url);
+  if (isFetchEventError(rawData)) {
+    return { success: false, html: rawData.message };
+  }
+
+  // minimal change. Only 1 URL expected, it contains an object.
   const data = {
-    ...JSON.parse(TestEvent),
+    ...rawData,
     "trace.trace_id": traceId,
     "trace.span_id": spanId,
     "hny-tricks.transmission_id": transmissionId,
