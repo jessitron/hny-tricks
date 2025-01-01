@@ -27,6 +27,11 @@ export const AVAILABLE_EVENTS: Record<string, AvailableEvent> = {
     rawUrl:
       "https://gist.githubusercontent.com/jessitron/ec40d3622721177d2fbdb7195aac2c39/raw/0f1bba813f1454dd374f9db3344bc6b732dcc1b9/structured-log.json",
   },
+  custom: {
+    description: "custom event (provide URL)",
+    userViewableUrl: "",
+    rawUrl: "",
+  },
 };
 
 function queryByTransmission(transmissionId: string) {
@@ -57,7 +62,9 @@ function queryByTransmission(transmissionId: string) {
 type SendEventInput = {
   service_name: string;
   event_choice: string;
+  custom_url?: string;
 };
+
 export async function sendEvent(
   auth: HnyTricksAuthorization,
   input: SendEventInput
@@ -72,7 +79,12 @@ export async function sendEvent(
     throw new Error("Bug. What kind of event choice is " + input.event_choice);
   }
 
-  const rawData = await fetchEventJson(chosenEvent.rawUrl);
+  const rawUrl = input.event_choice === "custom" ? input.custom_url : chosenEvent.rawUrl;
+  if (!rawUrl) {
+    return { success: false, html: "Please provide a URL for the custom event" };
+  }
+
+  const rawData = await fetchEventJson(rawUrl);
   if (isFetchEventError(rawData)) {
     return { success: false, html: rawData.message };
   }

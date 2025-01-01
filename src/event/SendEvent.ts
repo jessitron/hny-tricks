@@ -36,13 +36,24 @@ export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
                   checked=${key === "event1"}
                 />
                 <label for=${key}>${event.description}</label>
-                <a href=${event.userViewableUrl} target="_blank">
-                  <img
-                    src="external-link.svg"
-                    class="icon"
-                    alt="view event definition"
+                ${key !== "custom" && html`
+                  <a href=${event.userViewableUrl} target="_blank">
+                    <img
+                      src="external-link.svg"
+                      class="icon"
+                      alt="view event definition"
+                    />
+                  </a>
+                `}
+                ${key === "custom" && html`
+                  <input 
+                    type="text" 
+                    name="custom_url" 
+                    placeholder="Enter raw JSON URL"
+                    style="margin-left: 1em; width: 20em;"
+                    oninput="if(this.value) document.querySelector('input[value=custom]').checked = true"
                   />
-                </a>
+                `}
               </div>
             `
           )}
