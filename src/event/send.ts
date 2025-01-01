@@ -5,16 +5,6 @@ import { StatusUpdate } from "../status";
 import { fetchEventJson, isFetchEventError } from "./fetch";
 import { RandomIdGenerator } from "./RandomIdGenerator";
 
-const TEST_EVENT_VERSION = "0.0.4";
-
-const TestEvent = JSON.stringify({
-  "trace.trace_id": "TRACE_ID",
-  "trace.span_id": "SPAN_ID",
-  name: "hello there",
-  "library.name": "hny-tricks",
-  "library.version": TEST_EVENT_VERSION,
-});
-
 const Event1 = {
   description: "one root span",
   url: "https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d/raw",

@@ -311,6 +311,24 @@ section#send-event-section {
   background-color: var(--lat-ref-color-green-200);
 }
 
+.event-selection {
+  margin: 1em 0;
+  text-align: left;
+}
+
+.event-selection p {
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.event-selection div {
+  margin: 0.5em 0;
+}
+
+.event-selection input[type="radio"] {
+  margin-right: 0.5em;
+}
+
 section#send-event-section div.status {
   text-align: center;
 }

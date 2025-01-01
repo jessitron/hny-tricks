@@ -21,6 +21,17 @@ export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
   return html`<section id="send-event-section">
     <h3 class="section-title">Send a test span</h3>
     <form>
+        <div class="event-selection">
+            <p>Choose an event type:</p>
+            <div>
+                <input type="radio" id="event1" name="event_type" value="event1" checked>
+                <label for="event1">One Root Span</label>
+            </div>
+            <div>
+                <input type="radio" id="event2" name="event_type" value="event2">
+                <label for="event2">Complex Event</label>
+            </div>
+        </div>
         <label for="service_name">Service name (determines dataset):</label>
         <input name="service_name" value="testy-mctesterson"></input>
         <button hx-post="/event/send" hx-include=#auth_data hx-target="#send-event-section" hx-swap="outerHTML">Send</button>

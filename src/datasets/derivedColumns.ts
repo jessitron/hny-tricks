@@ -63,7 +63,7 @@ export class DerivedColumnForDatasetName implements Column {
       encodeURIComponent(JSON.stringify(QueryForDcDataset));
     const queryLink = html`<a href=${queryUrl} target="_blank"> 📈 </a>`;
     if (!this.hasPermissions) {
-      // can't create or know whether they have any, but they can have the query. might not work
+      // can't create, but they can have the query.
       return html`<td>${queryLink}</td>`;
     }
     // todo: I would like the query link to appear after we know there are any defined,
