@@ -4,13 +4,15 @@ import { html } from "../htm-but-right";
 import { StatusUpdate } from "../status";
 import { RandomIdGenerator } from "./RandomIdGenerator";
 
-const TEST_EVENT_VERSION = "0.0.1";
+const TEST_EVENT_VERSION = "0.0.4";
 
-const TestEvent = {
+const TestEvent = JSON.stringify({
+  "trace.trace_id": "TRACE_ID",
+  "trace.span_id": "SPAN_ID",
   name: "hello there",
   "library.name": "hny-tricks",
   "library.version": TEST_EVENT_VERSION,
-};
+});
 
 function queryByTransmission(transmissionId: string) {
   return {
@@ -50,7 +52,7 @@ export async function sendEvent(
   const transmissionId = gen.generateSpanId();
 
   const data = {
-    ...TestEvent,
+    ...JSON.parse(TestEvent),
     "trace.trace_id": traceId,
     "trace.span_id": spanId,
     "hny-tricks.transmission_id": transmissionId,
@@ -79,7 +81,8 @@ export async function sendEvent(
     "datasets/" +
     datasetSlug +
     "?query=" +
-    encodeURIComponent(JSON.stringify(queryByTransmission(transmissionId)));
+    encodeURIComponent(JSON.stringify(queryByTransmission(transmissionId))) +
+    "&tab=explore";
 
   return {
     success: true,
