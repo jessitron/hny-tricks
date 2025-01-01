@@ -39,6 +39,14 @@ export class DerivedColumnForDatasetName implements Column {
   }
 }
 
+type ListDerivedColumnResponse = {
+  id: string;
+  alis: string;
+  expression: string;
+  description: string;
+  created_at: string; // ISO8601
+  updated_at: string; // ISO8601
+};
 export async function derivedColumnExists(
   auth: HnyTricksAuthorization,
   slug: DatasetSlug,
@@ -52,7 +60,7 @@ export async function derivedColumnExists(
   });
 
   const apiUrl = `derived_columns/${slug}?alias=${alias}`;
-  const result = await fetchFromHoneycombApi(
+  const result = await fetchFromHoneycombApi<ListDerivedColumnResponse>(
     { apiKey: auth.apiKey, keyInfo: auth.keyInfo },
     apiUrl
   );
@@ -69,6 +77,18 @@ export async function derivedColumnExists(
     } else {
       return html`<span data-traceid=${currentTraceId()}>😵</span>`;
     }
+  }
+
+  console.log("lalala", JSON.stringify(result));
+  const expectedExpression = derivedColumnFormula(alias, { datasetSlug: slug });
+  const observedExpression = result.expression;
+  if (expectedExpression !== observedExpression) {
+    return html`<span
+      title="expression looks wrong. Expected: ${expectedExpression} Observed: ${observedExpression}"
+      data-traceid=${currentTraceId()}
+    >
+      😵‍💫
+    </span>`;
   }
   return html`<span
     title="derived column exists"
@@ -124,6 +144,14 @@ export async function createDerivedColumns(
   return { success, html: status.join(" ") };
 }
 
+function derivedColumnFormula(
+  alias: string,
+  inputs: { datasetSlug?: string; datasetName?: string }
+) {
+  const datasetName = inputs.datasetName || inputs.datasetSlug;
+  return `COALESCE("${datasetName}")`;
+}
+
 type DerivedColumnCreationStatus =
   | { slug: DatasetSlug; created: true }
   | { slug: DatasetSlug; created: false; error: string };
@@ -140,7 +168,10 @@ async function createDerivedColumn(
   }
 
   // only one is implemented right now
-  const expression = `COALESCE("${datasetName}")`;
+  const expression = derivedColumnFormula(alias, {
+    datasetSlug: slug,
+    datasetName,
+  });
   const data = {
     alias,
     expression,
