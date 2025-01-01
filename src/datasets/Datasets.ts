@@ -33,9 +33,17 @@ export async function describeDatasets(
     auth.permissions.canManageDatasets
   );
   if (!auth.permissions.canManageDatasets) {
-    return html`<span data-traceId="${currentTraceId()}">
-      This API Key does not have the "Manage Datasets" permission.
-    </span>`;
+    const reason =
+      auth.keyInfo.type === "configuration"
+        ? 'This API Key does not have the "Manage Datasets" permission.'
+        : "This is an ingest key; you need a configuration key to manage datasets.";
+    return html`<div
+      class="section-unavailable"
+      data-traceId="${currentTraceId()}"
+    >
+      <h3 class="section-title unavailable">Datasets</h3>
+      <p class="unavailable">Unavailable. ${reason}</p>
+    </div>`;
   }
 
   const datasets = await retrieveDatasets(auth);

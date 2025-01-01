@@ -239,9 +239,18 @@ input#trace-id {
   font-size: larger;
 }
 
+.section-unavailable {
+  text-align: left;
+}
+
 section#dataset-section {
   padding: 0px;
   border-color: var(--color-hny-indigo);
+  background-color: var(--lat-ref-color-purple-100);
+}
+
+section#dataset-section .section-unavailable {
+  padding: 10px;
 }
 
 .dataset-table {
