@@ -1,8 +1,8 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization } from "./common";
-import { fetchFromHoneycombApi, isFetchError } from "./HoneycombApi";
-import { Html, html } from "./htm-but-right";
-import { StatusUpdate } from "./status";
+import { HnyTricksAuthorization } from "../common";
+import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
+import { Html, html } from "../htm-but-right";
+import { StatusUpdate } from "../status";
 import { RandomIdGenerator } from "./RandomIdGenerator";
 
 const TEST_EVENT_VERSION = "0.0.1";

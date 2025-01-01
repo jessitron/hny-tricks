@@ -16,7 +16,7 @@ import {
 } from "./datasets/derivedColumns";
 import { DeleteDatasetInputs, deleteDatasets } from "./datasets/deletion";
 import { describeDatasets } from "./datasets/datasets";
-import { sendEvent, sendEventSection } from "./SendEvent";
+import { sendEvent, sendEventSection } from "./event/SendEvent";
 import { statusDiv } from "./status";
 
 const app = express();

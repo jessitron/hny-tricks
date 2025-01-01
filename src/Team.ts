@@ -16,7 +16,7 @@ import {
 } from "./common";
 import { html } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
-import { sendEventSection } from "./SendEvent";
+import { sendEventSection } from "./event/SendEvent";
 import { datasetSection } from "./datasets/datasets";
 
 /**
