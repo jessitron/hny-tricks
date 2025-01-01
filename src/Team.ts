@@ -19,7 +19,7 @@ import { currentTraceId } from "./tracing-util";
 import { sendEventSection } from "./SendEvent";
 
 /**
- * why is this file capitalized?
+ * why is this file capitalized? I haven't figured out the standards for that yet.
  * it represents responses to the /team html call.
  */
 
@@ -51,8 +51,8 @@ export async function team(apikey) {
     Loading datasets...
   </section>`;
   return html`<div data-traceid=${currentTraceId()}>
-    ${teamDescription(authResult)} ${traceSection} ${datasetSection}
-    ${sendEventSection()}
+    ${teamDescription(authResult)} ${traceSection} ${sendEventSection()}
+    ${datasetSection}
   </div>`;
 }
 
