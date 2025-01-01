@@ -294,7 +294,7 @@ section#dataset-section .section-unavailable {
 }
 
 .dataset-table .dataset-name-col {
-  text-align: left;
+  text-align: start;
 }
 
 .dataset-table tbody tr.active-row {

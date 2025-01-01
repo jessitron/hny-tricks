@@ -1,5 +1,5 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization } from "../common";
+import { constructEnvironmentLink, HnyTricksAuthorization } from "../common";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
 import { Html, html } from "../htm-but-right";
 import { StatusUpdate } from "../status";
@@ -40,6 +40,31 @@ export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
   </section>`;
 }
 
+function queryByTransmission(transmissionId: string) {
+  return {
+    time_range: 7200,
+    granularity: 0,
+    breakdowns: [],
+    calculations: [
+      {
+        op: "COUNT",
+      },
+    ],
+    filters: [
+      {
+        column: "hny-tricks.transmission_id",
+        op: "=",
+        value: transmissionId,
+      },
+    ],
+    filter_combination: "AND",
+    orders: [],
+    havings: [],
+    trace_joins: [],
+    limit: 100,
+  };
+}
+
 type SendEventInput = {
   service_name: string;
 };
@@ -50,16 +75,18 @@ export async function sendEvent(
   const gen = new RandomIdGenerator();
   const traceId = gen.generateTraceId();
   const spanId = gen.generateSpanId();
+  const transmissionId = gen.generateSpanId();
 
   const data = {
     ...TestEvent,
     "trace.trace_id": traceId,
     "trace.span_id": spanId,
+    "hny-tricks.transmission_id": transmissionId,
     service_name: input.service_name,
   };
 
-  const dataset = input.service_name;
-  const url = "events/" + encodeURIComponent(dataset);
+  const datasetSlug = encodeURIComponent(input.service_name);
+  const url = "events/" + datasetSlug;
 
   const result = await fetchFromHoneycombApi(
     {
@@ -74,5 +101,18 @@ export async function sendEvent(
   if (isFetchError(result)) {
     return { success: false, html: result.message };
   }
-  return { success: true, html: "1 event sent" };
+
+  const linkToQuery =
+    constructEnvironmentLink(auth) +
+    "datasets/" +
+    datasetSlug +
+    "?query=" +
+    encodeURIComponent(JSON.stringify(queryByTransmission(transmissionId)));
+
+  return {
+    success: true,
+    html: html`<span>
+      1 event sent. <a href=${linkToQuery} target="_blank"> 📉 </a>
+    </span>`,
+  };
 }
