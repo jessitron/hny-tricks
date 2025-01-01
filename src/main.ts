@@ -148,7 +148,7 @@ app.post("/event/send", async (req: Request, res: Response) => {
 
   const status = await sendEvent(auth, formData);
 
-  const output = sendEventSection(statusDiv(status));
+  const output = sendEventSection(auth, statusDiv(status));
   res.send(output);
 });
 
