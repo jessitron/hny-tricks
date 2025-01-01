@@ -99,7 +99,7 @@ export async function createDerivedColumns(
       createDerivedColumn(
         auth,
         inputs[`dataset-slug-${i}`],
-        decodeURIComponent(inputs[`dataset-name-${i}`]),
+        decodeURIComponent(inputs[`dataset_name_${i}`]),
         alias
       )
     )
