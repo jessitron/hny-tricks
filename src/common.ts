@@ -69,7 +69,7 @@ export type HnyTricksAuthorization = {
   apiKey: string;
   apiKeyId: string;
   keyInfo: KeyInfo;
-  permissions: { canManageDatasets: boolean };
+  permissions: { canManageDatasets: boolean; canSendEvents: boolean };
   environment: { slug: string; name: string };
   team: { slug: string; name: string };
 };
@@ -88,6 +88,7 @@ export function describeAuthorization(
       canManageDatasets:
         hnyAuthResponse.api_key_access.createDatasets &&
         hnyAuthResponse.type === "configuration",
+      canSendEvents: hnyAuthResponse.api_key_access.events,
     },
     environment: hnyAuthResponse.environment,
     team: hnyAuthResponse.team,

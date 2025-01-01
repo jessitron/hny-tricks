@@ -11,7 +11,10 @@ const TestEvent = {
   "library.version": TEST_EVENT_VERSION,
 };
 
-export function sendEventSection(status?: Html) {
+export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
+
+  
+  
   return html`<section id="send-event-section">
     <h3 class="section-title">Send a test span</h3>
     <form>

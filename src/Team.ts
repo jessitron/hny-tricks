@@ -6,7 +6,7 @@ import {
   isAuthError,
   startingApiKeyPrompt,
 } from "./ApiKeyPrompt";
-import { TraceSection } from "./TraceSection";
+import { TraceSection as traceSection } from "./TraceSection";
 import {
   constructEnvironmentLink,
   HnyTricksAuthError,
@@ -31,18 +31,16 @@ export async function team(apikey) {
     span.setAttribute("warning", "no api key received");
     return startingApiKeyPrompt;
   }
-  const authResult = await authorize(apikey);
-  if (isAuthError(authResult)) {
-    span?.setAttributes({ "hny.authError": authResult.html });
+  const auth = await authorize(apikey);
+  if (isAuthError(auth)) {
+    span?.setAttributes({ "hny.authError": auth.html });
     span?.setStatus({ code: 2, message: "auth failed" });
-    return authResult.html; // TODO: return the ApiKeyPrompt again
+    return auth.html; // TODO: return the ApiKeyPrompt again
   }
-  span?.setAttributes(spanAttributesAboutAuth(authResult));
-
-  const traceSection = TraceSection(authResult);
+  span?.setAttributes(spanAttributesAboutAuth(auth));
 
   return html`<div data-traceid=${currentTraceId()}>
-    ${teamDescription(authResult)} ${traceSection} ${sendEventSection()}
+    ${teamDescription(auth)} ${traceSection(auth)} ${sendEventSection(auth)}
     ${datasetSection()}
   </div>`;
 }
