@@ -135,6 +135,10 @@ async function createDerivedColumn(
 ): Promise<DerivedColumnCreationStatus> {
   const url = "/derived_columns/" + slug;
 
+  if (!datasetName) {
+    throw new Error("datasetName is undefined, creating dc for " + slug);
+  }
+
   // only one is implemented right now
   const expression = `COALESCE("${datasetName}")`;
   const data = {
