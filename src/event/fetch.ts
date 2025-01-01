@@ -1,5 +1,7 @@
 import { trace } from "@opentelemetry/api";
-import { report, recordError } from "../tracing-util";
+import { recordError } from "../tracing-util";
+
+import JSON5 from "json5";
 
 type SomeResponse = object;
 
@@ -50,7 +52,7 @@ export async function fetchEventJson(
       }
 
       try {
-        return JSON.parse(resultText);
+        return JSON5.parse(resultText);
       } catch (e) {
         return {
           fetchEventError: true,
