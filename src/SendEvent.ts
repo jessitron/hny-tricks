@@ -3,6 +3,7 @@ import { HnyTricksAuthorization } from "./common";
 import { fetchFromHoneycombApi, isFetchError } from "./HoneycombApi";
 import { Html, html } from "./htm-but-right";
 import { StatusUpdate } from "./status";
+import { RandomIdGenerator } from "./RandomIdGenerator";
 
 const TEST_EVENT_VERSION = "0.0.1";
 
@@ -46,7 +47,16 @@ export async function sendEvent(
   auth: HnyTricksAuthorization,
   input: SendEventInput
 ): Promise<StatusUpdate> {
-  const data = { ...TestEvent, service_name: input.service_name };
+  const gen = new RandomIdGenerator();
+  const traceId = gen.generateTraceId();
+  const spanId = gen.generateSpanId();
+
+  const data = {
+    ...TestEvent,
+    "trace.trace_id": traceId,
+    "trace.span_id": spanId,
+    service_name: input.service_name,
+  };
 
   const dataset = input.service_name;
   const url = "events/" + encodeURIComponent(dataset);
