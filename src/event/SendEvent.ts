@@ -1,7 +1,7 @@
 import { trace } from "@opentelemetry/api";
 import { HnyTricksAuthorization } from "../common";
 import { Html, html } from "../htm-but-right";
-import { Event1, Event2 } from "./send";
+import { AVAILABLE_EVENTS } from "./send";
 
 export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
   const span = trace.getActiveSpan();
@@ -22,26 +22,44 @@ export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
   return html`<section id="send-event-section">
     <h3 class="section-title">Send a test span</h3>
     <form>
+      <div class="event-form">
         <div class="event-selection">
-            <p>Choose an event type:</p>
-            <div>
-                <input type="radio" id="event1" name="event_type" value="event1" checked />
-                <label for="event1">One Root Span</label>
-                <a href=${Event1.url.replace('/raw', '')} target="_blank">
-                    <img src="external-link.svg" class="icon" alt="view event definition" />
+          <p>Choose an event to send:</p>
+          ${Object.entries(AVAILABLE_EVENTS).map(
+            ([key, event], index) => html`
+              <div>
+                <input
+                  type="radio"
+                  id=${key}
+                  name="event_choice"
+                  value=${key}
+                  checked=${key === "event1"}
+                />
+                <label for=${key}>${event.description}</label>
+                <a href=${event.userViewableUrl} target="_blank">
+                  <img
+                    src="external-link.svg"
+                    class="icon"
+                    alt="view event definition"
+                  />
                 </a>
-            </div>
-            <div>
-                <input type="radio" id="event2" name="event_type" value="event2" />
-                <label for="event2">Structured Log</label>
-                <a href=${Event2.url.replace('/raw', '')} target="_blank">
-                    <img src="external-link.svg" class="icon" alt="view event definition" />
-                </a>
-            </div>
+              </div>
+            `
+          )}
         </div>
-        <label for="service_name">Service name (determines dataset):</label>
-        <input name="service_name" value="testy-mctesterson" />
-        <button hx-post="/event/send" hx-include=#auth_data hx-target="#send-event-section" hx-swap="outerHTML">Send</button>
+        <div>
+          <label for="service_name">Service name (determines dataset):</label>
+          <input name="service_name" value="testy-mctesterson" />
+          <button
+            hx-post="/event/send"
+            hx-include="#auth_data"
+            hx-target="#send-event-section"
+            hx-swap="outerHTML"
+          >
+            Send
+          </button>
+        </div>
+      </div>
     </form>
     ${status}
   </section>`;

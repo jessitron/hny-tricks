@@ -312,8 +312,7 @@ section#send-event-section {
 }
 
 .event-selection {
-  margin: 1em 0;
-  text-align: left;
+  text-align: start;
 }
 
 .event-selection p {
@@ -322,10 +321,8 @@ section#send-event-section {
 }
 
 .event-selection div {
-  margin: 0.5em 0;
   display: flex;
   align-items: center;
-  gap: 0.5em;
 }
 
 .event-selection .icon {
@@ -340,4 +337,15 @@ section#send-event-section {
 
 section#send-event-section div.status {
   text-align: center;
+}
+
+.event-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.event-form div {
+  padding-inline-end: 5px;
 }

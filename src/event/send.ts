@@ -5,14 +5,28 @@ import { StatusUpdate } from "../status";
 import { fetchEventJson, isFetchEventError } from "./fetch";
 import { RandomIdGenerator } from "./RandomIdGenerator";
 
-export const Event1 = {
-  description: "one root span",
-  url: "https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d/raw",
+type AvailableEvent = {
+  description: string;
+  userViewableUrl: string;
+  rawUrl: string;
 };
 
-export const Event2 = {
-  description: "structured log",
-  url: "https://gist.github.com/jessitron/91fc3fb3416afe6e6957b6c48290fe61/raw",
+export const AVAILABLE_EVENTS: Record<string, AvailableEvent> = {
+  event1: {
+    description: "one root span",
+    userViewableUrl:
+      "https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d",
+    rawUrl:
+      "https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d/raw",
+  },
+  event2: {
+    description: "structured log",
+    userViewableUrl:
+      "https://gist.github.com/jessitron/ec40d3622721177d2fbdb7195aac2c39",
+    // for some reason, the raw URL for this one doesn't update when I edit the gist :-(
+    rawUrl:
+      "https://gist.githubusercontent.com/jessitron/ec40d3622721177d2fbdb7195aac2c39/raw/0f1bba813f1454dd374f9db3344bc6b732dcc1b9/structured-log.json",
+  },
 };
 
 function queryByTransmission(transmissionId: string) {
@@ -42,6 +56,7 @@ function queryByTransmission(transmissionId: string) {
 
 type SendEventInput = {
   service_name: string;
+  event_choice: string;
 };
 export async function sendEvent(
   auth: HnyTricksAuthorization,
@@ -52,7 +67,12 @@ export async function sendEvent(
   const spanId = gen.generateSpanId();
   const transmissionId = gen.generateSpanId();
 
-  const rawData = await fetchEventJson(Event1.url);
+  const chosenEvent = AVAILABLE_EVENTS[input.event_choice];
+  if (!chosenEvent) {
+    throw new Error("Bug. What kind of event choice is " + input.event_choice);
+  }
+
+  const rawData = await fetchEventJson(chosenEvent.rawUrl);
   if (isFetchEventError(rawData)) {
     return { success: false, html: rawData.message };
   }
