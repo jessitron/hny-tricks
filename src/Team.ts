@@ -17,6 +17,7 @@ import {
 import { html } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
 import { sendEventSection } from "./SendEvent";
+import { datasetSection } from "./datasets/datasets";
 
 /**
  * why is this file capitalized? I haven't figured out the standards for that yet.
@@ -40,19 +41,9 @@ export async function team(apikey) {
 
   const traceSection = TraceSection(authResult);
 
-  // TODO: move to datasets.ts
-  const datasetSection = html`<section
-    name="dataset-section"
-    id="dataset-section"
-    hx-trigger="load"
-    hx-post="/datasets"
-    hx-include="#auth_data"
-  >
-    Loading datasets...
-  </section>`;
   return html`<div data-traceid=${currentTraceId()}>
     ${teamDescription(authResult)} ${traceSection} ${sendEventSection()}
-    ${datasetSection}
+    ${datasetSection()}
   </div>`;
 }
 

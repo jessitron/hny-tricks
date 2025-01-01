@@ -10,6 +10,19 @@ import { currentTraceId } from "../tracing-util";
 import { DatasetSlug, HnyTricksDataset, Html } from "./dataset_common";
 import { DatasetsTable } from "./DatasetsTable";
 
+export function datasetSection() {
+  const datasetSection = html`<section
+    name="dataset-section"
+    id="dataset-section"
+    hx-trigger="load"
+    hx-post="/datasets"
+    hx-include="#auth_data"
+  >
+    Loading datasets...
+  </section>`;
+  return datasetSection;
+}
+
 export async function describeDatasets(
   auth: HnyTricksAuthorization,
   status?: Html
