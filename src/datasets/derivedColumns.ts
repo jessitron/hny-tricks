@@ -1,5 +1,5 @@
 import { trace } from "@opentelemetry/api";
-import { HnyTricksAuthorization } from "../common";
+import { constructEnvironmentLink, HnyTricksAuthorization } from "../common";
 import { html } from "../htm-but-right";
 import { currentTraceId } from "../tracing-util";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
@@ -9,13 +9,44 @@ import { StatusUpdate } from "../status";
 type DatasetSlug = string;
 type DerivedColumnAlias = string;
 
+const QueryForDcDataset = {
+  time_range: 7200,
+  granularity: 0,
+  breakdowns: ["dc.dataset"],
+  calculations: [
+    {
+      op: "COUNT",
+    },
+  ],
+  orders: [
+    {
+      op: "COUNT",
+      order: "descending",
+    },
+  ],
+  havings: [],
+  trace_joins: [],
+  limit: 1000,
+};
+
 export class DerivedColumnForDatasetName implements Column {
-  constructor() {}
+  private hasPermissions: boolean;
+  constructor(private auth: HnyTricksAuthorization) {
+    this.hasPermissions = auth.permissions.canManageColumns;
+  }
 
   header(): Html {
     return html`<th scope="col">dc.dataset</th>`;
   }
   row(d: HnyTricksDataset, i: number): Html {
+    if (!this.hasPermissions) {
+      return html`<td
+        title="API key lacks 'Manage Queries and Columns' permission"
+      >
+        💂🏽‍♀️
+      </td>`;
+    }
+
     const url = `/datasets/dc/exists?slug=${d.slug}&alias=dc.dataset&row=${i}`;
     return html`<td
       hx-trigger="intersect"
@@ -26,6 +57,17 @@ export class DerivedColumnForDatasetName implements Column {
     </td>`;
   }
   footer(): Html {
+    const queryUrl =
+      constructEnvironmentLink(this.auth) +
+      "?query=" +
+      encodeURIComponent(JSON.stringify(QueryForDcDataset));
+    const queryLink = html`<a href=${queryUrl} target="_blank"> 📈 </a>`;
+    if (!this.hasPermissions) {
+      // can't create or know whether they have any, but they can have the query. might not work
+      return html`<td>${queryLink}</td>`;
+    }
+    // todo: I would like the query link to appear after we know there are any defined,
+    // and the create button to appear after we know there are any not-defined.
     return html`<td>
       <button
         hx-post="/datasets/dc/create-all?alias=dc.dataset"
@@ -75,11 +117,12 @@ export async function derivedColumnExists(
           title="absent. create?"
       /></span>`;
     } else {
-      return html`<span data-traceid=${currentTraceId()}>😵</span>`;
+      return html`<span data-traceid=${currentTraceId()} title=${result.message}
+        >😵</span
+      >`;
     }
   }
 
-  console.log("lalala", JSON.stringify(result));
   const expectedExpression = derivedColumnFormula(alias, { datasetSlug: slug });
   const observedExpression = result.expression;
   if (expectedExpression !== observedExpression) {

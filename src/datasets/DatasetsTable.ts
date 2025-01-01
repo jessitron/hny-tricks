@@ -17,7 +17,7 @@ export function DatasetsTable(params: {
     new LinkToQuery(environmentUrl),
     new DaysSinceLastWritten(datasets.map((d) => d.last_written)),
     new DeleteMe(),
-    new DerivedColumnForDatasetName(),
+    new DerivedColumnForDatasetName(auth),
   ];
   return html`<form id="dataset-table-form">
     <table class="dataset-table">

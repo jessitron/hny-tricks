@@ -1,5 +1,4 @@
-import { html } from "./htm-but-right";
-
+// todo: move to where it's used
 export type HoneycombAuthResponse = {
   id: string;
   type: "configuration" | "ingest";
@@ -69,7 +68,11 @@ export type HnyTricksAuthorization = {
   apiKey: string;
   apiKeyId: string;
   keyInfo: KeyInfo;
-  permissions: { canManageDatasets: boolean; canSendEvents: boolean };
+  permissions: {
+    canManageDatasets: boolean;
+    canSendEvents: boolean;
+    canManageColumns: boolean;
+  };
   environment: { slug: string; name: string };
   team: { slug: string; name: string };
 };
@@ -92,6 +95,7 @@ export function describeAuthorization(
       canSendEvents:
         hnyAuthResponse.api_key_access.events ||
         hnyAuthResponse.type === "ingest",
+      canManageColumns: !!hnyAuthResponse.api_key_access.columns,
     },
     environment: hnyAuthResponse.environment,
     team: hnyAuthResponse.team,
