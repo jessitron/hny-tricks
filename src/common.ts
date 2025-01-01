@@ -88,7 +88,10 @@ export function describeAuthorization(
       canManageDatasets:
         hnyAuthResponse.api_key_access.createDatasets &&
         hnyAuthResponse.type === "configuration",
-      canSendEvents: hnyAuthResponse.api_key_access.events,
+      // Honeycomb subtlety: an ingest key doesn't bother stating its events permissions
+      canSendEvents:
+        hnyAuthResponse.api_key_access.events ||
+        hnyAuthResponse.type === "ingest",
     },
     environment: hnyAuthResponse.environment,
     team: hnyAuthResponse.team,
