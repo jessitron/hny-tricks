@@ -1,7 +1,7 @@
 import htm from "htm";
 import vhtml from "vhtml";
 import { trace } from "@opentelemetry/api";
-import { currentTraceId, reportAsSpanEvent } from "./tracing-util";
+import { currentTraceId } from "./tracing-util";
 
 /**
  * htm + vhtml convert template strings into HTML but with JSX-style property and component expansion.
@@ -12,10 +12,7 @@ const htmlOriginal = htm.bind(vhtml);
 
 export type Html = string;
 
-export const html = (
-  strings: TemplateStringsArray,
-  ...values: any[]
-): string => {
+export const html = (strings: TemplateStringsArray, ...values: any[]) => {
   try {
     const result = htmlOriginal(strings, ...values);
 
@@ -24,18 +21,18 @@ export const html = (
     }
     // console.log("what is the result? " + result);
     const span = trace.getActiveSpan();
-    reportAsSpanEvent("Interfering with HTML", {
-      "app.inputStrings": strings.join("\n"),
-      "app.inputValues": values.join("\n"),
+    span?.addEvent("Interfering with HTML", {
+      "app.inputStrings": strings.join(", "),
+      "app.inputValues": values.join(", "),
       "app.htm_result_type": typeof result,
       "app.htm_result": JSON.stringify(result),
     });
     return `<div data-traceid=${currentTraceId()} style="color:red">
-        Invalid HTML detected. Did you forget to close a tag?
-        <hr />
-        ${result}
-        <hr />
-      </div>`;
+      Invalid HTML detected. Did you forget to close a tag?
+      <hr />
+      ${result}
+      <hr />
+    </div>`;
   } catch (err) {
     console.log(err);
     console.log(err.printStackTrace);

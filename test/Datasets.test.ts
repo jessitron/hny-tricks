@@ -20,8 +20,6 @@ const fakeAuth: HnyTricksAuthorization = {
   },
   permissions: {
     canManageDatasets: false,
-    canSendEvents: false,
-    canManageColumns: false,
   },
   environment: {
     slug: "env_slug",

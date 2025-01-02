@@ -16,7 +16,7 @@ import {
 } from "./datasets/derivedColumns";
 import { DeleteDatasetInputs, deleteDatasets } from "./datasets/deletion";
 import { describeDatasets } from "./datasets/datasets";
-import { justThisPart, sendEventSection } from "./event/SendEvent";
+import { sendEventSection } from "./event/SendEvent";
 import { statusDiv } from "./status";
 import { sendEvent } from "./event/send";
 
@@ -154,9 +154,5 @@ app.post("/event/send", async (req: Request, res: Response) => {
 });
 
 app.get("/test-region/api/auth", fakeAuthEndpoint);
-
-app.get("/nonsense", (req: Request, res: Response) => {
-  res.send(justThisPart());
-});
 
 console.log("end of file");

@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`EventSelection renders the event selection form 1`] = `"<div class="event-selection"></div>"`;
-
-exports[`customEventBit renders 1`] = `"<div><input type="radio" id="custom_event" name="event_choice" value="custom"><label for="custom_event">custom:</label><input type="text" name="custom_url" placeholder="Enter raw JSON URL" style="margin-left: 1em; width: 20em;" oninput="if(this.value) document.querySelector(&apos;#custom_event&apos;).checked = true"></div>"`;
-
-exports[`onePresetEvent renders 1`] = `"<div><input type="radio" id="event1" name="event_choice" value="event1" checked="true"><label for="event1">one root span</label><a href="https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d" target="_blank"><img src="external-link.svg" class="icon" alt="view event definition"></a></div>"`;
-
-exports[`presetEventsBit renders 1`] = `"<p>Choose an event to send:</p>&lt;span&gt;event1&lt;/span&gt;&lt;span&gt;event2&lt;/span&gt; "`;
