@@ -1,0 +1,40 @@
+<div class="event-selection">
+  <p>Choose an event to send:</p>
+  <div>
+    <input
+      type="radio"
+      id="event1"
+      name="event_choice"
+      value="event1"
+      checked="true"
+    /><label for="event1">one root span</label
+    ><a
+      href="https://gist.github.com/jessitron/c1e01f2d6aebde4d5ee804aefa18ac7d"
+      target="_blank"
+      ><img src="external-link.svg" class="icon" alt="view event definition" /></a>
+  </div>
+  <div>
+    <input type="radio" id="event2" name="event_choice" value="event2" /><label
+      for="event2"
+      >structured log</label
+    ><a
+      href="https://gist.github.com/jessitron/ec40d3622721177d2fbdb7195aac2c39"
+      target="_blank"
+      ><img src="external-link.svg" class="icon" alt="view event definition" /></a>
+  </div>
+  <div>
+    <input
+      type="radio"
+      id="custom_event"
+      name="event_choice"
+      value="custom"
+    /><label for="custom_event">custom:</label
+    ><input
+      type="text"
+      name="custom_url"
+      placeholder="Enter raw JSON URL"
+      style="margin-left: 1em; width: 20em"
+      oninput="if(this.value) document.querySelector('#custom_event').checked = true"
+    />
+  </div>
+</div>

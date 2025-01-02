@@ -5,7 +5,7 @@ import { StatusUpdate } from "../status";
 import { fetchEventJson, isFetchEventError } from "./fetch";
 import { RandomIdGenerator } from "./RandomIdGenerator";
 
-type AvailableEvent = {
+export type AvailableEvent = {
   description: string;
   userViewableUrl: string;
   rawUrl: string;

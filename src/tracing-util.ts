@@ -6,6 +6,7 @@ import {
 } from "@opentelemetry/semantic-conventions";
 
 const REPORT_ATTRIBUTES_TO_CONSOLE = false;
+const REPORT_SPAN_EVENTS_TO_CONSOLE = true;
 
 export function report(attributes: Attributes) {
   trace.getActiveSpan()?.setAttributes(attributes);
@@ -14,6 +15,12 @@ export function report(attributes: Attributes) {
   }
 }
 
+export function reportAsSpanEvent(name: string, attributes: Attributes) {
+  trace.getActiveSpan()?.addEvent(name, attributes);
+  if (REPORT_SPAN_EVENTS_TO_CONSOLE) {
+    console.log(name + ": " + JSON.stringify(attributes, null, 2));
+  }
+}
 export function recordError(error: any, attributes?: Attributes) {
   recordException(error, attributes);
   if (REPORT_ATTRIBUTES_TO_CONSOLE) {
