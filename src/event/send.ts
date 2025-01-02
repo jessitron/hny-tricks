@@ -54,7 +54,7 @@ function queryByTransmission(transmissionId: string) {
   };
 }
 
-type SendEventInput = {
+export type SendEventInput = {
   service_name: string;
   event_choice: "custom" | keyof typeof AVAILABLE_EVENTS;
   custom_url?: string;
