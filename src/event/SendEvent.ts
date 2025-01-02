@@ -23,46 +23,7 @@ export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
     <h3 class="section-title">Send a test span</h3>
     <form>
       <div class="event-form">
-        <div class="event-selection">
-          <p>Choose an event to send:</p>
-          ${Object.entries(AVAILABLE_EVENTS).map(
-            ([key, event], index) => html`
-              <div>
-                <input
-                  type="radio"
-                  id=${key}
-                  name="event_choice"
-                  value=${key}
-                  checked=${key === "event1"}
-                />
-                <label for=${key}>${event.description}</label>
-                <a href=${event.userViewableUrl} target="_blank">
-                  <img
-                    src="external-link.svg"
-                    class="icon"
-                    alt="view event definition"
-                  />
-                </a>
-              </div>
-            `
-          )}
-          <div>
-            <input
-              type="radio"
-              id="custom_event"
-              name="event_choice"
-              value="custom"
-            />
-            <label for="custom_event">custom:</label>
-            <input
-              type="text"
-              name="custom_url"
-              placeholder="Enter raw JSON URL"
-              style="margin-left: 1em; width: 20em;"
-              oninput="if(this.value) document.querySelector('#custom_event').checked = true"
-            />
-          </div>
-        </div>
+        ${eventSelection()}
         <div>
           <label for="service_name">Service name (determines dataset):</label>
           <input name="service_name" value="testy-mctesterson" />
@@ -79,4 +40,47 @@ export function sendEventSection(auth: HnyTricksAuthorization, status?: Html) {
     </form>
     ${status}
   </section>`;
+}
+
+function eventSelection() {
+  return html`<div class="event-selection">
+    <p>Choose an event to send:</p>
+    ${Object.entries(AVAILABLE_EVENTS).map(
+      ([key, event], index) => html`
+        <div>
+          <input
+            type="radio"
+            id=${key}
+            name="event_choice"
+            value=${key}
+            checked=${key === "event1"}
+          />
+          <label for=${key}>${event.description}</label>
+          <a href=${event.userViewableUrl} target="_blank">
+            <img
+              src="external-link.svg"
+              class="icon"
+              alt="view event definition"
+            />
+          </a>
+        </div>
+      `
+    )}
+    <div>
+      <input
+        type="radio"
+        id="custom_event"
+        name="event_choice"
+        value="custom"
+      />
+      <label for="custom_event">custom:</label>
+      <input
+        type="text"
+        name="custom_url"
+        placeholder="Enter raw JSON URL"
+        style="margin-left: 1em; width: 20em;"
+        oninput="if(this.value) document.querySelector('#custom_event').checked = true"
+      />
+    </div>
+  </div>`;
 }
