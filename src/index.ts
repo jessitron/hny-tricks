@@ -36,7 +36,7 @@ export function index() {
           <img
             id="hero-image"
             src="./cute-doggy.png"
-            alt="some cute image"
+            alt="Honey, Ileanell's dog"
           />
           <div>
             <h1>🪩 Welcome 🪩</h1>
@@ -52,7 +52,7 @@ export function index() {
 This app can help!
             </p>
             <p>
-              Use at your own risk. Honeycomb does not publish or support this
+              Disclaimer: Use at your own risk. Honeycomb does not publish or support this
               app. I won't save your API key, but this deployment is not
               particularly secure. To use this app on production data, ${" "}
               <a href="https://github.com/jessitron/hny-tricks" target="_blank"
