@@ -94,7 +94,7 @@ app.post("/datasets/delete", async (req: Request, res: Response) => {
   res.send(output);
 });
 
-app.get("/datasets/dc/exists", async (req: Request, res: Response) => {
+app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   const { apikey, auth_data, ...formData } = req.body;
 
   const auth = parseAuthData(auth_data, req.path);

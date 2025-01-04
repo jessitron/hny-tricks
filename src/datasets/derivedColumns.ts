@@ -52,7 +52,7 @@ export class DerivedColumnForDatasetName implements Column {
     }&alias=dc.dataset&row=${i}&datasetName=${encodeURIComponent(d.name)}`;
     return html`<td
       hx-trigger="intersect"
-      hx-get=${url}
+      hx-post=${url}
       hx-include="#auth_data"
     >
       💬
