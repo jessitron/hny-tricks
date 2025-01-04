@@ -28,6 +28,34 @@ export const startingApiKeyPrompt = html`<${ApiKeyPrompt}
   endpointForApiKeyValidation="/validate"
 />`;
 
+const questionMarkSvg = html`<svg
+  width="16"
+  height="16"
+  viewBox="0 0 32 32"
+  fill="none"
+  data-testid="CircleQuestion"
+  aria-hidden="true"
+  style="height: 18px;"
+  class="css-5zt6r3"
+>
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M16 5C9.925 5 5 9.925 5 16s4.925 11 11 11 11-4.925 11-11S22.075 5 16 5zM3 16C3 8.82 8.82 3 16 3s13 5.82 13 13-5.82 13-13 13S3 23.18 3 16z"
+    fill="currentColor"
+  ></path>
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M14.087 9.38A5 5 0 1 1 17 18.9v.1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1 3 3 0 1 0-3-3 1 1 0 1 1-2 0 4.999 4.999 0 0 1 3.087-4.62z"
+    fill="currentColor"
+  ></path>
+  <path
+    d="M16 24.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"
+    fill="currentColor"
+  ></path>
+</svg>`;
+
 export function ApiKeyPrompt(params: {
   destinationElement: string;
   endpointToPopulateItWith: string;
@@ -36,7 +64,9 @@ export function ApiKeyPrompt(params: {
   return html`<section id="apikey-section" class="apiKey">
     <form hx-post="${params.endpointToPopulateItWith}" hx-target="${params.destinationElement}" hx-swap="innerHTML" id="apikey-form" hx-indicator="#big-think">
       <div>
-        <label for="apikey">Honeycomb API Key: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
+        <label for="apikey">Honeycomb API Key <a href="https://docs.honeycomb.io/get-started/configure/environments/manage-api-keys/" target="_blank">
+          <img src="questionMark.svg" />
+          </a>: <span id="reveal-password" tron-reveal="#apikey">👁</span></label>
         <input id="apikey" type="password" 
           name="apikey"
           hx-trigger="input changed throttle:200ms"
