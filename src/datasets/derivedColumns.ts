@@ -9,12 +9,6 @@ import { StatusUpdate } from "../status";
 type DatasetSlug = string;
 type DerivedColumnAlias = string;
 
-/* for future reference, here is how to get a slug from a name, from the Slugify function in hound.
- * (exceptions - if it needs disambiguation, that'd be random. It also can't be over 175 chars)
- * slug := slugReplaceRegex.ReplaceAllString(strings.ToLower(name), "-")
- * const slugReplaceRegex = `[^a-z0-9_~\.-]`
- */
-
 const QueryForDcDataset = {
   time_range: 7200,
   granularity: 0,

@@ -2,6 +2,7 @@ import { trace } from "@opentelemetry/api";
 import { HnyTricksAuthorization } from "../common";
 import { Html, html } from "../htm-but-right";
 import { AVAILABLE_EVENTS, SendEventInput } from "./send";
+import { currentTraceId } from "../tracing-util";
 
 export function sendEventSection(
   auth: HnyTricksAuthorization,
@@ -14,7 +15,10 @@ export function sendEventSection(
     "app.datasets.canSendEvents": auth.permissions.canSendEvents,
   });
   if (!auth.permissions.canSendEvents) {
-    return html`<section id="send-event-section">
+    return html`<section
+      id="send-event-section"
+      data-traceid=${currentTraceId()}
+    >
       <div class="section-unavailable">
         <h3 class="section-title unavailable">Send a test span</h3>
         <p class="unavailable">
@@ -24,7 +28,7 @@ export function sendEventSection(
     </section>`;
   }
 
-  return html`<section id="send-event-section">
+  return html`<section id="send-event-section" data-traceid=${currentTraceId()}>
     <h3 class="section-title">Send a test span</h3>
     <form>
       <div class="event-form">

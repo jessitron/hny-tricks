@@ -1,4 +1,6 @@
+import { trace } from "@opentelemetry/api";
 import { HnyTricksAuthorization, constructEnvironmentLink } from "../common";
+import { DatasetSlug } from "../datasets/dataset_common";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
 import { html } from "../htm-but-right";
 import { StatusUpdate } from "../status";
@@ -54,6 +56,15 @@ function queryByTransmission(transmissionId: string) {
   };
 }
 
+/* here is how to get a slug from a name, from the Slugify function in hound.
+ * (exceptions - if it needs disambiguation, that'd be random. It also can't be over 175 chars)
+ * slug := slugReplaceRegex.ReplaceAllString(strings.ToLower(name), "-")
+ */
+const slugReplaceRegex = /[^a-z0-9_~\.-]/g;
+function slugify(datasetName: string): DatasetSlug {
+  return datasetName.replaceAll(slugReplaceRegex, "-");
+}
+
 export type SendEventInput = {
   service_name: string;
   event_choice: "custom" | keyof typeof AVAILABLE_EVENTS;
@@ -68,6 +79,7 @@ export async function sendEvent(
   const traceId = gen.generateTraceId();
   const spanId = gen.generateSpanId();
   const transmissionId = gen.generateSpanId();
+  const span = trace.getActiveSpan();
 
   const rawUrl =
     input.event_choice === "custom"
@@ -94,7 +106,11 @@ export async function sendEvent(
     service_name: input.service_name,
   };
 
-  const datasetSlug = encodeURIComponent(input.service_name);
+  const datasetSlug = slugify(input.service_name);
+  span.setAttributes({
+    "app.send.datasetName": input.service_name,
+    "app.send.datasetSlug": datasetSlug,
+  });
   const url = "events/" + datasetSlug;
 
   const result = await fetchFromHoneycombApi(
