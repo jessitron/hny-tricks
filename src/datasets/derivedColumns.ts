@@ -75,8 +75,8 @@ export class DerivedColumnForDatasetName implements Column {
         hx-include="#auth_data"
         title="make these derived columns"
       >
-        Create
-      </button>
+        Create</button
+      >${queryLink}
     </td>`;
   }
 }
