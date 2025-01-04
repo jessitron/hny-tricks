@@ -42,8 +42,14 @@ export function index() {
             <h1>🪩 Welcome 🪩</h1>
             <p>
               Have a ${" "}<a href="https://honeycomb.io">Honeycomb.io</a>${" "}
-              API key, and want to know where it goes? This app will call the
-              Honeycomb Auth endpoint to find out.
+              API key, and 
+              <ul>
+              <li>want to know where it goes?</li>
+              <li>need to send a quick event?</li>
+              <li>wonder what datasets hold your events?</li>
+              <li>got some old, empty datasets hanging around?</li>
+</ul>
+This app can help!
             </p>
             <p>
               Use at your own risk. Honeycomb does not publish or support this
