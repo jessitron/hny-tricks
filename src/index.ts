@@ -35,8 +35,8 @@ export function index() {
         <div class="hero">
           <img
             id="hero-image"
-            src="./bug-thinks-nuggs.jpg"
-            alt="extremely arbitrary image"
+            src="./cute-doggy.png"
+            alt="some cute image"
           />
           <div>
             <h1>🪩 Welcome 🪩</h1>
