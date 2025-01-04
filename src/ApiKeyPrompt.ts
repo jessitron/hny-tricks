@@ -49,7 +49,6 @@ export function ApiKeyPrompt(params: {
       <div id="apikey-opinion">
       </div>
     </form>
-    <p class="fine-print">This API key will be sent to the Honeycomb Tricks backend, but we don't save it.
     </p> 
     <script src="/jess.js"></script>
  </section>`;
