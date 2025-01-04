@@ -44,7 +44,7 @@ export function ApiKeyPrompt(params: {
           hx-target="#apikey-opinion"
           hx-include="#apikey" 
           hx-swap="innerHTML"></input>
-        <button>Check Permissions</button>
+        <button>Give Me Options</button>
       </div>
       <div id="apikey-opinion">
       </div>
