@@ -68,7 +68,7 @@ export function teamDescription(auth: HnyTricksAuthorization) {
     <div class="team-description team-env">
       Environment: ${auth.environment.name || "Classic"} 
     </div>
-    <div class="team-link"><a href=${envLink}> ${envLink} </a>   
+    <div class="team-link"><a href=${envLink} target="_blank"> ${envLink} </a>   
       <button hx-post="${ENDPOINT_TO_POPULATE_ALL_SECTIONS}" hx-include="#apikey" hx-target="${ELEMENT_CONTAINING_ALL_SECTIONS}" hx-swap="innerHTML" hx-indicator="#big-think"> Reload </button>
     </div>
     <script src="/jess.js"></script>
