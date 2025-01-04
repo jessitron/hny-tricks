@@ -47,7 +47,9 @@ export class DerivedColumnForDatasetName implements Column {
       </td>`;
     }
 
-    const url = `/datasets/dc/exists?slug=${d.slug}&alias=dc.dataset&row=${i}`;
+    const url = `/datasets/dc/exists?slug=${
+      d.slug
+    }&alias=dc.dataset&row=${i}&datasetName=${encodeURIComponent(d.name)}`;
     return html`<td
       hx-trigger="intersect"
       hx-post=${url}
@@ -89,15 +91,24 @@ type ListDerivedColumnResponse = {
   created_at: string; // ISO8601
   updated_at: string; // ISO8601
 };
+
+type DerivedColumnExistsInput = {
+  slug: DatasetSlug;
+  datasetName: string;
+  alias: string;
+  row: string;
+};
+
 export async function derivedColumnExists(
   auth: HnyTricksAuthorization,
-  slug: DatasetSlug,
-  alias: DerivedColumnAlias,
-  row: string
+  input: DerivedColumnExistsInput
 ) {
   const span = trace.getActiveSpan();
+  const datasetName = decodeURIComponent(input.datasetName);
+  const { slug, alias, row } = input;
   span.setAttributes({
     "app.derived_column.slug": slug,
+    "app.derived_column.datasetName": datasetName,
     "app.derived_column.alias": alias,
   });
 
@@ -123,7 +134,13 @@ export async function derivedColumnExists(
     }
   }
 
-  const expectedExpression = derivedColumnFormula(alias, { datasetSlug: slug });
+  const expectedExpression = derivedColumnFormula(alias, {
+    datasetSlug: slug,
+    datasetName,
+  });
+  span.setAttributes({
+    "app.derived_column.expectedExpression": expectedExpression,
+  });
   const observedExpression = result.expression;
   if (expectedExpression !== observedExpression) {
     return html`<span
@@ -188,12 +205,12 @@ export async function createDerivedColumns(
 }
 
 function escapeDquote(str: string) {
-  str.replaceAll('"', '\\"');
+  return str.replaceAll('"', '\\"');
 }
 
 function derivedColumnFormula(
   alias: string,
-  inputs: { datasetSlug?: string; datasetName?: string }
+  inputs: { datasetSlug: string; datasetName: string }
 ) {
   const datasetName = inputs.datasetName || inputs.datasetSlug;
   return `COALESCE("${escapeDquote(datasetName)}")`;

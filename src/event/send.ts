@@ -79,6 +79,7 @@ export async function sendEvent(
   const traceId = gen.generateTraceId();
   const spanId = gen.generateSpanId();
   const transmissionId = gen.generateSpanId();
+  const datasetName = input.service_name;
   const span = trace.getActiveSpan();
 
   const rawUrl =
@@ -103,7 +104,7 @@ export async function sendEvent(
     "trace.trace_id": traceId,
     "trace.span_id": spanId,
     "hny-tricks.transmission_id": transmissionId,
-    service_name: input.service_name,
+    service_name: datasetName,
   };
 
   const datasetSlug = slugify(input.service_name);
@@ -111,7 +112,7 @@ export async function sendEvent(
     "app.send.datasetName": input.service_name,
     "app.send.datasetSlug": datasetSlug,
   });
-  const url = "events/" + datasetSlug;
+  const url = "events/" + encodeURIComponent(datasetName);
 
   const result = await fetchFromHoneycombApi(
     {

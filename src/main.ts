@@ -99,12 +99,7 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
 
   const auth = parseAuthData(auth_data, req.path);
 
-  const output = await derivedColumnExists(
-    auth,
-    req.query["slug"],
-    req.query["alias"],
-    req.query["row"]
-  );
+  const output = await derivedColumnExists(auth, req.query);
   res.send(output);
 });
 
