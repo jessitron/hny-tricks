@@ -188,10 +188,13 @@ button {
 .unhappy {
   padding: 2px;
   color: maroon;
+  background-color: white;
   border: 1px dashed maroon;
 }
 
 .happy {
+  padding: 2px;
+  background-color: white;
   color: green;
 }
 

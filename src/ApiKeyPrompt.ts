@@ -49,7 +49,6 @@ export function ApiKeyPrompt(params: {
       <div id="apikey-opinion">
       </div>
     </form>
-    </p> 
     <script src="/jess.js"></script>
  </section>`;
 }
