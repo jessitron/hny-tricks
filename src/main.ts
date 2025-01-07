@@ -100,7 +100,14 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   const auth = parseAuthData(auth_data, req.path);
 
   const output = await derivedColumnExists(auth, req.query);
-  res.send(output);
+  trace.getActiveSpan().setAttributes({
+    "app.hx-trigger": JSON.stringify(output.hx_trigger),
+    "app.nonsense": "archivista",
+  });
+  if (!!output.hx_trigger) {
+    res.header("Hx-Trigger", JSON.stringify(output.hx_trigger));
+  }
+  res.send(output.html);
 });
 
 app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {

@@ -8,7 +8,7 @@ var htmx = (function () {
 
   // Requires version 0.10.33 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.59";
+  const INSTRUMENTATION_VERSION = "0.0.63";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -1440,7 +1440,7 @@ var htmx = (function () {
         const wrappedEventListener = (parameters) => {
           return HnyOtelWeb.inChildSpan(
             HnyOtelWeb.APP_TRACER,
-            "handler for " + eventArgs.event,
+            "handle event: " + eventArgs.event,
             parameters.tracecontext,
             (span) => eventArgs.listener(parameters)
           );
@@ -2218,26 +2218,64 @@ var htmx = (function () {
      * @param {EventTarget} elt
      */
     function handleTriggerHeader(xhr, header, elt) {
-      HnyOtelWeb.inSpan(HnyOtelWeb.APP_TRACER, "trigger header", () => {
-        const triggerBody = xhr.getResponseHeader(header);
-        if (triggerBody.indexOf("{") === 0) {
-          const triggers = parseJSON(triggerBody);
-          for (const eventName in triggers) {
-            if (triggers.hasOwnProperty(eventName)) {
-              let detail = triggers[eventName];
-              if (!isRawObject(detail)) {
-                detail = { value: detail };
+      HnyOtelWeb.inSpan(
+        HnyOtelWeb.INTERNAL_TRACER,
+        "trigger header",
+        (processHeaderSpan) => {
+          const triggerBody = xhr.getResponseHeader(header);
+          processHeaderSpan.setAttributes({
+            "htmx.trigger.header": header,
+            "htmx.trigger.body": triggerBody,
+          });
+          if (triggerBody.indexOf("{") === 0) {
+            const triggers = parseJSON(triggerBody);
+            for (const eventName in triggers) {
+              if (triggers.hasOwnProperty(eventName)) {
+                HnyOtelWeb.inSpan(
+                  HnyOtelWeb.APP_TRACER,
+                  "header triggered " + eventName,
+                  (span) => {
+                    let detail = triggers[eventName];
+                    console.log("LALALA event name is _ eventName");
+                    span.setAttributes({
+                      "htmx.trigger.eventName": eventName,
+                      "htmx.trigger.originalDetail": safeStringify(detail),
+                      "htmx.trigger.isRawObject": isRawObject(detail),
+                    });
+                    if (isRawObject(detail)) {
+                      // @ts-ignore
+                      elt = detail.target !== undefined ? detail.target : elt;
+                    } else {
+                      detail = { value: detail };
+                    }
+                    span.setAttributes({
+                      "htmx.trigger.detail": safeStringify(detail),
+                      ...attributesAboutElement(elt),
+                    });
+                    triggerEvent(elt, eventName, detail);
+                  }
+                );
               }
-              triggerEvent(elt, eventName, detail);
+            }
+          } else {
+            const eventNames = triggerBody.split(",");
+            for (let i = 0; i < eventNames.length; i++) {
+              const eventName = eventNames[i].trim();
+              HnyOtelWeb.inSpan(
+                HnyOtelWeb.APP_TRACER,
+                "header triggered " + eventName,
+                (span) => {
+                  span.setAttributes({
+                    "htmx.trigger.detail": safeStringify(detail),
+                    ...attributesAboutElement(elt),
+                  });
+                  triggerEvent(elt, eventName, []);
+                }
+              );
             }
           }
-        } else {
-          const eventNames = triggerBody.split(",");
-          for (let i = 0; i < eventNames.length; i++) {
-            triggerEvent(elt, eventNames[i].trim(), []);
-          }
         }
-      });
+      );
     }
 
     const WHITESPACE = /\s/;
@@ -2934,7 +2972,7 @@ var htmx = (function () {
       const handler = (elt, evt) =>
         HnyOtelWeb.inSpan(
           HnyOtelWeb.INTERNAL_TRACER,
-          "handle trigger:" + triggerSpec.trigger,
+          "handle trigger: " + triggerSpec.trigger,
           (span) => {
             span.setAttributes({
               "htmx.trigger": triggerSpec.trigger,
@@ -3373,7 +3411,7 @@ var htmx = (function () {
      * @returns {boolean}
      */
     function triggerEvent(elt, eventName, detail) {
-      elt = resolveTarget(elt);
+      elt = resolveTarget(elt); // JESS: this can return null, make a useful exception
       if (detail == null) {
         detail = {};
       }
@@ -4697,6 +4735,11 @@ var htmx = (function () {
     function attributesAboutElement(elt) {
       if (!elt) {
         return {};
+      }
+      if (typeof elt === "string") {
+        return {
+          "htmx.element.selector": elt,
+        };
       }
       const attributes = {};
       if (!!elt.attributes) {

@@ -72,6 +72,9 @@ export class DerivedColumnForDatasetName implements Column {
     // and the create button to appear after we know there are any not-defined.
     return html`<td>
       <button
+        id="dc-dataset-create"
+        hx-on:dc-dataset-create="this.hidden=false"
+        hidden="true"
         hx-post="/datasets/dc/create-all?alias=dc.dataset"
         hx-target="#dataset-section"
         hx-include="#auth_data"
@@ -99,10 +102,15 @@ type DerivedColumnExistsInput = {
   row: string;
 };
 
+type HtmxResponse = {
+  html: string;
+  hx_trigger?: string | Record<string, { target: string }>; // send the event, or send it with a target
+};
+
 export async function derivedColumnExists(
   auth: HnyTricksAuthorization,
   input: DerivedColumnExistsInput
-) {
+): Promise<HtmxResponse> {
   const span = trace.getActiveSpan();
   const datasetName = decodeURIComponent(input.datasetName);
   const { slug, alias, row } = input;
@@ -119,18 +127,25 @@ export async function derivedColumnExists(
   );
   if (isFetchError(result)) {
     if (result.statusCode === 404) {
-      return html`<span data-traceid=${currentTraceId()}
-        ><input
-          class="create-dc-checkbox"
-          type="checkbox"
-          checked
-          name="create_${encodeURIComponent(alias)}_for_${row}"
-          title="absent. create?"
-      /></span>`;
+      return {
+        html: html`<span data-traceid=${currentTraceId()}
+          ><input
+            class="create-dc-checkbox"
+            type="checkbox"
+            checked
+            name="create_${encodeURIComponent(alias)}_for_${row}"
+            title="absent. create?"
+        /></span>`,
+        hx_trigger: { "dc-dataset-create": { target: "#dc-dataset-create" } },
+      };
     } else {
-      return html`<span data-traceid=${currentTraceId()} title=${result.message}
-        >😵</span
-      >`;
+      return {
+        html: html`<span
+          data-traceid=${currentTraceId()}
+          title=${result.message}
+          >😵</span
+        >`,
+      };
     }
   }
 
@@ -143,18 +158,24 @@ export async function derivedColumnExists(
   });
   const observedExpression = result.expression;
   if (expectedExpression !== observedExpression) {
-    return html`<span
-      title="expression looks wrong. Expected: ${expectedExpression} Observed: ${observedExpression}"
+    return {
+      html: html`<span
+        title="expression looks wrong. Expected: ${expectedExpression} Observed: ${observedExpression}"
+        data-traceid=${currentTraceId()}
+      >
+        😵‍💫
+      </span>`,
+    };
+  }
+  return {
+    html: html`<span
+      title="derived column exists"
       data-traceid=${currentTraceId()}
     >
-      😵‍💫
-    </span>`;
-  }
-  return html`<span
-    title="derived column exists"
-    data-traceid=${currentTraceId()}
-    >☘️</span
-  >`;
+      ☘️
+    </span>`,
+    // todo, turn on the query link
+  };
 }
 
 /**
