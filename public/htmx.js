@@ -6,14 +6,14 @@ var htmx = (function () {
     return;
   }
 
-  // Requires version 0.10.13 or greater of jessitron/hny-otel-web, separately initialized.
+  // Requires version 0.10.33 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.50";
+  const INSTRUMENTATION_VERSION = "0.0.59";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
     note: "Honeycomb tracing not found; this is a stub implementation.",
-    activeContext() {},
+    activeSpanContext() {},
     inSpan(_tracer, _span, fn) {
       return fn(this.emptySpan);
     },
@@ -1436,7 +1436,19 @@ var htmx = (function () {
     function addEventListenerImpl(arg1, arg2, arg3) {
       ready(function () {
         const eventArgs = processEventArgs(arg1, arg2, arg3);
-        eventArgs.target.addEventListener(eventArgs.event, eventArgs.listener);
+        console.log("Jess: i am wrapping a listener for ", eventArgs);
+        const wrappedEventListener = (parameters) => {
+          return HnyOtelWeb.inChildSpan(
+            HnyOtelWeb.APP_TRACER,
+            "handler for " + eventArgs.event,
+            parameters.tracecontext,
+            (span) => eventArgs.listener(parameters)
+          );
+        };
+        eventArgs.target.addEventListener(
+          eventArgs.event,
+          wrappedEventListener
+        );
       });
       const b = isFunction(arg2);
       return b ? arg2 : arg3;
@@ -2922,7 +2934,7 @@ var htmx = (function () {
       const handler = (elt, evt) =>
         HnyOtelWeb.inSpan(
           HnyOtelWeb.INTERNAL_TRACER,
-          "handle " + triggerSpec.trigger,
+          "handle trigger:" + triggerSpec.trigger,
           (span) => {
             span.setAttributes({
               "htmx.trigger": triggerSpec.trigger,
@@ -2939,6 +2951,8 @@ var htmx = (function () {
               "htmx.trigger.queue": triggerSpec.queue,
               "htmx.trigger.root": triggerSpec.root,
               "htmx.trigger.threshold": triggerSpec.threshold,
+              "htmx.trigger.event_exists": !!evt,
+              "htmx.event.detail": safeStringify(evt?.detail),
               ...attributesAboutElement(elt),
             });
             return inputHandler(elt, evt);
@@ -3359,47 +3373,45 @@ var htmx = (function () {
      * @returns {boolean}
      */
     function triggerEvent(elt, eventName, detail) {
-      return HnyOtelWeb.inSpan(
-        HnyOtelWeb.INTERNAL_TRACER,
-        "trigger " + eventName,
-        (span) => {
-          HnyOtelWeb.setAttributes({
+      elt = resolveTarget(elt);
+      if (detail == null) {
+        detail = {};
+      }
+      // JESS internal propagation
+      detail.tracecontext = HnyOtelWeb.activeSpanContext();
+      detail.elt = elt;
+      const event = makeEvent(eventName, detail);
+      if (!ignoreEventForLogging(eventName)) {
+        HnyOtelWeb.addSpanEvent(
+          // this would be in the scope of internal tracing
+          "trigger " + eventName,
+          {
+            "htmx.event": eventName,
             "htmx.detail": safeStringify(detail),
             ...attributesAboutElement(elt),
-            "jess.has-span-context": !!span,
-          });
-          elt = resolveTarget(elt);
-          if (detail == null) {
-            detail = {};
+            "jess.has-span-context": !!detail.tracecontext,
           }
-          // JESS begin internal propagation
-          detail.tracecontext = span.spanContext();
-          detail.elt = elt;
-          const event = makeEvent(eventName, detail);
-          if (htmx.logger && !ignoreEventForLogging(eventName)) {
-            // JESS: we could put span creation behind this condition todo
-            htmx.logger(elt, eventName, detail);
-          }
-          if (detail.error) {
-            logError(detail.error);
-            triggerEvent(elt, "htmx:error", { errorInfo: detail });
-          }
-          let eventResult = elt.dispatchEvent(event); // JESS: can I put tracing detail on this event object?
-          const kebabName = kebabEventName(eventName);
-          if (eventResult && kebabName !== eventName) {
-            const kebabedEvent = makeEvent(kebabName, event.detail);
-            eventResult = eventResult && elt.dispatchEvent(kebabedEvent);
-          }
-          withExtensions(asElement(elt), function (extension) {
-            eventResult =
-              eventResult &&
-              extension.onEvent(eventName, event) !== false &&
-              !event.defaultPrevented;
-          });
-          HnyOtelWeb.setAttributes({ "htmx.result": eventResult });
-          return eventResult;
-        }
-      );
+        );
+        htmx.logger && htmx.logger(elt, eventName, detail);
+      }
+      if (detail.error) {
+        logError(detail.error);
+        triggerEvent(elt, "htmx:error", { errorInfo: detail });
+      }
+      let eventResult = elt.dispatchEvent(event); // JESS: can I put tracing detail on this event object?
+      const kebabName = kebabEventName(eventName);
+      if (eventResult && kebabName !== eventName) {
+        const kebabedEvent = makeEvent(kebabName, event.detail);
+        eventResult = eventResult && elt.dispatchEvent(kebabedEvent);
+      }
+      withExtensions(asElement(elt), function (extension) {
+        eventResult =
+          eventResult &&
+          extension.onEvent(eventName, event) !== false &&
+          !event.defaultPrevented;
+      });
+      //HnyOtelWeb.setAttributes({ "htmx.result": eventResult }); // move the event creation down here?
+      return eventResult;
     }
 
     //= ===================================================================
@@ -4700,7 +4712,7 @@ var htmx = (function () {
         "htmx.element.path": elt.path,
         "htmx.element.class": elt.className,
         "htmx.element.attributes": JSON.stringify(attributes),
-        "htmx.element.nothing-interesting": "wisconsin",
+        "htmx.element.nothing-interesting": "guinea",
       };
     }
 

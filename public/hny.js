@@ -21242,7 +21242,7 @@ var $8d2dec6b2f42fe45$export$d1d5ca1ca02801e6 = "url.scheme";
 var $8d2dec6b2f42fe45$export$11d4f8ef7be26b3d = "user_agent.original";
 
 
-const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.30";
+const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.34";
 function $c9f3acea5fa71cd0$var$initializeTracing(params /* { apiKey: string, serviceName: string } */ ) {
     if (!params) params = {};
     if (!params.apiKey) throw new Error("Usage: initializeTracing({ apiKey: 'honeycomb api key', serviceName: 'name of this service' })");
@@ -21306,8 +21306,8 @@ function $c9f3acea5fa71cd0$var$sendTestSpan() {
     console.log("Sending test span", span.spanContext());
     span.end();
 }
-function $c9f3acea5fa71cd0$var$activeContext() {
-    return (0, $c903d3361d9a81c0$export$a078c61943f9dbbe).active();
+function $c9f3acea5fa71cd0$var$activeSpanContext() {
+    return (0, $d3d11f3bc96c5059$export$357889f174732d38).getActiveSpan()?.spanContext();
 }
 function $c9f3acea5fa71cd0$var$setAttributes(attributes) {
     const span = (0, $d3d11f3bc96c5059$export$357889f174732d38).getActiveSpan();
@@ -21380,11 +21380,11 @@ function $c9f3acea5fa71cd0$var$recordException(exception, additionalAttributes) 
 }
 function $c9f3acea5fa71cd0$var$addSpanEvent(message, attributes) {
     const span = (0, $d3d11f3bc96c5059$export$357889f174732d38).getActiveSpan();
-    span.addEvent(message, attributes);
+    span?.addEvent(message, attributes);
 }
 function $c9f3acea5fa71cd0$var$inChildSpan(inputTracer, spanName, spanContext, fn) {
-    if (!spanContext || !spanContext.spanId || !spanContext.traceId || spanContext.traceFlags === undefined) console.log("inChildSpan: I need a SpanContext as my third argument");
-    const usefulContext = (0, $d3d11f3bc96c5059$export$357889f174732d38).setSpanContext((0, $c903d3361d9a81c0$export$a078c61943f9dbbe).active(), spanContext);
+    if (!!spanContext && (!spanContext.spanId || !spanContext.traceId || spanContext.traceFlags === undefined)) console.log("inChildSpan: the third argument should be a spanContext (or undefined to use the active context)");
+    const usefulContext = !!spanContext ? (0, $d3d11f3bc96c5059$export$357889f174732d38).setSpanContext((0, $c903d3361d9a81c0$export$a078c61943f9dbbe).active(), spanContext) : (0, $c903d3361d9a81c0$export$a078c61943f9dbbe).active();
     return $c9f3acea5fa71cd0$var$inSpan(inputTracer, spanName, fn, usefulContext);
 }
 const $c9f3acea5fa71cd0$export$8e18f7a649cdb84b = {
@@ -21394,7 +21394,7 @@ const $c9f3acea5fa71cd0$export$8e18f7a649cdb84b = {
     inSpanAsync: $c9f3acea5fa71cd0$var$inSpanAsync,
     recordException: $c9f3acea5fa71cd0$var$recordException,
     addSpanEvent: $c9f3acea5fa71cd0$var$addSpanEvent,
-    activeContext: $c9f3acea5fa71cd0$var$activeContext,
+    activeSpanContext: $c9f3acea5fa71cd0$var$activeSpanContext,
     inChildSpan: $c9f3acea5fa71cd0$var$inChildSpan
 };
 // Now for the REAL export

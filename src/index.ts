@@ -17,6 +17,7 @@ export function index() {
         dangerouslySetInnerHTML=${{ __html: javascriptToStartTracing }}
       ></script>
       <script src="/htmx.js"></script>
+      <script src="/htmx-testibits.js"></script>
       <title>Hny Tricks</title>
       <link rel="stylesheet" href="styles.css" />
       <link rel="icon" type="image/png" href="/honeycomb-heart.png" />
