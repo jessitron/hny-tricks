@@ -5,9 +5,9 @@ import {
   fetchFromHoneycombApi,
   isFetchError,
 } from "../HoneycombApi";
-import { html } from "../htm-but-right";
+import { Html, html } from "../htm-but-right";
 import { currentTraceId } from "../tracing-util";
-import { DatasetSlug, HnyTricksDataset, Html } from "./dataset_common";
+import { DatasetSlug, HnyTricksDataset } from "./dataset_common";
 import { DatasetsTable } from "./DatasetsTable";
 
 export function datasetSection() {
@@ -26,7 +26,7 @@ export function datasetSection() {
 export async function describeDatasets(
   auth: HnyTricksAuthorization,
   status?: Html
-): Promise<string> {
+): Promise<Html> {
   const span = trace.getActiveSpan();
   span?.setAttribute(
     "app.datasets.canManageDatasets",

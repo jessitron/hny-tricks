@@ -7,6 +7,12 @@ describe("making htm work better in error cases", () => {
     expect(result).toContain("Invalid HTML detected.");
   });
 
+  it("when it's two top-level elements, returns an array of them", () => {
+    const result = html`<p>one</p>
+      <p>two</p>`;
+    expect(result).toStrictEqual(["<p>one</p>", "<p>two</p>"]);
+  });
+
   it("when the html is fine, returns a string", () => {
     const result = html`<div><span>hello</span></div>`;
     expect(result).toBe("<div><span>hello</span></div>");

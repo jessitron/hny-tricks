@@ -9,7 +9,7 @@ import { fakeAuthEndpoint } from "./FakeRegion";
 import { currentTraceId, report } from "./tracing-util";
 import { index } from "./index";
 import { TraceActions } from "./TraceSection";
-import { html } from "./htm-but-right";
+import { html, normalizeHtml } from "./htm-but-right";
 import {
   createDerivedColumns,
   derivedColumnExists,
@@ -54,14 +54,14 @@ app.get("/", (req, res) => {
 });
 
 app.post("/team", async (req: Request, res: Response) => {
-  res.send(await team(req.body.apikey));
+  res.send(normalizeHtml(await team(req.body.apikey)));
 });
 
 // used in the ApiKeyPrompt
 app.post("/validate", (req: Request, res: Response) => {
   const apiKeyInterpretation = commentOnApiKey(req.body.apikey);
   report({ "app.response": apiKeyInterpretation });
-  res.send(apiKeyInterpretation);
+  res.send(normalizeHtml(apiKeyInterpretation));
 });
 
 app.post("/trace", async (req: Request, res: Response) => {
@@ -72,7 +72,7 @@ app.post("/trace", async (req: Request, res: Response) => {
   trace.getActiveSpan().setAttributes({
     "app.traceId": formData["trace-id"],
   });
-  res.send(await TraceActions(auth, formData["trace-id"]));
+  res.send(normalizeHtml(await TraceActions(auth, formData["trace-id"])));
 });
 
 app.post("/datasets", async (req: Request, res: Response) => {
@@ -80,7 +80,7 @@ app.post("/datasets", async (req: Request, res: Response) => {
   const auth = parseAuthData(auth_data, req.path);
 
   const output = await describeDatasets(auth);
-  res.send(output);
+  res.send(normalizeHtml(output));
 });
 
 app.post("/datasets/delete", async (req: Request, res: Response) => {
@@ -91,7 +91,7 @@ app.post("/datasets/delete", async (req: Request, res: Response) => {
   const status = await deleteDatasets(auth, formData as DeleteDatasetInputs);
 
   const output = await describeDatasets(auth, statusDiv(status));
-  res.send(output);
+  res.send(normalizeHtml(output));
 });
 
 app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
@@ -107,7 +107,7 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   if (!!output.hx_trigger) {
     res.header("Hx-Trigger", JSON.stringify(output.hx_trigger));
   }
-  res.send(output.html);
+  res.send(normalizeHtml(output.html));
 });
 
 app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
@@ -124,7 +124,7 @@ app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
   );
 
   const output = await describeDatasets(auth, statusDiv(status));
-  res.send(output);
+  res.send(normalizeHtml(output));
 });
 
 app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
@@ -141,7 +141,7 @@ app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
   );
 
   const output = await describeDatasets(auth, statusDiv(status));
-  res.send(output);
+  res.send(normalizeHtml(output));
 });
 
 app.post("/event/send", async (req: Request, res: Response) => {
@@ -152,7 +152,7 @@ app.post("/event/send", async (req: Request, res: Response) => {
   const status = await sendEvent(auth, formData);
 
   const output = sendEventSection(auth, formData, statusDiv(status));
-  res.send(output);
+  res.send(normalizeHtml(output));
 });
 
 app.get("/test-region/api/auth", fakeAuthEndpoint);

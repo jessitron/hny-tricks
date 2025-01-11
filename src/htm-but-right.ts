@@ -27,11 +27,21 @@ export function normalizeHtml(html: Html): string {
   } else return html.join("");
 }
 
-export const html = (strings: TemplateStringsArray, ...values: any[]) => {
+export const html = (strings: TemplateStringsArray, ...values: any[]): Html => {
   try {
     const result = htmlOriginal(strings, ...values);
 
     if (typeof result === "string") {
+      return result;
+    }
+    // if result is an array, return
+    if (
+      Array.isArray(result) &&
+      result.length > 0 &&
+      typeof result[0] === "string" &&
+      result[0].startsWith("<")
+    ) {
+      // this looks like an array of multiple top-level elements
       return result;
     }
     // console.log("what is the result? " + result);

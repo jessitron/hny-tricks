@@ -1,9 +1,9 @@
 import { trace } from "@opentelemetry/api";
 import { constructEnvironmentLink, HnyTricksAuthorization } from "../common";
-import { html } from "../htm-but-right";
+import { Html, html } from "../htm-but-right";
 import { currentTraceId } from "../tracing-util";
 import { fetchFromHoneycombApi, isFetchError } from "../HoneycombApi";
-import { Column, Html, HnyTricksDataset } from "./dataset_common";
+import { Column, HnyTricksDataset } from "./dataset_common";
 import { StatusUpdate } from "../status";
 
 type DatasetSlug = string;
@@ -111,7 +111,7 @@ type DerivedColumnExistsInput = {
 };
 
 type HtmxResponse = {
-  html: string;
+  html: Html;
   hx_trigger?: string | Record<string, { target: string }>; // send the event, or send it with a target
 };
 

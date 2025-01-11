@@ -1,6 +1,6 @@
 import { HnyTricksAuthorization, constructEnvironmentLink } from "../common";
-import { html } from "../htm-but-right";
-import { Column, HnyTricksDataset, Html } from "./dataset_common";
+import { Html, html } from "../htm-but-right";
+import { Column, HnyTricksDataset } from "./dataset_common";
 import { DaysSinceLastWritten, DeleteMe } from "./deletion";
 import { DerivedColumnForDatasetName } from "./derivedColumns";
 

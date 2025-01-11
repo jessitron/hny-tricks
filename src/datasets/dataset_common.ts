@@ -1,3 +1,4 @@
+import { Html } from "../htm-but-right";
 
 export type DatasetSlug = string;
 
@@ -9,7 +10,6 @@ export type HnyTricksDataset = {
 };
 
 
-export type Html = string;
 export interface Column {
   header(): Html;
   row(d: HnyTricksDataset, i: number): Html;

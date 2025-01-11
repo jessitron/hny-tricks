@@ -1,4 +1,4 @@
-import { html } from "./htm-but-right";
+import { Html, html } from "./htm-but-right";
 import { trace } from "@opentelemetry/api";
 import {
   Region,
@@ -32,7 +32,7 @@ export function ApiKeyPrompt(params: {
   destinationElement: string;
   endpointToPopulateItWith: string;
   endpointForApiKeyValidation: string;
-}): string {
+}): Html {
   return html`<section id="apikey-section" class="apiKey">
     <form hx-post="${params.endpointToPopulateItWith}" hx-target="${params.destinationElement}" hx-swap="innerHTML" id="apikey-form" hx-indicator="#big-think">
       <div>
@@ -55,7 +55,7 @@ export function ApiKeyPrompt(params: {
  </section>`;
 }
 
-export function commentOnApiKey(apiKey: string): string {
+export function commentOnApiKey(apiKey: string): Html {
   if (!apiKey) {
     return "";
   }
@@ -153,9 +153,9 @@ export function interpretApiKey(apiKey: string): KeyInfo {
 
 export type AuthError = {
   authError: true;
-  html: string;
+  html: Html;
 };
-function authError(htmlInput: string): AuthError {
+function authError(htmlInput: Html): AuthError {
   const wrappedHtml = html`<div data-traceid="${currentTraceId()}">
     ${htmlInput}
   </div>`;
