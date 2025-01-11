@@ -30,6 +30,19 @@ describe("the htm+vhtml library", () => {
     expect(outer).toBe(expected);
   });
 
+  it("gives back weird shit when you don't close all your tags", () => {
+    const fucky = html(["<div><p>stuff and things</div>"] as any); // the formatter doesn't let me put invalid html in this test
+    const expected = ["div", "<p>stuff and things</p>"];
+    expect(fucky).toStrictEqual(expected);
+  });
+
+  it("gives back a fine array when you gave it two top-level elements", () => {
+    const actual = html`<p>one</p>
+      <p>two</p>`;
+    const expected = ["<p>one</p>", "<p>two</p>"];
+    expect(actual).toStrictEqual(expected);
+  });
+
   it("sometimes does escape html when inserted as a value", () => {
     const currentTraceId = "s;aofdjhaldkjfhalskjdhf";
     const status = {

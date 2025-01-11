@@ -10,7 +10,22 @@ import { currentTraceId } from "./tracing-util";
  */
 const htmlOriginal = htm.bind(vhtml);
 
-export type Html = string;
+export type Html = string | string[];
+/**
+ * Right before sending back to the client, turn this into a string.
+ *
+ * More than one element comes out as an array, which is OK for combining
+ * into larger blocks of Html. If you normalize that into a string, it won't
+ * combine right, it'll get escaped.
+ *
+ * @param html some output of html`...`
+ * @returns string
+ */
+export function normalizeHtml(html: Html): string {
+  if (typeof html === "string") {
+    return html;
+  } else return html.join("");
+}
 
 export const html = (strings: TemplateStringsArray, ...values: any[]) => {
   try {
