@@ -10,6 +10,14 @@ in which jess makes a GUI for the things she wants to accomplish in the honeycom
 
 Problems? create an issue, hopefully it emails me. I'd link you to Office Hours, but I don't want this to seem like an official Honeycomb app in any way.
 
+## test
+
+`npm test`
+
+or to update snapshots, if you've changed the output and the current output is good:
+
+`npm test -- -u`
+
 ## weird dependencies
 
 (the .js is included in this repo)

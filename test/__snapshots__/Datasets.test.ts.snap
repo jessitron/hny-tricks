@@ -14,20 +14,20 @@ exports[`DatasetsTable Renders datasets, the same as before 1`] = `
       </tr>
     </thead>
     <tr>
-      <th scope="row" class="dataset-name-col">API gateway</th>
+      <th scope="row" class="dataset-name-col">API gateway<input type="hidden" name="dataset_name_0" value="API%20gateway"></th>
       <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/api-gateway/overview" target="_blank" class="link-symbol">⛭</a></td>
       <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/api-gateway?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📉</a></td>
       <td>2</td>
       <td><input name="dataset-slug-0" value="api-gateway" type="hidden"><input class="delete-dataset-checkbox" type="checkbox" title="I only delete empty datasets" disabled="true"></td>
-      <td hx-trigger="intersect" hx-post="/datasets/dc/exists?slug=api-gateway&amp;alias=dc.dataset" hx-include="#auth_data">💬</td>
+      <td title="API key lacks &apos;Manage Queries and Columns&apos; permission">💂🏽‍♀️</td>
     </tr>
     <tr>
-      <th scope="row" class="dataset-name-col">ye olde proxy</th>
+      <th scope="row" class="dataset-name-col">ye olde proxy<input type="hidden" name="dataset_name_1" value="ye%20olde%20proxy"></th>
       <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/olde-proxy/overview" target="_blank" class="link-symbol">⛭</a></td>
       <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/datasets/olde-proxy?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📉</a></td>
       <td>365</td>
       <td><input name="dataset-slug-1" value="olde-proxy" type="hidden"><input class="delete-dataset-checkbox" type="checkbox" name="delete-dataset-1" checked="true"></td>
-      <td hx-trigger="intersect" hx-post="/datasets/dc/exists?slug=olde-proxy&amp;alias=dc.dataset" hx-include="#auth_data">💬</td>
+      <td title="API key lacks &apos;Manage Queries and Columns&apos; permission">💂🏽‍♀️</td>
     </tr>
     <tfoot>
       <tr>
@@ -36,7 +36,7 @@ exports[`DatasetsTable Renders datasets, the same as before 1`] = `
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
         <td>2</td>
         <td><button hx-post="/datasets/delete" hx-target="#dataset-section" hx-include="#auth_data">Delete Old Datasets</button></td>
-        <td><button hx-post="/datasets/dc/create-all?alias=dc.dataset" hx-target="#dataset-section" hx-include="#auth_data" title="make these derived columns">Create</button></td>
+        <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A7200%2C%22granularity%22%3A0%2C%22breakdowns%22%3A%5B%22dc.dataset%22%5D%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22orders%22%3A%5B%7B%22op%22%3A%22COUNT%22%2C%22order%22%3A%22descending%22%7D%5D%2C%22havings%22%3A%5B%5D%2C%22trace_joins%22%3A%5B%5D%2C%22limit%22%3A1000%7D" target="_blank"> 📈 </a></td>
       </tr>
     </tfoot>
   </table>
@@ -63,7 +63,7 @@ exports[`DatasetsTable outputs the same thing as before, for an empty one 1`] = 
         <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A5184000%2C%22granularity%22%3A0%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22filter_combination%22%3A%22AND%22%2C%22limit%22%3A1000%7D" target="_blank" class="link-symbol">📈</a></td>
         <td>Infinity</td>
         <td><button hx-post="/datasets/delete" hx-target="#dataset-section" hx-include="#auth_data">Delete Old Datasets</button></td>
-        <td><button hx-post="/datasets/dc/create-all?alias=dc.dataset" hx-target="#dataset-section" hx-include="#auth_data" title="make these derived columns">Create</button></td>
+        <td><a href="http://localhost:3000/test-region/ui/team_slug/environments/env_slug/?query=%7B%22time_range%22%3A7200%2C%22granularity%22%3A0%2C%22breakdowns%22%3A%5B%22dc.dataset%22%5D%2C%22calculations%22%3A%5B%7B%22op%22%3A%22COUNT%22%7D%5D%2C%22orders%22%3A%5B%7B%22op%22%3A%22COUNT%22%2C%22order%22%3A%22descending%22%7D%5D%2C%22havings%22%3A%5B%5D%2C%22trace_joins%22%3A%5B%5D%2C%22limit%22%3A1000%7D" target="_blank"> 📈 </a></td>
       </tr>
     </tfoot>
   </table>
