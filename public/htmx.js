@@ -8,7 +8,7 @@ var htmx = (function () {
 
   // Requires version 0.10.33 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.67";
+  const INSTRUMENTATION_VERSION = "0.0.68";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -2236,7 +2236,6 @@ var htmx = (function () {
                   "header triggered " + eventName,
                   (span) => {
                     let detail = triggers[eventName];
-                    console.log("LALALA event name is _ eventName");
                     span.setAttributes({
                       "htmx.trigger.eventName": eventName,
                       "htmx.trigger.originalDetail": safeStringify(detail),

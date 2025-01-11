@@ -231,7 +231,7 @@ export async function createDerivedColumns(
           </p>`;
         });
 
-  return { success, html: status.join(" ") };
+  return { success, html: status };
 }
 
 function escapeDquote(str: string) {
