@@ -73,7 +73,7 @@ export class DerivedColumnForDatasetName implements Column {
     return html`<td>
       <button
         id="dc-dataset-create"
-        hx-on:dc-dataset-create="this.hidden=false"
+        hx-on:dc-dataset-create="this.hidden = false"
         hidden="true"
         hx-post="/datasets/dc/create-all?alias=dc.dataset"
         hx-target="#dataset-section"
@@ -81,7 +81,15 @@ export class DerivedColumnForDatasetName implements Column {
         title="make these derived columns"
       >
         Create</button
-      >${queryLink}
+      ><a
+        href=${queryUrl}
+        target="_blank"
+        hidden="true"
+        hx-on:dc-dataset-query="this.hidden = false"
+        id="dc-dataset-query"
+      >
+        📈
+      </a>
     </td>`;
   }
 }
@@ -174,6 +182,7 @@ export async function derivedColumnExists(
     >
       ☘️
     </span>`,
+    hx_trigger: { "dc-dataset-query": { target: "#dc-dataset-query" } },
     // todo, turn on the query link
   };
 }

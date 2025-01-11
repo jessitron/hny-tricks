@@ -8,7 +8,7 @@ var htmx = (function () {
 
   // Requires version 0.10.33 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.66";
+  const INSTRUMENTATION_VERSION = "0.0.67";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -3419,7 +3419,15 @@ var htmx = (function () {
      * @returns {boolean}
      */
     function triggerEvent(elt, eventName, detail) {
+      const origElt = elt;
       elt = resolveTarget(elt); // JESS: this can return null, make a useful exception
+      if (!elt) {
+        HnyOtelWeb.recordException(`Event target not found`, {
+          "htmx.trigger.target": safeStringify(origElt),
+          "htmx.trigger.eventName": eventName,
+        });
+        return;
+      }
       if (detail == null) {
         detail = {};
       }
