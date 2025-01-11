@@ -8,7 +8,7 @@ var htmx = (function () {
 
   // Requires version 0.10.33 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.68";
+  const INSTRUMENTATION_VERSION = "0.0.73";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -391,6 +391,12 @@ var htmx = (function () {
 
     // JESS
     function safeStringify(obj) {
+      if (obj === undefined) {
+        return "undefined";
+      }
+      if (obj === null) {
+        return "null";
+      }
       try {
         return JSON.stringify(obj);
       } catch (e) {
@@ -5219,15 +5225,18 @@ var htmx = (function () {
               }
             );
           };
-          xhr.onerror = function () {
+          xhr.onerror = function (event, event2) {
             return HnyOtelWeb.inChildSpan(
               HnyOtelWeb.INTERNAL_TRACER,
-              "xhr error received",
+              "communication failure",
               issueAjaxRequestSpanContext,
               () => {
                 HnyOtelWeb.setAttributes({
                   "htmx.request.path": responseInfo.pathInfo?.finalRequestPath,
                   "htmx.request-config": safeStringify(requestConfig),
+                  "htmx.xhr.error": safeStringify(event),
+                  "htmx.xhr.type": event.type,
+                  "htmx.xhr.error2": safeStringify(event2),
                 });
                 removeRequestIndicators(indicators, disableElts);
                 triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);

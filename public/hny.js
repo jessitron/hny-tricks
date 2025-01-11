@@ -21242,7 +21242,7 @@ var $8d2dec6b2f42fe45$export$d1d5ca1ca02801e6 = "url.scheme";
 var $8d2dec6b2f42fe45$export$11d4f8ef7be26b3d = "user_agent.original";
 
 
-const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.34";
+const $c9f3acea5fa71cd0$var$MY_VERSION = "0.10.35";
 function $c9f3acea5fa71cd0$var$initializeTracing(params /* { apiKey: string, serviceName: string } */ ) {
     if (!params) params = {};
     if (!params.apiKey) throw new Error("Usage: initializeTracing({ apiKey: 'honeycomb api key', serviceName: 'name of this service' })");
@@ -21358,6 +21358,7 @@ async function $c9f3acea5fa71cd0$var$inSpanAsync(inputTracer, spanName, fn, cont
 }
 function $c9f3acea5fa71cd0$var$recordException(exception, additionalAttributes) {
     const span = (0, $d3d11f3bc96c5059$export$357889f174732d38).getActiveSpan();
+    if (!span) return;
     // I took this from the sdk-trace-base, except I'm gonna support additional attributes.
     // https://github.com/open-telemetry/opentelemetry-js/blob/90afa2850c0690f7a18ecc511c04927a3183490b/packages/opentelemetry-sdk-trace-base/src/Span.ts#L321
     const attributes = {};
