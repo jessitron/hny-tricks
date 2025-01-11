@@ -10,7 +10,10 @@ import { currentTraceId } from "./tracing-util";
  */
 const htmlOriginal = htm.bind(vhtml);
 
-export type Html = string | string[];
+/**
+ * This can be a string or an array of strings ... or nested arrays of strings
+ */
+export type Html = string | Html[];
 /**
  * Right before sending back to the client, turn this into a string.
  *
@@ -24,7 +27,9 @@ export type Html = string | string[];
 export function normalizeHtml(html: Html): string {
   if (typeof html === "string") {
     return html;
-  } else return html.join("");
+  }
+  const allStrings = html.map(normalizeHtml);
+  return allStrings.join("");
 }
 
 export const html = (strings: TemplateStringsArray, ...values: any[]): Html => {

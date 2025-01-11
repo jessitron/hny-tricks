@@ -43,6 +43,23 @@ describe("the htm+vhtml library", () => {
     expect(actual).toStrictEqual(expected);
   });
 
+  it("can combine multiple of its own values", () => {
+    const oneParagraph = html`<p>stuff</p>`;
+    const another = html`<p>two</p>`;
+    const actual = html`${oneParagraph}${another}`;
+    const expected = ["<p>stuff</p>", "<p>two</p>"];
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it("will nest arrays when combining, doesn't flatten them", () => {
+    const twoParagraphs = html`<p>stuff</p>
+      <p>moar</p>`;
+    const another = html`<p>two</p>`;
+    const actual = html`${twoParagraphs}${another}`;
+    const expected = [["<p>stuff</p>", "<p>moar</p>"], "<p>two</p>"];
+    expect(actual).toStrictEqual(expected);
+  });
+
   it("sometimes does escape html when inserted as a value", () => {
     const currentTraceId = "s;aofdjhaldkjfhalskjdhf";
     const status = {

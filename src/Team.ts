@@ -11,10 +11,9 @@ import {
   constructEnvironmentLink,
   HnyTricksAuthError,
   HnyTricksAuthorization,
-  HoneycombUIEndpointByRegion,
   spanAttributesAboutAuth,
 } from "./common";
-import { html } from "./htm-but-right";
+import { html, normalizeHtml } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
 import { sendEventSection } from "./event/SendEvent";
 import { datasetSection } from "./datasets/datasets";
@@ -33,7 +32,7 @@ export async function team(apikey) {
   }
   const auth = await authorize(apikey);
   if (isAuthError(auth)) {
-    span?.setAttributes({ "hny.authError": auth.html });
+    span?.setAttributes({ "hny.authError": normalizeHtml(auth.html) });
     span?.setStatus({ code: 2, message: "auth failed" });
     return auth.html; // TODO: return the ApiKeyPrompt again
   }

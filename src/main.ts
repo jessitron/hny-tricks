@@ -60,7 +60,7 @@ app.post("/team", async (req: Request, res: Response) => {
 // used in the ApiKeyPrompt
 app.post("/validate", (req: Request, res: Response) => {
   const apiKeyInterpretation = commentOnApiKey(req.body.apikey);
-  report({ "app.response": apiKeyInterpretation });
+  report({ "app.response": normalizeHtml(apiKeyInterpretation) });
   res.send(normalizeHtml(apiKeyInterpretation));
 });
 
