@@ -32,6 +32,15 @@ describe("checking the API key", () => {
     expect(result.region).toBe("unknowable");
   });
 
+  it("recognizes a management key ID in US prod", () => {
+    const inactiveSecret = "bj04p21fsex72d7pn4rpq5jhdd8bfkyt";
+    const inactiveKeyId = "hcamk_01jjb3wjzgc54eq850gc1pbsxp";
+    const result = interpretApiKey(inactiveKeyId);
+    expect(result.type).toBe("management key ID");
+    expect(result.environmentType).toBe("none");
+    expect(result.region).toBe("US");
+  });
+
   it("recognizes a classic ingest key", () => {
     const inactiveKey =
       "hcaic_01j26r145dhj7th0wmm2rexgmrqc1jghy6pmjxa9k7ft22m27cx9rx5yse";

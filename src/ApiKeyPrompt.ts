@@ -106,26 +106,26 @@ function remarkOnKeyInfo(keyInfo): {
   };
 }
 
+export function regionByLetter(letter: string): Region {
+  switch (letter) {
+    case "a":
+      return "US";
+    case "b":
+      return "EU";
+    case "c":
+      return "dogfood US";
+    case "d":
+      return "dogfood EU";
+  }
+}
+
 export function interpretApiKey(apiKey: string): KeyInfo {
   let keyType: KeyType = "none";
   let region: Region = "unknown";
   let environmentType: EnvironmentType = "none";
   if (apiKey.length === 64 && apiKey.match(/^hc[abcd]i[kc]_[a-z0-9]{58}$/)) {
     keyType = "ingest";
-    switch (apiKey[2]) {
-      case "a":
-        region = "US";
-        break;
-      case "b":
-        region = "EU";
-        break;
-      case "c":
-        region = "dogfood US";
-        break;
-      case "d":
-        region = "dogfood EU";
-        break;
-    }
+    region = regionByLetter(apiKey[2]);
     switch (apiKey[4]) {
       case "c":
         environmentType = "classic";
@@ -142,6 +142,13 @@ export function interpretApiKey(apiKey: string): KeyInfo {
     keyType = "configuration";
     environmentType = "classic";
     region = "unknowable";
+  } else if (
+    apiKey.length === 32 &&
+    apiKey.match(/^hc[abcd]mk_[a-z0-9]{26}$/)
+  ) {
+    keyType = "management key ID";
+    environmentType = "none";
+    region = regionByLetter(apiKey[2]);
   }
   trace.getActiveSpan()?.setAttributes({
     "honeycomb.key.type": keyType,
