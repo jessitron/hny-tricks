@@ -24,7 +24,12 @@ export type HoneycombAuthResponse = {
   };
 };
 
-export type KeyType = "none" | "ingest" | "configuration" | "management key ID";
+export type KeyType =
+  | "none"
+  | "ingest"
+  | "configuration"
+  | "management key ID"
+  | "management key secret";
 export type Region =
   | "local test"
   | "US"

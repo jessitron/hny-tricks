@@ -33,12 +33,19 @@ describe("checking the API key", () => {
   });
 
   it("recognizes a management key ID in US prod", () => {
-    const inactiveSecret = "bj04p21fsex72d7pn4rpq5jhdd8bfkyt";
     const inactiveKeyId = "hcamk_01jjb3wjzgc54eq850gc1pbsxp";
     const result = interpretApiKey(inactiveKeyId);
     expect(result.type).toBe("management key ID");
     expect(result.environmentType).toBe("none");
     expect(result.region).toBe("US");
+  });
+
+  it("recognizes a management secret ID in US prod", () => {
+    const inactiveSecret = "bj04p21fsex72d7pn4rpq5jhdd8bfkyt"; // nice
+    const result = interpretApiKey(inactiveSecret);
+    expect(result.type).toBe("management key secret");
+    expect(result.environmentType).toBe("none");
+    expect(result.region).toBe("unknowable");
   });
 
   it("recognizes a classic ingest key", () => {

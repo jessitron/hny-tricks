@@ -142,13 +142,14 @@ export function interpretApiKey(apiKey: string): KeyInfo {
     keyType = "configuration";
     environmentType = "classic";
     region = "unknowable";
-  } else if (
-    apiKey.length === 32 &&
-    apiKey.match(/^hc[abcd]mk_[a-z0-9]{26}$/)
-  ) {
+  } else if (apiKey.match(/^hc[abcd]mk_[a-z0-9]{26}$/)) {
     keyType = "management key ID";
     environmentType = "none";
     region = regionByLetter(apiKey[2]);
+  } else if (apiKey.match(/^[a-z0-9]{32}$/)) {
+    keyType = "management key secret";
+    environmentType = "none";
+    region = "unknowable";
   }
   trace.getActiveSpan()?.setAttributes({
     "honeycomb.key.type": keyType,
