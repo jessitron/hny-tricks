@@ -99,6 +99,18 @@ function remarkOnKeyInfo(keyInfo): {
       className: "happy",
       description: "That looks like a Honeycomb configuration key. Great.",
     };
+  } else if (keyInfo.type === "management key ID") {
+    return {
+      className: "unhappy",
+      description:
+        "That looks like a management key ID. I need a configuration or ingest key.",
+    };
+  } else if (keyInfo.type === "management key secret") {
+    return {
+      className: "unhappy",
+      description:
+        "That might be a management key secret. I need a configuration or ingest key.",
+    };
   }
   return {
     className: "unhappy",
