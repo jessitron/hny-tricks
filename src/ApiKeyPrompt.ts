@@ -116,6 +116,10 @@ export function regionByLetter(letter: string): Region {
       return "dogfood US";
     case "d":
       return "dogfood EU";
+    case "e":
+      return "kibble US";
+    case "f":
+      return "kibble EU";
   }
 }
 
@@ -123,7 +127,7 @@ export function interpretApiKey(apiKey: string): KeyInfo {
   let keyType: KeyType = "none";
   let region: Region = "unknown";
   let environmentType: EnvironmentType = "none";
-  if (apiKey.length === 64 && apiKey.match(/^hc[abcd]i[kc]_[a-z0-9]{58}$/)) {
+  if (apiKey.length === 64 && apiKey.match(/^hc[abcdef]i[kc]_[a-z0-9]{58}$/)) {
     keyType = "ingest";
     region = regionByLetter(apiKey[2]);
     switch (apiKey[4]) {
@@ -142,7 +146,7 @@ export function interpretApiKey(apiKey: string): KeyInfo {
     keyType = "configuration";
     environmentType = "classic";
     region = "unknowable";
-  } else if (apiKey.match(/^hc[abcd]mk_[a-z0-9]{26}$/)) {
+  } else if (apiKey.match(/^hc[abcdef]mk_[a-z0-9]{26}$/)) {
     keyType = "management key ID";
     environmentType = "none";
     region = regionByLetter(apiKey[2]);

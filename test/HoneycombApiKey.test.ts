@@ -48,6 +48,14 @@ describe("checking the API key", () => {
     expect(result.region).toBe("unknowable");
   });
 
+  it("recognizes a management secret ID in US kibble", () => {
+    const inactiveKeyId = "hcemk_01jjb4gge6abc2j638rhy58r77";
+    const result = interpretApiKey(inactiveKeyId);
+    expect(result.type).toBe("management key ID");
+    expect(result.environmentType).toBe("none");
+    expect(result.region).toBe("kibble US");
+  });
+
   it("recognizes a classic ingest key", () => {
     const inactiveKey =
       "hcaic_01j26r145dhj7th0wmm2rexgmrqc1jghy6pmjxa9k7ft22m27cx9rx5yse";
