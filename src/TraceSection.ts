@@ -21,10 +21,7 @@ export function TraceSection(authResult: HnyTricksAuthorization) {
 </section>`;
 }
 
-export async function traceActions(
-  auth: HnyTricksAuthorization,
-  traceId: string
-) {
+export function traceActions(auth: HnyTricksAuthorization, traceId: string) {
   const traceUrl =
     constructEnvironmentLink(auth) + `/trace?trace_id=${traceId}`;
   return html`<span>

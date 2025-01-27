@@ -61,13 +61,13 @@ app.post("/validate", (req: Request, res: Response) => {
   res.send(normalizeHtml(apiKeyInterpretation));
 });
 
-app.post("/trace", async (req: Request, res: Response) => {
+app.post("/trace", (req: Request, res: Response) => {
   const { auth_data, ...formData } = req.body;
 
   const auth = parseAuthData(auth_data, req.path);
 
   report({ "app.traceId": formData["trace-id"] });
-  res.send(normalizeHtml(await traceActions(auth, formData["trace-id"])));
+  res.send(normalizeHtml(traceActions(auth, formData["trace-id"])));
 });
 
 app.post("/datasets", async (req: Request, res: Response) => {
