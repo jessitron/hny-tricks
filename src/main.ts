@@ -1,13 +1,19 @@
 import "./tracing";
+
 import express, { Request, Response } from "express";
-import { commentOnApiKey } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
-import { parseAuthData, team } from "./Team";
-import { fakeAuthEndpoint } from "./FakeRegion";
 import { report } from "./tracing-util";
-import { index } from "./index";
-import { TraceActions } from "./TraceSection";
 import { normalizeHtml } from "./htm-but-right";
+import {
+  HnyTricksAuthErrorMessage,
+  isHnyTricksAuthError,
+} from "./event/AuthError";
+
+import { fakeAuthEndpoint } from "./FakeRegion";
+import { commentOnApiKey } from "./ApiKeyPrompt";
+import { parseAuthData, team } from "./Team";
+import { index } from "./index";
+import { traceActions } from "./TraceSection";
 import {
   createDerivedColumns,
   derivedColumnExists,
@@ -17,10 +23,6 @@ import { describeDatasets } from "./datasets/datasets";
 import { sendEventSection } from "./event/SendEvent";
 import { statusDiv } from "./status";
 import { sendEvent } from "./event/send";
-import {
-  HnyTricksAuthErrorMessage,
-  isHnyTricksAuthError,
-} from "./event/AuthError";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -53,7 +55,6 @@ app.post("/team", async (req: Request, res: Response) => {
   res.send(normalizeHtml(await team(req.body.apikey)));
 });
 
-// used in the ApiKeyPrompt
 app.post("/validate", (req: Request, res: Response) => {
   const apiKeyInterpretation = commentOnApiKey(req.body.apikey);
   report({ "app.response": normalizeHtml(apiKeyInterpretation) });
@@ -65,10 +66,8 @@ app.post("/trace", async (req: Request, res: Response) => {
 
   const auth = parseAuthData(auth_data, req.path);
 
-  report({
-    "app.traceId": formData["trace-id"],
-  });
-  res.send(normalizeHtml(await TraceActions(auth, formData["trace-id"])));
+  report({ "app.traceId": formData["trace-id"] });
+  res.send(normalizeHtml(await traceActions(auth, formData["trace-id"])));
 });
 
 app.post("/datasets", async (req: Request, res: Response) => {

@@ -21,7 +21,7 @@ export function TraceSection(authResult: HnyTricksAuthorization) {
 </section>`;
 }
 
-export async function TraceActions(
+export async function traceActions(
   auth: HnyTricksAuthorization,
   traceId: string
 ) {
