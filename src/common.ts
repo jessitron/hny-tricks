@@ -129,10 +129,3 @@ export function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
   );
 }
 
-// First define your custom error class
-export class HnyTricksAuthError extends Error {
-  constructor(public message: string, public contextMessage: string) {
-    super(message);
-    this.name = "CustomError";
-  }
-}

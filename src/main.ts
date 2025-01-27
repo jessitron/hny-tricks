@@ -4,7 +4,6 @@ import { trace } from "@opentelemetry/api";
 import { commentOnApiKey } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
 import { parseAuthData, team } from "./Team";
-import { HnyTricksAuthError } from "./common";
 import { fakeAuthEndpoint } from "./FakeRegion";
 import { currentTraceId, report } from "./tracing-util";
 import { index } from "./index";
@@ -19,6 +18,10 @@ import { describeDatasets } from "./datasets/datasets";
 import { sendEventSection } from "./event/SendEvent";
 import { statusDiv } from "./status";
 import { sendEvent } from "./event/send";
+import {
+  HnyTricksAuthErrorMessage,
+  isHnyTricksAuthError,
+} from "./event/AuthError";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,16 +29,11 @@ const port = process.env.PORT || 3000;
 // serve files from the public directory
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // Error handling middleware
 app.use((err, req, res, next) => {
-  if (err instanceof HnyTricksAuthError) {
-    res.status(400).send(html`
-      <div traceId=${currentTraceId()}>
-        <p>Problem with Authorization.</p>
-        <p>Message: ${err.message}</p>
-        <p>Context: ${err.contextMessage}</p>
-      </div>
-    `);
+  if (isHnyTricksAuthError(err)) {
+    res.status(400).send(HnyTricksAuthErrorMessage({ error: err }));
   } else {
     next(err);
   }
@@ -102,7 +100,6 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   const output = await derivedColumnExists(auth, req.query);
   trace.getActiveSpan().setAttributes({
     "app.hx-trigger": JSON.stringify(output.hx_trigger),
-    "app.nonsense": "archivista",
   });
   if (!!output.hx_trigger) {
     res.header("Hx-Trigger", JSON.stringify(output.hx_trigger));

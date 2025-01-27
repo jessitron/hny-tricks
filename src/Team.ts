@@ -9,7 +9,6 @@ import {
 import { TraceSection as traceSection } from "./TraceSection";
 import {
   constructEnvironmentLink,
-  HnyTricksAuthError,
   HnyTricksAuthorization,
   spanAttributesAboutAuth,
 } from "./common";
@@ -17,6 +16,7 @@ import { html, normalizeHtml } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
 import { sendEventSection } from "./event/SendEvent";
 import { datasetSection } from "./datasets/datasets";
+import { HnyTricksAuthError } from "./event/AuthError";
 
 /**
  * why is this file capitalized? I haven't figured out the standards for that yet.
