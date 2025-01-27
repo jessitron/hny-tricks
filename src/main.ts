@@ -1,14 +1,13 @@
 import "./tracing";
 import express, { Request, Response } from "express";
-import { trace } from "@opentelemetry/api";
 import { commentOnApiKey } from "./ApiKeyPrompt";
 import bodyParser from "body-parser";
 import { parseAuthData, team } from "./Team";
 import { fakeAuthEndpoint } from "./FakeRegion";
-import { currentTraceId, report } from "./tracing-util";
+import { report } from "./tracing-util";
 import { index } from "./index";
 import { TraceActions } from "./TraceSection";
-import { html, normalizeHtml } from "./htm-but-right";
+import { normalizeHtml } from "./htm-but-right";
 import {
   createDerivedColumns,
   derivedColumnExists,
@@ -46,8 +45,7 @@ app.listen(port, () => {
 app.get("/", (req, res) => {
   console.log("here we are at /");
   const fullResponse = `<!DOCTYPE html>${index()}`;
-  const span = trace.getActiveSpan();
-  span?.setAttribute("response.body", fullResponse);
+  report({ "response.body": fullResponse });
   res.send(fullResponse);
 });
 
@@ -67,7 +65,7 @@ app.post("/trace", async (req: Request, res: Response) => {
 
   const auth = parseAuthData(auth_data, req.path);
 
-  trace.getActiveSpan().setAttributes({
+  report({
     "app.traceId": formData["trace-id"],
   });
   res.send(normalizeHtml(await TraceActions(auth, formData["trace-id"])));
@@ -98,7 +96,7 @@ app.post("/datasets/dc/exists", async (req: Request, res: Response) => {
   const auth = parseAuthData(auth_data, req.path);
 
   const output = await derivedColumnExists(auth, req.query);
-  trace.getActiveSpan().setAttributes({
+  report({
     "app.hx-trigger": JSON.stringify(output.hx_trigger),
   });
   if (!!output.hx_trigger) {
