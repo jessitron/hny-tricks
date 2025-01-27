@@ -10,7 +10,6 @@ import {
 } from "./event/AuthError";
 
 import { fakeAuthEndpoint } from "./FakeRegion";
-import { commentOnApiKey } from "./ApiKeyPrompt";
 import { parseAuthData, team } from "./Team";
 import { index } from "./index";
 import { traceActions } from "./TraceSection";
@@ -23,6 +22,7 @@ import { describeDatasets } from "./datasets/datasets";
 import { sendEventSection } from "./event/SendEvent";
 import { statusDiv } from "./status";
 import { sendEvent } from "./event/send";
+import { commentOnApiKey } from "./auth/validate";
 
 const app = express();
 const port = process.env.PORT || 3000;
