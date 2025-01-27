@@ -14,6 +14,7 @@ const htmlOriginal = htm.bind(vhtml);
  * This can be a string or an array of strings ... or nested arrays of strings
  */
 export type Html = string | Html[];
+
 /**
  * Right before sending back to the client, turn this into a string.
  *
