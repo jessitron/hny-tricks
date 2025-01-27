@@ -56,9 +56,9 @@ app.post("/team", async (req: Request, res: Response) => {
 });
 
 app.post("/validate", (req: Request, res: Response) => {
-  const apiKeyInterpretation = commentOnApiKey(req.body.apikey);
-  report({ "app.response": normalizeHtml(apiKeyInterpretation) });
-  res.send(normalizeHtml(apiKeyInterpretation));
+  const apiKeyInterpretation = normalizeHtml(commentOnApiKey(req.body.apikey));
+  report({ "response.body": apiKeyInterpretation });
+  res.send(apiKeyInterpretation);
 });
 
 app.post("/trace", (req: Request, res: Response) => {

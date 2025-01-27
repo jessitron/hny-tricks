@@ -24,7 +24,6 @@ import { HnyTricksAuthError } from "./event/AuthError";
  */
 
 export async function team(apikey) {
-  // TODO: do this part in main?
   const span = trace.getActiveSpan();
   if (!apikey) {
     span.setAttribute("warning", "no api key received");
