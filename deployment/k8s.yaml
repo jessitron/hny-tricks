@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest
+          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:turbine
           imagePullPolicy: Always
           ports:
             - containerPort: 80

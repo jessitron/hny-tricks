@@ -7,11 +7,7 @@ import {
   startingApiKeyPrompt,
 } from "./ApiKeyPrompt";
 import { TraceSection as traceSection } from "./TraceSection";
-import {
-  constructEnvironmentLink,
-  HnyTricksAuthorization,
-  spanAttributesAboutAuth,
-} from "./common";
+import { constructEnvironmentLink, HnyTricksAuthorization } from "./common";
 import { html, normalizeHtml } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
 import { sendEventSection } from "./event/SendEvent";
@@ -92,4 +88,15 @@ export function parseAuthData(
   ) as HnyTricksAuthorization;
   span?.setAttributes(spanAttributesAboutAuth(auth));
   return auth;
+}
+
+function spanAttributesAboutAuth(auth: HnyTricksAuthorization) {
+  return {
+    "honeycomb.key.type": auth?.keyInfo?.type,
+    "honeycomb.key.region": auth?.keyInfo?.region,
+    "honeycomb.key.environmentType": auth?.keyInfo?.environmentType,
+    "honeycomb.key.id": auth?.apiKeyId,
+    "honeycomb.environment": auth?.environment?.slug,
+    "honeycomb.team": auth?.team?.slug,
+  };
 }

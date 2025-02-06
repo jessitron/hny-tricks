@@ -4,6 +4,8 @@ import {
   HoneycombAuthResponse,
   HoneycombApiEndpointByRegion,
   HnyTricksAuthorization,
+  HoneycombUIEndpointByRegion,
+  KeyInfo,
 } from "./common";
 import { fetchFromHoneycombApi, isFetchError } from "./HoneycombApi";
 import {
@@ -12,6 +14,7 @@ import {
   recordError,
   report,
 } from "./tracing-util";
+import { interpretApiKey } from "./auth/validate";
 
 export const ELEMENT_CONTAINING_ALL_SECTIONS = "#stuff";
 export const ENDPOINT_TO_POPULATE_ALL_SECTIONS = "/team";
@@ -63,7 +66,7 @@ function authError(htmlInput: Html): AuthError {
 export function isAuthError(
   response: HnyTricksAuthorization | AuthError
 ): response is AuthError {
-  return (response as AuthError).authError;
+  return (response as AuthError)?.authError;
 }
 
 export async function authorize(
@@ -79,6 +82,34 @@ export async function authorize(
       </div>`
     );
   }
+  const keyInfo = interpretApiKey(apiKey);
+  if (keyInfo.region === "unknown") {
+    return authError(html`<div>
+      <span class="unhappy">This doesn't look like an API key</span>
+    </div>`);
+  }
+  if (keyInfo.region === "unknowable") {
+    const workingRegion = await tryAllRegions(apiKey);
+    if (workingRegion === "unknown") {
+      return authError(html`<div>
+        <span class="unhappy">
+          That API key did not work in any Honeycomb region. 😭
+        </span>
+      </div>`);
+    }
+    keyInfo.region = workingRegion; // now we know.
+  }
+  const response = await fetchFromHoneycombApi<HoneycombAuthResponse>(
+    { apiKey, keyInfo },
+    "auth"
+  );
+  report({ "honeycomb.auth.response": JSON.stringify(response) });
+  if (isFetchError(response)) {
+    return authError(html`<div>
+      <span class="unhappy">Auth check failed: ${response.message}</span>
+    </div>`);
+  }
+  return describeAuthorization(apiKey, keyInfo, response);
 }
 
 async function tryAllRegions(apiKey: string): Promise<Region> {
@@ -108,4 +139,29 @@ async function tryAllRegions(apiKey: string): Promise<Region> {
     });
     return regionIdentified;
   });
+}
+
+function describeAuthorization(
+  apiKey: string,
+  keyInfo: KeyInfo,
+  hnyAuthResponse: HoneycombAuthResponse
+): HnyTricksAuthorization {
+  return {
+    apiKey, // don't log this
+    apiKeyId: hnyAuthResponse.id, // this is safe to print
+    keyInfo,
+    permissions: {
+      // Honeycomb subtlety: createDatasets perms bestows dataset management only for configuration keys.
+      canManageDatasets:
+        hnyAuthResponse.api_key_access.createDatasets &&
+        hnyAuthResponse.type === "configuration",
+      // Honeycomb subtlety: an ingest key doesn't bother stating its events permissions
+      canSendEvents:
+        hnyAuthResponse.api_key_access.events ||
+        hnyAuthResponse.type === "ingest",
+      canManageColumns: !!hnyAuthResponse.api_key_access.columns,
+    },
+    environment: hnyAuthResponse.environment,
+    team: hnyAuthResponse.team,
+  };
 }

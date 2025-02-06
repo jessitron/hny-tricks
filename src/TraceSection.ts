@@ -1,5 +1,3 @@
-import { trace } from "@opentelemetry/api";
-import { authorize, isAuthError } from "./ApiKeyPrompt";
 import { constructEnvironmentLink, HnyTricksAuthorization } from "./common";
 import { html } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";

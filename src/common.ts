@@ -82,41 +82,6 @@ export type HnyTricksAuthorization = {
   team: { slug: string; name: string };
 };
 
-export function describeAuthorization(
-  apiKey: string,
-  keyInfo: KeyInfo,
-  hnyAuthResponse: HoneycombAuthResponse
-): HnyTricksAuthorization {
-  return {
-    apiKey, // don't log this
-    apiKeyId: hnyAuthResponse.id, // this is safe to print
-    keyInfo,
-    permissions: {
-      // Honeycomb subtlety: createDatasets perms bestows dataset management only for configuration keys.
-      canManageDatasets:
-        hnyAuthResponse.api_key_access.createDatasets &&
-        hnyAuthResponse.type === "configuration",
-      // Honeycomb subtlety: an ingest key doesn't bother stating its events permissions
-      canSendEvents:
-        hnyAuthResponse.api_key_access.events ||
-        hnyAuthResponse.type === "ingest",
-      canManageColumns: !!hnyAuthResponse.api_key_access.columns,
-    },
-    environment: hnyAuthResponse.environment,
-    team: hnyAuthResponse.team,
-  };
-}
-export function spanAttributesAboutAuth(auth: HnyTricksAuthorization) {
-  return {
-    "honeycomb.key.type": auth?.keyInfo?.type,
-    "honeycomb.key.region": auth?.keyInfo?.region,
-    "honeycomb.key.environmentType": auth?.keyInfo?.environmentType,
-    "honeycomb.key.id": auth?.apiKeyId,
-    "honeycomb.environment": auth?.environment?.slug,
-    "honeycomb.team": auth?.team?.slug,
-  };
-}
-
 export function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
   // TODO: handle classic and get the endpoint right
   const envSlug = auth.environment.slug || "$legacy$"; // Classic environment doesn't have a slug
@@ -128,4 +93,3 @@ export function constructEnvironmentLink(auth: HnyTricksAuthorization): any {
     "/"
   );
 }
-
