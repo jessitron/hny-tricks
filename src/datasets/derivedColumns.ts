@@ -85,7 +85,7 @@ export class DerivedColumnForDatasetName implements Column {
         href=${queryUrl}
         target="_blank"
         hidden="true"
-        hx-on:dc-dataset-query="this.hidden = false"
+        hx-on:dc-dataset-query-event="this.hidden = false"
         id="dc-dataset-query"
       >
         📈
@@ -182,7 +182,7 @@ export async function derivedColumnExists(
     >
       ☘️
     </span>`,
-    hx_trigger: { "dc-dataset-query": { target: "#dc-dataset-query" } },
+    hx_trigger: { "dc-dataset-query-event": { target: "#dc-dataset-query" } },
     // todo, turn on the query link
   };
 }
