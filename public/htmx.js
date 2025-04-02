@@ -8,7 +8,7 @@ var htmx = (function () {
 
   // Requires version 0.10.33 or greater of jessitron/hny-otel-web, separately initialized.
   // @ts-ignore
-  const INSTRUMENTATION_VERSION = "0.0.73";
+  const INSTRUMENTATION_VERSION = "0.0.74";
 
   const HnyOtelWeb = window.Hny || {
     emptySpan: { spanContext() {}, setAttributes() {} },
@@ -2976,7 +2976,7 @@ var htmx = (function () {
     function addTriggerHandler(elt, triggerSpec, nodeData, inputHandler) {
       const handler = (elt, evt) =>
         HnyOtelWeb.inSpan(
-          HnyOtelWeb.INTERNAL_TRACER,
+          HnyOtelWeb.APP_TRACER,
           "handle trigger: " + triggerSpec.trigger,
           (span) => {
             span.setAttributes({
@@ -4776,7 +4776,7 @@ var htmx = (function () {
         "htmx.element.path": elt.path,
         "htmx.element.class": elt.className,
         "htmx.element.attributes": JSON.stringify(attributes),
-        "htmx.element.nothing-interesting": "guinea",
+        "htmx.element.nothing-interesting": "oreo cookie",
       };
     }
 
@@ -5175,7 +5175,7 @@ var htmx = (function () {
 
           xhr.onload = function () {
             return HnyOtelWeb.inChildSpan(
-              HnyOtelWeb.APP_TRACER,
+              HnyOtelWeb.INTERNAL_TRACER,
               "xhr response received",
               issueAjaxRequestSpanContext,
               () => {
@@ -5225,7 +5225,7 @@ var htmx = (function () {
               }
             );
           };
-          xhr.onerror = function (event, event2) {
+          xhr.onerror = function (event) {
             return HnyOtelWeb.inChildSpan(
               HnyOtelWeb.INTERNAL_TRACER,
               "communication failure",
@@ -5236,7 +5236,6 @@ var htmx = (function () {
                   "htmx.request-config": safeStringify(requestConfig),
                   "htmx.xhr.error": safeStringify(event),
                   "htmx.xhr.type": event.type,
-                  "htmx.xhr.error2": safeStringify(event2),
                 });
                 removeRequestIndicators(indicators, disableElts);
                 triggerErrorEvent(elt, "htmx:afterRequest", responseInfo);
