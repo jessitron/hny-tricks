@@ -9,6 +9,26 @@ import { StatusUpdate } from "../status";
 type DatasetSlug = string;
 type DerivedColumnAlias = string;
 
+// Environment-level derived column aliases
+export const ENVIRONMENT_COLUMN_ALIASES = {
+  ENVIRONMENT: "dc.environment",
+  TEAM: "dc.team", 
+  REGION: "dc.region",
+  ENVIRONMENT_TYPE: "dc.environment_type"
+} as const;
+
+export type EnvironmentColumnAlias = typeof ENVIRONMENT_COLUMN_ALIASES[keyof typeof ENVIRONMENT_COLUMN_ALIASES];
+
+// Column type classification
+export type ColumnScope = "dataset" | "environment";
+
+export type DerivedColumnInfo = {
+  alias: DerivedColumnAlias | EnvironmentColumnAlias;
+  scope: ColumnScope;
+  description: string;
+  formulaGenerator: (context: any) => string;
+};
+
 const QueryForDcDataset = {
   time_range: 7200,
   granularity: 0,
@@ -245,6 +265,53 @@ function derivedColumnFormula(
   const datasetName = inputs.datasetName || inputs.datasetSlug;
   return `COALESCE("${escapeDquote(datasetName)}")`;
 }
+
+// Environment-level formula generators
+export function generateEnvironmentFormula(
+  alias: EnvironmentColumnAlias,
+  auth: HnyTricksAuthorization
+): string {
+  switch (alias) {
+    case ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT:
+      return `COALESCE("${escapeDquote(auth.environment.name)}")`;
+    case ENVIRONMENT_COLUMN_ALIASES.TEAM:
+      return `COALESCE("${escapeDquote(auth.team.name)}")`;
+    case ENVIRONMENT_COLUMN_ALIASES.REGION:
+      return `COALESCE("${escapeDquote(auth.keyInfo.region)}")`;
+    case ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT_TYPE:
+      return `COALESCE("${escapeDquote(auth.keyInfo.environmentType)}")`;
+    default:
+      throw new Error(`Unknown environment column alias: ${alias}`);
+  }
+}
+
+// Environment column metadata
+export const ENVIRONMENT_COLUMN_DEFINITIONS: Record<EnvironmentColumnAlias, DerivedColumnInfo> = {
+  [ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT]: {
+    alias: ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT,
+    scope: "environment",
+    description: "Environment name for multi-environment context. Created by jessitron/hny-tricks",
+    formulaGenerator: (auth: HnyTricksAuthorization) => generateEnvironmentFormula(ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT, auth)
+  },
+  [ENVIRONMENT_COLUMN_ALIASES.TEAM]: {
+    alias: ENVIRONMENT_COLUMN_ALIASES.TEAM,
+    scope: "environment", 
+    description: "Team name for organizational context. Created by jessitron/hny-tricks",
+    formulaGenerator: (auth: HnyTricksAuthorization) => generateEnvironmentFormula(ENVIRONMENT_COLUMN_ALIASES.TEAM, auth)
+  },
+  [ENVIRONMENT_COLUMN_ALIASES.REGION]: {
+    alias: ENVIRONMENT_COLUMN_ALIASES.REGION,
+    scope: "environment",
+    description: "Honeycomb region identifier. Created by jessitron/hny-tricks", 
+    formulaGenerator: (auth: HnyTricksAuthorization) => generateEnvironmentFormula(ENVIRONMENT_COLUMN_ALIASES.REGION, auth)
+  },
+  [ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT_TYPE]: {
+    alias: ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT_TYPE,
+    scope: "environment",
+    description: "Environment type (classic vs e&s). Created by jessitron/hny-tricks",
+    formulaGenerator: (auth: HnyTricksAuthorization) => generateEnvironmentFormula(ENVIRONMENT_COLUMN_ALIASES.ENVIRONMENT_TYPE, auth)
+  }
+};
 
 type DerivedColumnCreationStatus =
   | { slug: DatasetSlug; created: true }
