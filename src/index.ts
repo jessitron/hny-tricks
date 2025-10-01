@@ -42,12 +42,13 @@ export function index() {
             <h1>🪩 Welcome 🪩</h1>
             <p>
               Have a ${" "}<a href="https://honeycomb.io">Honeycomb.io</a>${" "}
-              API key, and 
+              API key, and
               <ul>
               <li>want to know where it goes?</li>
               <li>need to send a quick event?</li>
               <li>wonder what datasets hold your events?</li>
               <li>got some old, empty datasets hanging around?</li>
+              <li>want to <a href="/copy-board">copy a board between environments</a>?</li>
 </ul>
 This app can help!
             </p>

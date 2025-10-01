@@ -12,6 +12,7 @@ import {
 import { fakeAuthEndpoint } from "./FakeRegion";
 import { parseAuthData, team } from "./Team";
 import { index } from "./index";
+import { copyBoardPage } from "./copyBoard";
 import { traceActions } from "./TraceSection";
 import {
   createDerivedColumns,
@@ -47,6 +48,13 @@ app.listen(port, () => {
 app.get("/", (req, res) => {
   console.log("here we are at /");
   const fullResponse = `<!DOCTYPE html>${index()}`;
+  report({ "response.body": fullResponse });
+  res.send(fullResponse);
+});
+
+app.get("/copy-board", (req, res) => {
+  console.log("here we are at /copy-board");
+  const fullResponse = `<!DOCTYPE html>${copyBoardPage()}`;
   report({ "response.body": fullResponse });
   res.send(fullResponse);
 });
