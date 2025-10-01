@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hny-tricks
-  namespace: hny-tricks
+  namespace: default
 spec:
   selector:
     app: hny-tricks
@@ -15,7 +15,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hny-tricks
-  namespace: hny-tricks
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -34,7 +34,7 @@ spec:
             - containerPort: 3000
           env:
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://daemonset-otelcol.default.svc.cluster.local:4318"
+              value: "http://htp-builder-primary-collector:4318"
             - name: OTEL_SERVICE_NAME
               value: "hny-tricks"
             - name: HONEYCOMB_INGEST_API_KEY
@@ -48,7 +48,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx-for-hny-tricks
-  namespace: hny-tricks
+  namespace: default
 spec:
   selector:
     app: nginx-for-hny-tricks
@@ -62,7 +62,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-for-hny-tricks
-  namespace: hny-tricks
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:turbine
+          image: 414852377253.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest-arm
           imagePullPolicy: Always
           ports:
             - containerPort: 80

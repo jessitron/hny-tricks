@@ -22,15 +22,17 @@ and then there's "aws for pwd" which confirms the region
 
 be in the right k8s context
 
-`k config use-context pixie-lou`
+`k config use-context orion`
 
 ### Build an image
 
 A directory up from here:
 
 ```sh
-docker build --platform linux/amd64 -t jessitron/hny-tricks:latest .
+docker build  -t jessitron/hny-tricks:latest .
 ```
+
+... add `--platform linux/amd64` if the cluster is on arm64.
 
 ### Push the image
 
@@ -73,7 +75,7 @@ See the image with:
 
 Once, create a namespace:
 
-`k create namespace hny-tricks`
+... no don't, put it in the default so it can see the collectors easily
 
 ### Now I need to set up a k8s.yaml
 
@@ -90,26 +92,35 @@ there's an nginx directory here. Let's try
 (once) `aws ecr create-repository --repository-name jessitron/hny-tricks-nginx`
 
 ```sh
-docker build --platform linux/amd64 -t jessitron/hny-tricks-nginx:latest .
+cd nginx
 
-docker tag jessitron/hny-tricks-nginx:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest
+docker build  -t jessitron/hny-tricks-nginx:latest-arm .
+
+docker tag jessitron/hny-tricks-nginx:latest-arm ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest-arm
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/jessitron/hny-tricks-nginx:latest-arm
 ```
 
+### get the honeycomb ingress key
+
+The key points to modernity/orion, because that's where the collector sends data.
+
+```
+k create secret generic honeycomb-ingest-for-hny-tricks --from-literal=apikey=...
+```
+
+### You need a collector, jess
+
+... and that gets into Pipeline Builder, shite
+
 ### do a deployment
+
+run `deploy` one directory up from here.
 
 `k apply -f k8s.yaml`
 
 ### set up ingress
 
-see jessitron/infra/otel-demo-help/o11yday-ingress.yaml for the ingress.
-
-### get the honeycomb ingress key
-
-The key points to modernity/otel-demo, because that's where the collector sends data.
-It is realistic for apps that don't connect to one another (like hny-tricks and otel-demo) to be running in the same environment.
-
-`k --namespace hny-tricks create secret generic honeycomb-ingest-for-hny-tricks --from-literal=apikey=...`
+I moved the ingress yaml file here, `hny-tricks-ingress.yaml`.
 
 ### set up the collector to send to a different environment for this app.
 

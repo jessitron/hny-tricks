@@ -7,7 +7,7 @@ set -x
 
 me=$0
 
-VERSION_NUMBER=22
+VERSION_NUMBER=27
 export IMAGE_NAME=jessitron/hny-tricks
 export IMAGE_TAG=hny-tricks-$VERSION_NUMBER
 export IMAGE_REPO=414852377253.dkr.ecr.us-east-1.amazonaws.com
@@ -16,7 +16,7 @@ export IMAGE_REPO=414852377253.dkr.ecr.us-east-1.amazonaws.com
 aws ecr get-login-password --region $(aws configure get region) | docker login --username AWS --password-stdin $IMAGE_REPO
 
 # because separately pushing ignores the other platform GOD I HATE HASHICORP SOMETIMES
-docker build --platform linux/amd64 -t $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG .
+docker build -t $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG .
 docker push $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG
 
 if [ "$?" -ne 0 ]; then
