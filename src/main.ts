@@ -64,13 +64,13 @@ app.get("/copy-board", (req, res) => {
 
 app.post("/copy-board/validate-from", async (req: Request, res: Response) => {
   const apiKey = req.body["from-apikey"];
-  const output = await validateApiKey(apiKey);
+  const output = await validateApiKey(apiKey, true);
   res.send(normalizeHtml(output));
 });
 
 app.post("/copy-board/validate-to", async (req: Request, res: Response) => {
   const apiKey = req.body["to-apikey"];
-  const output = await validateApiKey(apiKey);
+  const output = await validateApiKey(apiKey, false);
   res.send(normalizeHtml(output));
 });
 

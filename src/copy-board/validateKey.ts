@@ -3,7 +3,7 @@ import { HnyTricksAuthorization, constructEnvironmentLink } from "../common";
 import { authorize, isAuthError } from "../ApiKeyPrompt";
 import { currentTraceId } from "../tracing-util";
 
-export async function validateApiKey(apiKey: string): Promise<Html> {
+export async function validateApiKey(apiKey: string, shouldLoadBoards: boolean = false): Promise<Html> {
   if (!apiKey) {
     return html`<div></div>`;
   }
@@ -13,10 +13,10 @@ export async function validateApiKey(apiKey: string): Promise<Html> {
     return auth.html;
   }
 
-  return showEnvironmentInfo(auth);
+  return showEnvironmentInfo(auth, shouldLoadBoards);
 }
 
-function showEnvironmentInfo(auth: HnyTricksAuthorization): Html {
+function showEnvironmentInfo(auth: HnyTricksAuthorization, shouldLoadBoards: boolean): Html {
   const envLink = constructEnvironmentLink(auth);
   const canManageBoards =
     auth.keyInfo.type === "configuration" &&
@@ -32,7 +32,7 @@ function showEnvironmentInfo(auth: HnyTricksAuthorization): Html {
       <a href=${envLink} target="_blank"> ${envLink} </a>
     </div>
     ${boardPermissionStatus(auth)}
-    ${canManageBoards ? html`<div
+    ${canManageBoards && shouldLoadBoards ? html`<div
       hx-get="/copy-board/list-boards"
       hx-trigger="load"
       hx-vals='{"from-apikey": "${auth.apiKey}"}'
