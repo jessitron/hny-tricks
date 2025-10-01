@@ -4,10 +4,7 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import { report } from "./tracing-util";
 import { normalizeHtml } from "./htm-but-right";
-import {
-  HnyTricksAuthErrorMessage,
-  isHnyTricksAuthError,
-} from "./event/AuthError";
+import { HnyTricksAuthErrorMessage, isHnyTricksAuthError } from "./event/AuthError";
 
 import { fakeAuthEndpoint } from "./FakeRegion";
 import { parseAuthData, team } from "./Team";
@@ -18,10 +15,7 @@ import { listBoards } from "./copy-board/listBoards";
 import { analyzeBoard } from "./copy-board/analyzeBoard";
 import { authorize } from "./ApiKeyPrompt";
 import { traceActions } from "./TraceSection";
-import {
-  createDerivedColumns,
-  derivedColumnExists,
-} from "./datasets/derivedColumns";
+import { createDerivedColumns, derivedColumnExists } from "./datasets/derivedColumns";
 import { DeleteDatasetInputs, deleteDatasets } from "./datasets/deletion";
 import { describeDatasets } from "./datasets/datasets";
 import { sendEventSection } from "./event/SendEvent";
@@ -45,8 +39,18 @@ app.use((err, req, res, next) => {
   }
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`http://localhost:${port}`);
+});
+
+server.on("error", (error: NodeJS.ErrnoException) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`Error: Port ${port} is already in use`);
+    process.exit(1);
+  } else {
+    console.error("Server error:", error);
+    process.exit(1);
+  }
 });
 
 app.get("/", (req, res) => {
@@ -160,11 +164,7 @@ app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
 
   const alias = req.query["alias"];
 
-  const status = await createDerivedColumns(
-    auth,
-    alias,
-    formData as DeleteDatasetInputs
-  );
+  const status = await createDerivedColumns(auth, alias, formData as DeleteDatasetInputs);
 
   const output = await describeDatasets(auth, statusDiv(status));
   res.send(normalizeHtml(output));
@@ -177,11 +177,7 @@ app.post("/datasets/dc/create-all", async (req: Request, res: Response) => {
 
   const alias = req.query["alias"];
 
-  const status = await createDerivedColumns(
-    auth,
-    alias,
-    formData as DeleteDatasetInputs
-  );
+  const status = await createDerivedColumns(auth, alias, formData as DeleteDatasetInputs);
 
   const output = await describeDatasets(auth, statusDiv(status));
   res.send(normalizeHtml(output));
