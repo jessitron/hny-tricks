@@ -14,6 +14,8 @@ import { parseAuthData, team } from "./Team";
 import { index } from "./index";
 import { copyBoardPage } from "./copyBoard";
 import { validateApiKey } from "./copy-board/validateKey";
+import { listBoards } from "./copy-board/listBoards";
+import { authorize } from "./ApiKeyPrompt";
 import { traceActions } from "./TraceSection";
 import {
   createDerivedColumns,
@@ -70,6 +72,25 @@ app.post("/copy-board/validate-to", async (req: Request, res: Response) => {
   const apiKey = req.body["to-apikey"];
   const output = await validateApiKey(apiKey);
   res.send(normalizeHtml(output));
+});
+
+app.get("/copy-board/list-boards", async (req: Request, res: Response) => {
+  const apiKey = req.query["from-apikey"] as string;
+  const auth = await authorize(apiKey);
+  if ("html" in auth) {
+    res.send(normalizeHtml(auth.html));
+    return;
+  }
+  const output = await listBoards(auth);
+  res.send(normalizeHtml(output));
+});
+
+app.post("/copy-board/analyze-board", async (req: Request, res: Response) => {
+  const boardId = req.body["board-id"];
+  const apiKey = req.body["from-apikey"];
+
+  // For now, just show a placeholder
+  res.send(normalizeHtml(`<div>Analysis for board ${boardId} will appear here...</div>`));
 });
 
 app.post("/team", async (req: Request, res: Response) => {

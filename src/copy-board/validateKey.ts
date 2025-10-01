@@ -18,7 +18,9 @@ export async function validateApiKey(apiKey: string): Promise<Html> {
 
 function showEnvironmentInfo(auth: HnyTricksAuthorization): Html {
   const envLink = constructEnvironmentLink(auth);
-  const hasBoards = auth.permissions.canManageDatasets; // boards permission is part of dataset management for config keys
+  const canManageBoards =
+    auth.keyInfo.type === "configuration" &&
+    auth.permissions.canManageDatasets;
 
   return html`<div class="team-description" data-traceid="${currentTraceId()}">
     <div class="team-description team-region">✅ Region: ${auth.keyInfo.region}</div>
@@ -30,6 +32,14 @@ function showEnvironmentInfo(auth: HnyTricksAuthorization): Html {
       <a href=${envLink} target="_blank"> ${envLink} </a>
     </div>
     ${boardPermissionStatus(auth)}
+    ${canManageBoards ? html`<div
+      hx-get="/copy-board/list-boards"
+      hx-trigger="load"
+      hx-vals='{"from-apikey": "${auth.apiKey}"}'
+      hx-target="this"
+      hx-swap="outerHTML"
+      hx-indicator="#big-think"
+    ></div>` : ""}
   </div>`;
 }
 
