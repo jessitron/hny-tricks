@@ -1,1 +1,30 @@
+#!/bin/bash
+
+honeycomb-whoami () {
+if [ -z "$HONEYCOMB_API_KEY" ]
+then
+echo "no HONEYCOMB_API_KEY environment variable"
+exit 0
+fi
+response=$(curl -s -H "X-Honeycomb-Team: $HONEYCOMB_API_KEY" \
+                   "https://api.honeycomb.io/1/auth")
+	if [ $? -ne 0 ]
+	then
+		echo "Error: Failed to fetch data from Honeycomb API."
+		exit 1
+	fi
+	team_slug=$(echo "$response" | jq -r '.team.slug')
+	env_slug=$(echo "$response" | jq -r '.environment.slug')
+	env_url="https://ui.honeycomb.io/${team_slug}/environments/${env_slug}/"
+echo "Look for traces in: $env_url"
+}
+
+# if .be exists, source it
+
+if [ -f .be ]; then
+. .be
+fi
+
+honeycomb-whoami
+
 npm run start
