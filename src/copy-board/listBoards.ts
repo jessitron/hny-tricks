@@ -19,7 +19,7 @@ export async function listBoards(auth: HnyTricksAuthorization): Promise<Html> {
       keyInfo: auth.keyInfo,
       method: "GET",
     },
-    "/1/boards"
+    "boards"
   );
 
   if (isFetchError(response)) {
