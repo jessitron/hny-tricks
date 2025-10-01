@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api-docs.honeycomb.io)",
+      "Bash(chmod:*)",
+      "Bash(SOURCE_API_KEY=g8DiLVIeXmKmELzAdtbzED TARGET_API_KEY=nHbn38F7ZHnuzjjjMqsNdC python copy-calculated-field.py cf.anthropic_cost openhands-cli openhands-cli)",
+      "Bash(SOURCE_API_KEY=g8DiLVIeXmKmELzAdtbzED TARGET_API_KEY=nHbn38F7ZHnuzjjjMqsNdC python3 copy-calculated-field.py cf.anthropic_cost openhands-cli openhands-cli)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
