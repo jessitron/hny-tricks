@@ -77,6 +77,7 @@ export type HnyTricksAuthorization = {
     canManageDatasets: boolean;
     canSendEvents: boolean;
     canManageColumns: boolean;
+    canManageBoards: boolean;
   };
   environment: { slug: string; name: string };
   team: { slug: string; name: string };

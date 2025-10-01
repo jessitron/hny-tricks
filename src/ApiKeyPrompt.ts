@@ -160,6 +160,7 @@ function describeAuthorization(
         hnyAuthResponse.api_key_access.events ||
         hnyAuthResponse.type === "ingest",
       canManageColumns: !!hnyAuthResponse.api_key_access.columns,
+      canManageBoards: !!hnyAuthResponse.api_key_access.boards,
     },
     environment: hnyAuthResponse.environment,
     team: hnyAuthResponse.team,

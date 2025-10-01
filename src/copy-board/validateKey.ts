@@ -20,7 +20,7 @@ function showEnvironmentInfo(auth: HnyTricksAuthorization): Html {
   const envLink = constructEnvironmentLink(auth);
   const canManageBoards =
     auth.keyInfo.type === "configuration" &&
-    auth.permissions.canManageDatasets;
+    auth.permissions.canManageBoards;
 
   return html`<div class="team-description" data-traceid="${currentTraceId()}">
     <div class="team-description team-region">✅ Region: ${auth.keyInfo.region}</div>
@@ -47,7 +47,7 @@ function boardPermissionStatus(auth: HnyTricksAuthorization): Html {
   // Check if this is a configuration key with board management permissions
   const canManageBoards =
     auth.keyInfo.type === "configuration" &&
-    auth.permissions.canManageDatasets;
+    auth.permissions.canManageBoards;
 
   if (canManageBoards) {
     return html`<div class="happy">✅ Can manage boards</div>`;
