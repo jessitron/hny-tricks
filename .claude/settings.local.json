@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:api-docs.honeycomb.io)"
+      "WebFetch(domain:api-docs.honeycomb.io)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(npm run start:*)"
     ],
     "deny": [],
     "ask": []
