@@ -404,3 +404,18 @@ section#send-event-section div.status {
   border-radius: 5px;
   min-height: 20px;
 }
+
+/* Copy Board page styles */
+.apikey-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.apikey-container .apiKey {
+  flex: 1;
+}
+
+#board-list-section {
+  background-color: var(--lat-ref-color-sky-200);
+}

@@ -36,8 +36,8 @@ function showEnvironmentInfo(auth: HnyTricksAuthorization, shouldLoadBoards: boo
       hx-get="/copy-board/list-boards"
       hx-trigger="load"
       hx-vals='{"from-apikey": "${auth.apiKey}"}'
-      hx-target="this"
-      hx-swap="outerHTML"
+      hx-target="#board-list"
+      hx-swap="innerHTML"
       hx-indicator="#big-think"
     ></div>` : ""}
   </div>`;
