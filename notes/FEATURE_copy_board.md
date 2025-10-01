@@ -2,13 +2,13 @@
 
 This is rather different from the other things hny-tricks does, so it should be another page in the app.
 
-## add a new page to the app called Copy Honeycomb Board
+## add a new page to the app called Copy Honeycomb Board ✅
 
 - make a link from the main page to the new page.
 
 Try to keep the code for this feature in its own directory. Reuse code and routes from the main page where possible.
 
-## Get the API keys
+## Get the API keys ✅
 
 - on the new page, ask for two api keys. One is "From Environment" and the other is "To Environment".
 
@@ -16,10 +16,11 @@ Try to keep the code for this feature in its own directory. Reuse code and route
 
 - check that they each have permission to manage boards. If not, display a message.
 
-## Get the boards from the From Environment - not yet
+## Get the boards from the From Environment
 
 - list the boards in the From Environment
 - for each board, show the name and a button to copy it.
+- When I push the button, a new section appears, which will eventually show the analysis of the board.
 
 ## Analyze the board - not yet
 
