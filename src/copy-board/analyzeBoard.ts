@@ -3,35 +3,48 @@ import { HnyTricksAuthorization } from "../common";
 import { Html, html } from "../htm-but-right";
 import { currentTraceId } from "../tracing-util";
 
-type QuerySpec = {
-  caption?: string;
-  graph_settings?: object;
-  query_id?: string;
-  query_style?: string;
-  query?: {
-    calculations?: Array<{
-      op: string;
-      column?: string;
-    }>;
-    filters?: Array<{
-      column: string;
-      op: string;
-      value?: any;
-    }>;
-    breakdowns?: string[];
-    orders?: Array<{
-      column?: string;
-      op?: string;
-      order?: string;
-    }>;
-    havings?: Array<{
-      calculate_op: string;
-      column?: string;
-      op: string;
-      value?: any;
-    }>;
-    time_range?: number;
-    granularity?: number;
+type QueryDefinition = {
+  id: string;
+  calculations?: Array<{
+    op: string;
+    column?: string;
+  }>;
+  filters?: Array<{
+    column: string;
+    op: string;
+    value?: any;
+  }>;
+  breakdowns?: string[];
+  orders?: Array<{
+    column?: string;
+    op?: string;
+    order?: string;
+  }>;
+  havings?: Array<{
+    calculate_op: string;
+    column?: string;
+    op: string;
+    value?: any;
+  }>;
+  time_range?: number;
+  granularity?: number;
+  limit?: number;
+};
+
+type Panel = {
+  type: string;
+  position?: {
+    x_coordinate: number;
+    y_coordinate: number;
+    height: number;
+    width: number;
+  };
+  query_panel?: {
+    query_id: string;
+    query_annotation_id?: string;
+    visualization_settings?: object;
+    query_style?: string;
+    dataset: string;
   };
 };
 
@@ -39,9 +52,8 @@ type BoardDetails = {
   id: string;
   name: string;
   description?: string;
-  column_layout?: string;
-  style?: string;
-  queries?: QuerySpec[];
+  type?: string;
+  panels?: Panel[];
 };
 
 export async function analyzeBoard(
@@ -63,31 +75,75 @@ export async function analyzeBoard(
     </div>`;
   }
 
+  // Fetch query definitions for all query panels
+  const panels = response.panels || [];
+  const queryPanels = panels.filter((p) => p.type === "query" && p.query_panel);
+
+  const queriesWithDefs = await Promise.all(
+    queryPanels.map(async (panel) => {
+      const queryPanel = panel.query_panel!;
+      const queryDef = await fetchFromHoneycombApi<QueryDefinition>(
+        {
+          apiKey: auth.apiKey,
+          keyInfo: auth.keyInfo,
+          method: "GET",
+        },
+        `queries/${queryPanel.dataset}/${queryPanel.query_id}`
+      );
+
+      return {
+        panel,
+        queryDef: isFetchError(queryDef) ? null : queryDef,
+        error: isFetchError(queryDef) ? queryDef : null,
+      };
+    })
+  );
+
   return html`<div class="board-analysis-content" data-traceid="${currentTraceId()}">
     <h4>Board: ${response.name}</h4>
     ${response.description ? html`<p>${response.description}</p>` : ""}
-    ${renderQueries(response.queries || [])}
+    ${renderPanels(queriesWithDefs)}
   </div>`;
 }
 
-function renderQueries(queries: QuerySpec[]): Html {
-  if (queries.length === 0) {
-    return html`<p>No queries found on this board.</p>`;
+function renderPanels(
+  queriesWithDefs: Array<{
+    panel: Panel;
+    queryDef: QueryDefinition | null;
+    error: any;
+  }>
+): Html {
+  if (queriesWithDefs.length === 0) {
+    return html`<p>No query panels found on this board.</p>`;
   }
 
   return html`<div class="queries-section">
-    <h5>Queries (${queries.length})</h5>
+    <h5>Query Panels (${queriesWithDefs.length})</h5>
     <ul class="queries-list">
-      ${queries.map((q, idx) => renderQuery(q, idx))}
+      ${queriesWithDefs.map((item, idx) => renderQueryPanel(item, idx))}
     </ul>
   </div>`;
 }
 
-function renderQuery(querySpec: QuerySpec, index: number): Html {
-  const caption = querySpec.caption || `Query ${index + 1}`;
-  const query = querySpec.query;
+function renderQueryPanel(
+  item: {
+    panel: Panel;
+    queryDef: QueryDefinition | null;
+    error: any;
+  },
+  index: number
+): Html {
+  const queryPanel = item.panel.query_panel!;
+  const caption = `Query ${index + 1} (${queryPanel.dataset})`;
 
-  if (!query) {
+  if (item.error) {
+    return html`<li class="query-item">
+      <strong>${caption}</strong>
+      <div class="unhappy">⚠️ Error fetching query: ${item.error.message}</div>
+    </li>`;
+  }
+
+  if (!item.queryDef) {
     return html`<li class="query-item">
       <strong>${caption}</strong>
       <div class="query-detail">No query definition available</div>
@@ -98,12 +154,19 @@ function renderQuery(querySpec: QuerySpec, index: number): Html {
     <details>
       <summary><strong>${caption}</strong></summary>
       <div class="query-details">
-        ${renderCalculations(query.calculations)}
-        ${renderBreakdowns(query.breakdowns)}
-        ${renderFilters(query.filters)}
-        ${renderOrders(query.orders)}
-        ${renderHavings(query.havings)}
-        ${renderTimeRange(query.time_range)}
+        <div class="query-section">
+          <strong>Query ID:</strong> ${queryPanel.query_id}
+        </div>
+        <div class="query-section">
+          <strong>Dataset:</strong> ${queryPanel.dataset}
+        </div>
+        ${renderCalculations(item.queryDef.calculations)}
+        ${renderBreakdowns(item.queryDef.breakdowns)}
+        ${renderFilters(item.queryDef.filters)}
+        ${renderOrders(item.queryDef.orders)}
+        ${renderHavings(item.queryDef.havings)}
+        ${renderTimeRange(item.queryDef.time_range)}
+        ${renderLimit(item.queryDef.limit)}
       </div>
     </details>
   </li>`;
@@ -137,7 +200,10 @@ function renderFilters(filters?: Array<{ column: string; op: string; value?: any
   return html`<div class="query-section">
     <strong>Filters:</strong>
     <ul>
-      ${filters.map((filter) => html`<li>${filter.column} ${filter.op} ${JSON.stringify(filter.value)}</li>`)}
+      ${filters.map((filter) => {
+        const valueStr = filter.value !== undefined ? ` ${JSON.stringify(filter.value)}` : "";
+        return html`<li>${filter.column} ${filter.op}${valueStr}</li>`;
+      })}
     </ul>
   </div>`;
 }
@@ -172,5 +238,14 @@ function renderTimeRange(timeRange?: number): Html {
   }
   return html`<div class="query-section">
     <strong>Time range:</strong> ${timeRange} seconds
+  </div>`;
+}
+
+function renderLimit(limit?: number): Html {
+  if (!limit) {
+    return html``;
+  }
+  return html`<div class="query-section">
+    <strong>Limit:</strong> ${limit}
   </div>`;
 }
