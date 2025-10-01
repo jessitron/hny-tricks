@@ -1,5 +1,6 @@
 import { html } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
+import { ApiKeyInputs } from "./copy-board/ApiKeyInputs";
 
 export function copyBoardPage() {
   return html`<html>
@@ -33,7 +34,7 @@ export function copyBoardPage() {
           </div>
         </div>
         <div id="stuff">
-          <p>Coming soon: Board copying functionality</p>
+          ${ApiKeyInputs()}
         </div>
         <div id="big-think" class="htmx-indicator">
           <img src="./spin.gif" />

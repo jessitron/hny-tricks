@@ -13,6 +13,7 @@ import { fakeAuthEndpoint } from "./FakeRegion";
 import { parseAuthData, team } from "./Team";
 import { index } from "./index";
 import { copyBoardPage } from "./copyBoard";
+import { validateApiKey } from "./copy-board/validateKey";
 import { traceActions } from "./TraceSection";
 import {
   createDerivedColumns,
@@ -57,6 +58,18 @@ app.get("/copy-board", (req, res) => {
   const fullResponse = `<!DOCTYPE html>${copyBoardPage()}`;
   report({ "response.body": fullResponse });
   res.send(fullResponse);
+});
+
+app.post("/copy-board/validate-from", async (req: Request, res: Response) => {
+  const apiKey = req.body["from-apikey"];
+  const output = await validateApiKey(apiKey);
+  res.send(normalizeHtml(output));
+});
+
+app.post("/copy-board/validate-to", async (req: Request, res: Response) => {
+  const apiKey = req.body["to-apikey"];
+  const output = await validateApiKey(apiKey);
+  res.send(normalizeHtml(output));
 });
 
 app.post("/team", async (req: Request, res: Response) => {
