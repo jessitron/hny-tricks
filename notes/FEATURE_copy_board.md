@@ -36,6 +36,8 @@ The API Docs are here, read them: https://api-docs.honeycomb.io/api/boards
 
 - from the columns, extract a list of derived columns. From those, get their definitions and list the columns included in their formula.
 
+The Derived Columns (Calculated Fields) API Docs are here: https://api-docs.honeycomb.io/api/derived-columns
+
 ## Check feasibility - not yet
 
 Now it gets interesting.

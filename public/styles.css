@@ -377,6 +377,25 @@ section#send-event-section div.status {
   gap: 5px;
 }
 
+.board-info a {
+  color: var(--color-hny-denim);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.board-info a:hover {
+  color: var(--color-hny-pacific);
+  text-decoration: underline;
+}
+
+.board-info a .icon {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+}
+
 .board-description {
   color: #666;
   font-size: 0.9em;

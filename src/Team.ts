@@ -11,7 +11,7 @@ import { constructEnvironmentLink, HnyTricksAuthorization } from "./common";
 import { html, normalizeHtml } from "./htm-but-right";
 import { currentTraceId } from "./tracing-util";
 import { sendEventSection } from "./event/SendEvent";
-import { datasetSection } from "./datasets/datasets";
+import { datasetSection } from "./datasets/Datasets";
 import { HnyTricksAuthError } from "./event/AuthError";
 
 /**

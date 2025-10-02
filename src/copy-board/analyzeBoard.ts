@@ -31,6 +31,16 @@ type QueryDefinition = {
   limit?: number;
 };
 
+type ColumnInfo = {
+  key_name: string;
+  type: string;
+  description?: string;
+  hidden?: boolean;
+  id?: string;
+  alias?: string;
+  expression?: string;
+};
+
 type Panel = {
   type: string;
   position?: {
@@ -55,6 +65,43 @@ type BoardDetails = {
   type?: string;
   panels?: Panel[];
 };
+
+function extractColumnsFromQuery(queryDef: QueryDefinition): Set<string> {
+  const columns = new Set<string>();
+
+  // Extract from calculations
+  queryDef.calculations?.forEach((calc) => {
+    if (calc.column) {
+      columns.add(calc.column);
+    }
+  });
+
+  // Extract from filters
+  queryDef.filters?.forEach((filter) => {
+    columns.add(filter.column);
+  });
+
+  // Extract from breakdowns
+  queryDef.breakdowns?.forEach((breakdown) => {
+    columns.add(breakdown);
+  });
+
+  // Extract from orders
+  queryDef.orders?.forEach((order) => {
+    if (order.column) {
+      columns.add(order.column);
+    }
+  });
+
+  // Extract from havings
+  queryDef.havings?.forEach((having) => {
+    if (having.column) {
+      columns.add(having.column);
+    }
+  });
+
+  return columns;
+}
 
 export async function analyzeBoard(
   auth: HnyTricksAuthorization,
@@ -91,9 +138,33 @@ export async function analyzeBoard(
         `queries/${queryPanel.dataset}/${queryPanel.query_id}`
       );
 
+      let columns: ColumnInfo[] = [];
+      if (!isFetchError(queryDef)) {
+        // Fetch column information for the dataset
+        const columnsResponse = await fetchFromHoneycombApi<ColumnInfo[]>(
+          {
+            apiKey: auth.apiKey,
+            keyInfo: auth.keyInfo,
+            method: "GET",
+          },
+          `columns/${queryPanel.dataset}`
+        );
+
+        if (!isFetchError(columnsResponse)) {
+          // Extract column names used in the query
+          const usedColumns = extractColumnsFromQuery(queryDef);
+          // Filter to only show columns used in the query
+          // For derived columns, check both key_name and alias
+          columns = columnsResponse.filter((col) =>
+            usedColumns.has(col.key_name) || (col.alias && usedColumns.has(col.alias))
+          );
+        }
+      }
+
       return {
         panel,
         queryDef: isFetchError(queryDef) ? null : queryDef,
+        columns,
         error: isFetchError(queryDef) ? queryDef : null,
       };
     })
@@ -110,6 +181,7 @@ function renderPanels(
   queriesWithDefs: Array<{
     panel: Panel;
     queryDef: QueryDefinition | null;
+    columns: ColumnInfo[];
     error: any;
   }>
 ): Html {
@@ -129,6 +201,7 @@ function renderQueryPanel(
   item: {
     panel: Panel;
     queryDef: QueryDefinition | null;
+    columns: ColumnInfo[];
     error: any;
   },
   index: number
@@ -160,6 +233,7 @@ function renderQueryPanel(
         <div class="query-section">
           <strong>Dataset:</strong> ${queryPanel.dataset}
         </div>
+        ${renderColumns(item.columns)}
         ${renderCalculations(item.queryDef.calculations)}
         ${renderBreakdowns(item.queryDef.breakdowns)}
         ${renderFilters(item.queryDef.filters)}
@@ -170,6 +244,23 @@ function renderQueryPanel(
       </div>
     </details>
   </li>`;
+}
+
+function renderColumns(columns: ColumnInfo[]): Html {
+  if (!columns || columns.length === 0) {
+    return html``;
+  }
+  return html`<div class="query-section">
+    <strong>Columns Used (${columns.length}):</strong>
+    <ul>
+      ${columns.map((col) => {
+        const displayName = col.alias || col.key_name;
+        const isDerived = col.alias && col.expression;
+        const typeInfo = isDerived ? `derived (${col.type})` : col.type;
+        return html`<li><code>${displayName}</code>: ${typeInfo}</li>`;
+      })}
+    </ul>
+  </div>`;
 }
 
 function renderCalculations(calculations?: Array<{ op: string; column?: string }>): Html {
