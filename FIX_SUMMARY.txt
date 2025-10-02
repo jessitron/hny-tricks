@@ -1,0 +1,64 @@
+================================================================================
+FIX SUMMARY: Calculated Fields Now Included in Copy Board Query Analysis
+================================================================================
+
+PROBLEM:
+--------
+When analyzing boards using the copy-board feature, calculated fields (derived 
+columns) were not appearing in the list of columns used by queries. This made 
+it difficult to understand the full dependencies of queries.
+
+ROOT CAUSE:
+-----------
+1. The ColumnInfo type definition was incomplete - missing fields for derived 
+   columns (id, alias, expression)
+2. The column filtering logic only checked 'key_name', but derived columns are 
+   referenced by their 'alias' in queries
+
+SOLUTION:
+---------
+Modified src/copy-board/analyzeBoard.ts to:
+
+1. Enhanced ColumnInfo type to include:
+   - id: Unique identifier for derived columns
+   - alias: The name used to reference derived columns in queries
+   - expression: The formula/expression for derived columns
+
+2. Updated column filtering to check BOTH key_name AND alias:
+   columns = columnsResponse.filter((col) =>
+     usedColumns.has(col.key_name) || (col.alias && usedColumns.has(col.alias))
+   );
+
+3. Improved display to:
+   - Show the alias for derived columns (not the internal key_name)
+   - Mark derived columns as "derived (type)" for clarity
+
+TESTING:
+--------
+✅ Created comprehensive unit tests (test/analyzeBoard.test.ts)
+✅ All new tests pass (4/4)
+✅ TypeScript compilation successful
+✅ No breaking changes to existing functionality
+
+IMPACT:
+-------
+Before: Queries showed incomplete column lists, missing calculated fields
+After:  All columns including calculated fields are displayed and clearly marked
+
+Example:
+  Before: Columns Used (2): duration, status_code
+  After:  Columns Used (3): duration, status_code, error_rate: derived (float)
+
+FILES MODIFIED:
+---------------
+- src/copy-board/analyzeBoard.ts (main implementation)
+- src/copy-board/analyzeBoard.js (compiled output)
+
+FILES ADDED:
+------------
+- test/analyzeBoard.test.ts (unit tests)
+- CALCULATED_FIELDS_FIX.md (detailed technical documentation)
+- CHANGES_SUMMARY.md (updated with this fix)
+- FIX_SUMMARY.txt (this file)
+
+================================================================================
